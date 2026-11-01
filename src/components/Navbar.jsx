@@ -8,7 +8,6 @@ import {
   Coins,
   Volume2,
   VolumeX,
-  Tv,
   Sparkles,
   RotateCcw,
 } from 'lucide-react';
@@ -19,8 +18,6 @@ export default function Navbar({
   setCurrentView,
   soundEnabled,
   setSoundEnabled,
-  crtEnabled,
-  setCrtEnabled,
   triggerCelebration,
   resetData,
 }) {
@@ -28,7 +25,7 @@ export default function Navbar({
     { id: 'leaderboard', label: 'LEADERBOARD', icon: Trophy, isLive: true },
     { id: 'admin', label: 'OPERATOR', icon: LayoutDashboard },
     { id: 'events', label: 'EVENTS', icon: Calendar },
-    { id: 'teams', label: 'TEAMS', icon: Users },
+    { id: 'teams', label: 'CREWS', icon: Users },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
     { id: 'scoring', label: 'SCORING', icon: Coins },
   ];
@@ -43,41 +40,36 @@ export default function Navbar({
     setSoundEnabled(newState);
   };
 
-  const handleCrtToggle = () => {
-    soundFx.play('click');
-    setCrtEnabled(!crtEnabled);
-  };
-
   return (
-    <header className="sticky top-0 z-40 bg-[#121118] border-b-2 border-arcade-border select-none">
+    <header className="sticky top-0 z-40 bg-[#FAF7EE]/95 backdrop-blur-md border-b-3 border-pop-ink select-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-18 py-3">
-          {/* Logo & Arcade Brand */}
+        <div className="flex items-center justify-between h-20 py-3">
+          {/* Studio Brand Logo */}
           <div
             onClick={() => handleNavClick('leaderboard')}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-3.5 cursor-pointer group"
           >
-            {/* Bold Retro Arcade Token Box */}
-            <div className="w-10 h-10 rounded-lg bg-arcade-yellow border-2 border-black shadow-arcade flex items-center justify-center font-arcade text-black font-black text-lg group-hover:-translate-y-0.5 transition-transform">
+            {/* Chunky Pop Mascot Tile */}
+            <div className="w-12 h-12 rounded-2xl bg-pop-yellow border-3 border-pop-ink shadow-pop flex items-center justify-center text-2xl font-black group-hover:-translate-y-1 group-hover:rotate-3 transition-transform">
               👾
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-arcade text-base sm:text-lg tracking-wider text-arcade-white group-hover:text-arcade-yellow transition-colors">
+                <span className="font-bungee text-xl sm:text-2xl tracking-wide text-pop-ink group-hover:text-pop-purple transition-colors">
                   FUNTOPIA
                 </span>
-                <span className="px-1.5 py-0.5 rounded bg-arcade-pink text-white font-pixel text-[9px] font-bold tracking-widest uppercase">
+                <span className="px-2 py-0.5 rounded-full bg-pop-coral text-white font-arcade text-[9px] font-black tracking-widest uppercase border border-pop-ink shadow-pop-sm">
                   ARCADE
                 </span>
               </div>
-              <p className="text-[10px] font-mono text-arcade-muted tracking-wider hidden sm:block">
-                CHAMPIONSHIP LEADERBOARD
+              <p className="text-[11px] font-mono text-pop-muted tracking-wider hidden sm:block font-bold">
+                CHAMPIONSHIP CIRCUIT • INDIE EDITION
               </p>
             </div>
           </div>
 
-          {/* Navigation Links (Tactile Solid Tabs) */}
-          <nav className="hidden md:flex items-center gap-1 bg-[#1a1923] p-1.5 rounded-lg border border-arcade-border">
+          {/* Navigation Pills (Color-blocked) */}
+          <nav className="hidden md:flex items-center gap-1.5 bg-pop-butter p-1.5 rounded-2xl border-2 border-pop-ink shadow-pop-sm">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentView === item.id;
@@ -85,63 +77,50 @@ export default function Navbar({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-display font-bold tracking-wider transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
                     isActive
-                      ? 'bg-arcade-yellow text-black border border-black shadow-arcade-sm'
-                      : 'text-arcade-muted hover:text-arcade-white hover:bg-[#252332]'
+                      ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
+                      : 'text-pop-ink hover:bg-white/80'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-4 h-4" />
                   <span>{item.label}</span>
                   {item.isLive && (
-                    <span className="w-2 h-2 rounded-full bg-arcade-pink animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-pop-coral animate-ping" />
                   )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Arcade Utility Deck */}
+          {/* Utility Controls */}
           <div className="flex items-center gap-2">
-            {/* Celebration Confetti Blast */}
+            {/* Celebration Confetti */}
             <button
               onClick={() => {
                 soundFx.play('fanfare');
                 triggerCelebration();
               }}
-              title="Trigger Winner Celebration"
-              className="p-2 rounded-lg bg-[#1e1c27] border border-arcade-border text-arcade-yellow hover:bg-[#2b2838] transition-all"
+              title="Winner Celebration Fanfare"
+              className="p-2.5 rounded-xl bg-pop-coral text-white border-2 border-pop-ink shadow-pop-sm hover:-translate-y-0.5 active:translate-y-0.5 transition-all"
             >
-              <Sparkles className="w-4 h-4" />
-            </button>
-
-            {/* CRT Scanline Toggle */}
-            <button
-              onClick={handleCrtToggle}
-              title={crtEnabled ? 'CRT Scanlines On' : 'CRT Scanlines Off'}
-              className={`p-2 rounded-lg border transition-all ${
-                crtEnabled
-                  ? 'bg-arcade-cyan text-black border-black font-bold'
-                  : 'bg-[#1e1c27] border-arcade-border text-arcade-muted hover:text-white'
-              }`}
-            >
-              <Tv className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 text-pop-yellow" />
             </button>
 
             {/* Sound Toggle */}
             <button
               onClick={handleSoundToggle}
-              title={soundEnabled ? '8-Bit Audio On' : '8-Bit Audio Off'}
-              className={`p-2 rounded-lg border transition-all ${
+              title={soundEnabled ? '8-Bit Synth SFX Enabled' : 'Muted'}
+              className={`p-2.5 rounded-xl border-2 border-pop-ink shadow-pop-sm transition-all ${
                 soundEnabled
-                  ? 'bg-arcade-pink text-white border-black font-bold'
-                  : 'bg-[#1e1c27] border-arcade-border text-arcade-muted hover:text-white'
+                  ? 'bg-pop-purple text-white'
+                  : 'bg-white text-pop-muted hover:bg-pop-butter'
               }`}
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             </button>
 
-            {/* Reset Seed State */}
+            {/* Reset Data */}
             <button
               onClick={() => {
                 if (window.confirm('Reset championship data to original seed?')) {
@@ -150,15 +129,15 @@ export default function Navbar({
                 }
               }}
               title="Reset Sample Data"
-              className="p-2 rounded-lg bg-[#1e1c27] border border-arcade-border text-arcade-muted hover:text-red-400 transition-all"
+              className="p-2.5 rounded-xl bg-white border-2 border-pop-ink shadow-pop-sm text-pop-muted hover:text-pop-coral transition-all"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Mobile Nav Row */}
-        <div className="flex md:hidden items-center gap-1 py-2 border-t border-arcade-border overflow-x-auto">
+        {/* Mobile Navigation Row */}
+        <div className="flex md:hidden items-center gap-1 py-2 border-t-2 border-pop-ink/20 overflow-x-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -166,13 +145,13 @@ export default function Navbar({
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded text-[11px] font-display font-bold whitespace-nowrap ${
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-display font-black whitespace-nowrap ${
                   isActive
-                    ? 'bg-arcade-yellow text-black'
-                    : 'text-arcade-muted hover:text-white'
+                    ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink'
+                    : 'text-pop-muted hover:text-pop-ink'
                 }`}
               >
-                <Icon className="w-3 h-3" />
+                <Icon className="w-3.5 h-3.5" />
                 <span>{item.label}</span>
               </button>
             );

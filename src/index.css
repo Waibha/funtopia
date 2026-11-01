@@ -4,71 +4,54 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
-    background-color: #0c0b10;
-    color: #f4f4f6;
+    background-color: #FAF7EE;
+    color: #180A28;
     font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Crisp Arcade Scrollbar */
+  /* Retro Pop Ivory Scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: #111016;
+    background: #F2EDE0;
   }
   ::-webkit-scrollbar-thumb {
-    background: #2a2736;
-    border-radius: 2px;
+    background: #180A28;
+    border-radius: 4px;
+    border: 2px solid #F2EDE0;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #ffe600;
+    background: #FF2A6D;
   }
 }
 
 @layer components {
-  /* Tactile Solid Arcade Buttons */
-  .arcade-btn-yellow {
-    @apply bg-arcade-yellow text-black font-display font-black text-xs tracking-wider uppercase px-4 py-2.5 rounded-lg border-2 border-black shadow-arcade transition-all duration-150 active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-yellow-300;
+  /* Tactile Retro Pop Buttons */
+  .btn-pop-yellow {
+    @apply bg-pop-yellow text-pop-ink font-display font-black text-xs sm:text-sm tracking-wider uppercase px-4 py-2.5 rounded-xl border-2 border-pop-ink shadow-pop transition-all duration-150 hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-x-1 active:translate-y-1 active:shadow-none;
   }
 
-  .arcade-btn-pink {
-    @apply bg-arcade-pink text-white font-display font-black text-xs tracking-wider uppercase px-4 py-2.5 rounded-lg border-2 border-black shadow-arcade transition-all duration-150 active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-pink-600;
+  .btn-pop-coral {
+    @apply bg-pop-coral text-white font-display font-black text-xs sm:text-sm tracking-wider uppercase px-4 py-2.5 rounded-xl border-2 border-pop-ink shadow-pop transition-all duration-150 hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-x-1 active:translate-y-1 active:shadow-none;
   }
 
-  .arcade-btn-cyan {
-    @apply bg-arcade-cyan text-black font-display font-black text-xs tracking-wider uppercase px-4 py-2.5 rounded-lg border-2 border-black shadow-arcade transition-all duration-150 active:translate-x-1 active:translate-y-1 active:shadow-none hover:bg-cyan-300;
+  .btn-pop-purple {
+    @apply bg-pop-purple text-white font-display font-black text-xs sm:text-sm tracking-wider uppercase px-4 py-2.5 rounded-xl border-2 border-pop-ink shadow-pop transition-all duration-150 hover:-translate-y-0.5 hover:shadow-pop-lg active:translate-x-1 active:translate-y-1 active:shadow-none;
   }
 
-  .arcade-btn-ghost {
-    @apply bg-arcade-surface text-arcade-white font-display font-bold text-xs tracking-wider px-3.5 py-2 rounded-lg border border-arcade-border hover:bg-arcade-elevated hover:border-arcade-muted transition-all active:translate-y-0.5;
+  .btn-pop-white {
+    @apply bg-white text-pop-ink font-display font-bold text-xs sm:text-sm tracking-wider px-3.5 py-2 rounded-xl border-2 border-pop-ink shadow-pop-sm hover:bg-pop-yellow-light transition-all active:translate-y-0.5 active:shadow-none;
   }
 
-  /* Clean Solid Arcade Panel Card */
-  .arcade-card {
-    @apply bg-arcade-surface rounded-xl border border-arcade-border shadow-arcade-sm;
-  }
-}
-
-@layer utilities {
-  /* Subtle CRT Scanline mode (optional toggle) */
-  .crt-active {
-    position: relative;
-  }
-  .crt-active::after {
-    content: " ";
-    display: block;
-    position: fixed;
-    top: 0; left: 0; bottom: 0; right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-    z-index: 9999;
-    background-size: 100% 3px;
-    pointer-events: none;
-    opacity: 0.6;
+  /* Premium Pop Arcade Card Surface */
+  .pop-card {
+    @apply bg-white rounded-2xl border-3 border-pop-ink shadow-pop;
   }
 }

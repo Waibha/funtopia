@@ -17,7 +17,6 @@ export default function App() {
   const [data, setData] = useState(() => loadStoredData());
   const [currentView, setCurrentView] = useState('leaderboard');
   const [soundEnabled, setSoundEnabled] = useState(soundFx.enabled);
-  const [crtEnabled, setCrtEnabled] = useState(false);
   const [quickScoreTeamId, setQuickScoreTeamId] = useState(null);
 
   // Sync state changes to localStorage
@@ -39,10 +38,10 @@ export default function App() {
   const triggerCelebration = () => {
     try {
       confetti({
-        particleCount: 140,
-        spread: 90,
+        particleCount: 150,
+        spread: 100,
         origin: { y: 0.6 },
-        colors: ['#FF007F', '#00F0FF', '#FFE600', '#A855F7', '#FF5E3A', '#10B981'],
+        colors: ['#F5EE00', '#FF2A6D', '#7928CA', '#FF6B00', '#00E5FF', '#180A28'],
       });
     } catch (e) {
       console.warn('Confetti trigger error', e);
@@ -133,8 +132,8 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#0c0b10] text-arcade-white flex flex-col relative selection:bg-arcade-yellow selection:text-black ${crtEnabled ? 'crt-active' : ''}`}>
-      {/* Clean Dark Arcade Chassis Texture */}
+    <div className="min-h-screen bg-[#FAF7EE] text-[#180A28] flex flex-col relative selection:bg-pop-yellow selection:text-pop-ink font-sans">
+      {/* Warm Ivory Graphic Texture */}
       <CosmicBackground />
 
       {/* Main App Content Container */}
@@ -145,8 +144,6 @@ export default function App() {
           setCurrentView={setCurrentView}
           soundEnabled={soundEnabled}
           setSoundEnabled={setSoundEnabled}
-          crtEnabled={crtEnabled}
-          setCrtEnabled={setCrtEnabled}
           triggerCelebration={triggerCelebration}
           resetData={handleResetData}
           activeEvent={activeEvent}
@@ -221,18 +218,18 @@ export default function App() {
           )}
         </main>
 
-        {/* Arcade Studio Footer */}
-        <footer className="border-t border-arcade-border py-5 bg-[#121118] mt-12 text-center text-xs font-mono text-arcade-muted select-none">
+        {/* Studio Footer */}
+        <footer className="border-t-3 border-pop-ink py-6 bg-pop-butter mt-16 text-center text-xs font-mono text-pop-muted select-none">
           <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="font-arcade text-arcade-yellow text-[10px]">FUNTOPIA</span>
-              <span>/</span>
-              <span>RETRO ARCADE CHAMPIONSHIP</span>
-            </div>
-            <div className="flex items-center gap-3 text-[11px]">
-              <span className="text-zinc-500">BRANCH: person-1/ui-foundation</span>
+              <span className="font-bungee text-pop-ink text-sm">FUNTOPIA</span>
               <span>•</span>
-              <span className="text-emerald-400 font-bold">READY PLAYER 1</span>
+              <span className="font-bold text-pop-ink">PREMIUM RETRO POP ARCADE</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs font-bold text-pop-ink">
+              <span>BRANCH: person-1/ui-foundation</span>
+              <span>•</span>
+              <span className="text-pop-purple font-black">READY PLAYER 1</span>
             </div>
           </div>
         </footer>

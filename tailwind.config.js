@@ -7,19 +7,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        arcade: {
-          bg: '#0c0b10',          // Deep charcoal / near-black
-          surface: '#15141c',     // Clean panel background
-          elevated: '#1e1c27',    // Card / slot surface
-          border: '#2c293a',      // Crisp structural border
-          pink: '#ff007f',        // Bold hot magenta
-          purple: '#7928ca',      // Bold arcade purple
-          yellow: '#ffe600',      // High-contrast arcade yellow
-          orange: '#ff6b00',      // Arcade blazing orange
-          cyan: '#00f0ff',        // Vibrant arcade cyan
-          green: '#10b981',       // High-score green
-          white: '#f4f4f6',       // Primary text
-          muted: '#8b8899',       // Secondary text
+        pop: {
+          canvas: '#FAF7EE',        // Primary warm ivory / pale butter
+          butter: '#F5EEDB',        // Subdued ivory tint
+          surface: '#FFFFFF',       // Clean card surface
+          card: '#FFFFFF',
+          ink: '#180A28',           // Deep aubergine dark ink
+          purple: '#7928CA',        // Electric purple
+          'purple-light': '#F3E8FF',
+          coral: '#FF2A6D',         // Hot coral pink
+          'coral-light': '#FFE4EC',
+          orange: '#FF6B00',        // Vibrant tangerine orange
+          'orange-light': '#FFF0E5',
+          yellow: '#F5EE00',        // Acid lemon yellow
+          'yellow-light': '#FEFBC8',
+          cyan: '#00E5FF',          // Sharp pop cyan
+          'cyan-light': '#E0FBFF',
+          green: '#05D179',         // Punchy pop green
+          border: '#180A28',        // High-contrast ink border
+          muted: '#6B5E78',         // Secondary ink
         },
       },
       fontFamily: {
@@ -31,12 +37,13 @@ export default {
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       boxShadow: {
-        'arcade-sm': '2px 2px 0px #000',
-        'arcade': '4px 4px 0px #000',
-        'arcade-lg': '6px 6px 0px #000',
-        'arcade-yellow': '4px 4px 0px #ffe600',
-        'arcade-pink': '4px 4px 0px #ff007f',
-        'arcade-cyan': '4px 4px 0px #00f0ff',
+        'pop-sm': '2px 2px 0px #180A28',
+        'pop': '4px 4px 0px #180A28',
+        'pop-lg': '6px 6px 0px #180A28',
+        'pop-xl': '8px 8px 0px #180A28',
+        'pop-yellow': '4px 4px 0px #F5EE00',
+        'pop-coral': '4px 4px 0px #FF2A6D',
+        'pop-purple': '4px 4px 0px #7928CA',
       },
       keyframes: {
         'marquee': {

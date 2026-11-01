@@ -75,37 +75,37 @@ export default function ScoringManagement({
     .reverse();
 
   return (
-    <div className="py-6 space-y-6 max-w-7xl mx-auto">
+    <div className="py-8 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <Coins className="w-5 h-5 text-arcade-yellow" />
-          <h1 className="font-bungee text-2xl sm:text-3xl text-white">
+          <Coins className="w-5 h-5 text-pop-coral" />
+          <h1 className="font-bungee text-2xl sm:text-3xl text-pop-ink">
             SCORING TERMINAL
           </h1>
         </div>
-        <p className="text-arcade-muted font-sans text-xs sm:text-sm">
-          Dispatch point rewards, issue rule penalties, and audit the live verified ledger.
+        <p className="text-pop-muted font-sans text-xs sm:text-sm font-medium">
+          Dispatch point rewards, issue rule deductions, and audit the live verified ledger.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* DISPATCH TERMINAL (1 col) */}
-        <div className="bg-[#15141c] border-2 border-black rounded-xl p-5 shadow-arcade flex flex-col justify-between">
+        <div className="bg-white border-3 border-pop-ink rounded-3xl p-6 shadow-pop flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4 border-b border-arcade-border pb-2.5">
-              <span className="font-arcade text-xs text-white">SCORE DISPATCH</span>
-              <div className="flex items-center gap-1 bg-[#0e0d14] p-1 rounded border border-arcade-border text-xs font-mono">
+            <div className="flex items-center justify-between mb-5 border-b-2 border-pop-ink pb-3">
+              <span className="font-arcade text-xs text-pop-ink font-black">DISPATCH PANEL</span>
+              <div className="flex items-center gap-1 bg-pop-butter p-1 rounded-xl border-2 border-pop-ink text-xs font-mono">
                 <button
                   type="button"
                   onClick={() => {
                     soundFx.play('click');
                     setIsDeduction(false);
                   }}
-                  className={`px-2.5 py-1 rounded font-bold transition-colors ${
+                  className={`px-3 py-1 rounded-lg font-black transition-all ${
                     !isDeduction
-                      ? 'bg-arcade-yellow text-black'
-                      : 'text-arcade-muted hover:text-white'
+                      ? 'bg-pop-yellow text-pop-ink border border-pop-ink shadow-pop-sm'
+                      : 'text-pop-muted hover:text-pop-ink'
                   }`}
                 >
                   AWARD
@@ -116,10 +116,10 @@ export default function ScoringManagement({
                     soundFx.play('click');
                     setIsDeduction(true);
                   }}
-                  className={`px-2.5 py-1 rounded font-bold transition-colors ${
+                  className={`px-3 py-1 rounded-lg font-black transition-all ${
                     isDeduction
-                      ? 'bg-red-600 text-white'
-                      : 'text-arcade-muted hover:text-white'
+                      ? 'bg-pop-coral text-white border border-pop-ink shadow-pop-sm'
+                      : 'text-pop-muted hover:text-pop-ink'
                   }`}
                 >
                   DEDUCT
@@ -127,13 +127,13 @@ export default function ScoringManagement({
               </div>
             </div>
 
-            <form onSubmit={handleScoreSubmit} className="space-y-3.5 text-xs font-mono">
+            <form onSubmit={handleScoreSubmit} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">RECIPIENT CREW</label>
+                <label className="block text-pop-ink mb-1 font-black">RECIPIENT CREW</label>
                 <select
                   value={selectedTeamId}
                   onChange={(e) => setSelectedTeamId(e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow font-display font-bold"
+                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-display font-black text-sm focus:outline-none focus:border-pop-coral"
                 >
                   {data.teams.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -144,11 +144,11 @@ export default function ScoringManagement({
               </div>
 
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">DISCIPLINE</label>
+                <label className="block text-pop-ink mb-1 font-black">DISCIPLINE</label>
                 <select
                   value={selectedGameId}
                   onChange={(e) => setSelectedGameId(e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow font-display font-bold"
+                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-display font-black text-sm focus:outline-none focus:border-pop-coral"
                 >
                   {data.games.map((g) => (
                     <option key={g.id} value={g.id}>
@@ -158,28 +158,28 @@ export default function ScoringManagement({
                 </select>
               </div>
 
-              {/* Point Value & Quick Chips */}
+              {/* Point Value & Quick Increment Chips */}
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">
+                <label className="block text-pop-ink mb-1 font-black">
                   POINTS ({isDeduction ? 'PENALTY -' : 'AWARD +'})
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">🪙</span>
+                  <span className="text-2xl">🪙</span>
                   <input
                     type="number"
                     min={1}
                     required
                     value={pointsDelta}
                     onChange={(e) => setPointsDelta(Number(e.target.value))}
-                    className={`w-full px-3 py-2 rounded bg-[#0e0d14] border text-base font-mono font-black focus:outline-none ${
+                    className={`w-full px-3.5 py-2 rounded-xl bg-pop-canvas border-2 text-xl font-mono font-black focus:outline-none ${
                       isDeduction
-                        ? 'border-red-500 text-red-400'
-                        : 'border-arcade-yellow text-arcade-yellow'
+                        ? 'border-pop-coral text-pop-coral'
+                        : 'border-pop-ink text-pop-ink'
                     }`}
                   />
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
                   {quickPills.map((val) => (
                     <button
                       type="button"
@@ -188,7 +188,7 @@ export default function ScoringManagement({
                         soundFx.play('click');
                         setPointsDelta(val);
                       }}
-                      className="px-2 py-1 rounded bg-[#0e0d14] hover:bg-white/10 border border-arcade-border text-white text-[11px] font-mono font-bold"
+                      className="px-2.5 py-1 rounded-lg bg-pop-butter hover:bg-pop-yellow-light border-2 border-pop-ink text-pop-ink text-xs font-mono font-black shadow-pop-sm transition-all"
                     >
                       {isDeduction ? `-${val}` : `+${val}`}
                     </button>
@@ -197,71 +197,71 @@ export default function ScoringManagement({
               </div>
 
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">REASON</label>
+                <label className="block text-pop-ink mb-1 font-black">REASON</label>
                 <input
                   type="text"
                   required
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="e.g. 1st Place Podium Finish"
-                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
+                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-medium focus:outline-none focus:border-pop-coral"
                 />
               </div>
 
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">OPERATOR</label>
+                <label className="block text-pop-ink mb-1 font-black">OPERATOR</label>
                 <input
                   type="text"
                   value={adminName}
                   onChange={(e) => setAdminName(e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
+                  className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className={`w-full py-2.5 rounded font-display font-black text-xs tracking-wider uppercase border-2 border-black shadow-arcade transition-all ${
+                className={`w-full py-3 rounded-2xl font-display font-black text-xs sm:text-sm tracking-wider uppercase border-3 border-pop-ink shadow-pop transition-all hover:-translate-y-0.5 active:translate-y-1 ${
                   isDeduction
-                    ? 'bg-red-600 text-white hover:bg-red-500'
-                    : 'bg-arcade-yellow text-black hover:bg-yellow-300'
+                    ? 'bg-pop-coral text-white hover:bg-red-600'
+                    : 'bg-pop-yellow text-pop-ink hover:bg-yellow-300'
                 }`}
               >
-                {isDeduction ? `DEDUCT -${pointsDelta} PTS` : `AWARD +${pointsDelta} PTS`}
+                {isDeduction ? `DEDUCT -${pointsDelta} PTS` : `DISPATCH +${pointsDelta} PTS`}
               </button>
             </form>
           </div>
         </div>
 
         {/* VERIFIED LEDGER TABLE (2 cols) */}
-        <div className="lg:col-span-2 bg-[#15141c] border-2 border-black rounded-xl p-5 shadow-arcade flex flex-col justify-between">
+        <div className="lg:col-span-2 bg-white border-3 border-pop-ink rounded-3xl p-6 shadow-pop flex flex-col justify-between">
           <div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 border-b border-arcade-border pb-2.5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 border-b-2 border-pop-ink pb-3">
               <div>
-                <span className="font-arcade text-xs text-white">VERIFIED AUDIT LEDGER</span>
-                <p className="text-[11px] font-mono text-arcade-muted mt-0.5">
-                  Showing {filteredTransactions.length} of {data.transactions.length} records
+                <span className="font-arcade text-xs text-pop-ink font-black">VERIFIED AUDIT LEDGER</span>
+                <p className="text-xs font-mono text-pop-muted mt-0.5 font-bold">
+                  Showing {filteredTransactions.length} of {data.transactions.length} entries
                 </p>
               </div>
 
               {/* Search & Team Filter */}
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:w-44">
-                  <Search className="w-3.5 h-3.5 text-arcade-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <div className="relative flex-1 sm:w-48">
+                  <Search className="w-3.5 h-3.5 text-pop-muted absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    className="w-full pl-8 pr-2.5 py-1.5 rounded bg-[#0e0d14] border border-arcade-border text-xs font-mono text-white focus:outline-none"
+                    placeholder="Search ledger..."
+                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono text-pop-ink font-bold focus:outline-none"
                   />
                 </div>
 
                 <select
                   value={filterTeam}
                   onChange={(e) => setFilterTeam(e.target.value)}
-                  className="px-2.5 py-1.5 rounded bg-[#0e0d14] border border-arcade-border text-xs font-mono text-white focus:outline-none"
+                  className="px-3 py-1.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono text-pop-ink font-bold focus:outline-none"
                 >
-                  <option value="all">All Teams</option>
+                  <option value="all">All Crews</option>
                   {data.teams.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.name}
@@ -272,7 +272,7 @@ export default function ScoringManagement({
             </div>
 
             {/* Transaction Rows */}
-            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
               {filteredTransactions.map((tx) => {
                 const team = data.teams.find((t) => t.id === tx.teamId);
                 const game = data.games.find((g) => g.id === tx.gameId);
@@ -281,29 +281,29 @@ export default function ScoringManagement({
                 return (
                   <div
                     key={tx.id}
-                    className="p-3 rounded-lg bg-[#100f16] border border-arcade-border flex items-center justify-between gap-3 text-xs font-mono"
+                    className="p-3.5 rounded-2xl bg-pop-butter border-2 border-pop-ink flex items-center justify-between gap-3 text-xs font-mono"
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0 border border-black"
-                        style={{ backgroundColor: team?.color || '#FF007F' }}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border-2 border-pop-ink shadow-pop-sm"
+                        style={{ backgroundColor: team?.color || '#FF2A6D' }}
                       >
                         {team?.avatar}
                       </div>
 
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white font-display">
+                          <span className="font-black text-pop-ink font-display text-sm">
                             {team?.name || 'Unknown'}
                           </span>
-                          <span className="text-[10px] text-arcade-muted">
+                          <span className="text-[11px] text-pop-muted font-bold">
                             in {game?.name || 'Discipline'}
                           </span>
                         </div>
-                        <p className="text-zinc-300 text-xs italic mt-0.5">
+                        <p className="text-pop-ink text-xs italic mt-0.5 font-medium">
                           "{tx.reason}"
                         </p>
-                        <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
+                        <div className="text-[10px] text-pop-muted flex items-center gap-2 mt-0.5 font-bold">
                           <span>By: {tx.admin}</span>
                           <span>•</span>
                           <span>{new Date(tx.timestamp).toLocaleTimeString()}</span>
@@ -313,10 +313,10 @@ export default function ScoringManagement({
 
                     <div className="flex items-center gap-3 shrink-0">
                       <span
-                        className={`text-sm font-black font-mono px-2 py-0.5 rounded ${
+                        className={`text-sm font-black font-mono px-2.5 py-1 rounded-xl border-2 border-pop-ink shadow-pop-sm ${
                           isPositive
-                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                            : 'bg-red-950 text-red-400 border border-red-800'
+                            ? 'bg-pop-green text-pop-ink'
+                            : 'bg-pop-coral text-white'
                         }`}
                       >
                         {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
@@ -324,8 +324,8 @@ export default function ScoringManagement({
 
                       <button
                         onClick={() => handleRollback(tx.id)}
-                        title="Rollback Transaction"
-                        className="p-1.5 rounded bg-[#201d2a] hover:bg-red-950 hover:text-red-400 text-zinc-400 transition-colors"
+                        title="Revert Transaction"
+                        className="p-2 rounded-xl bg-white hover:bg-pop-coral hover:text-white text-pop-ink border-2 border-pop-ink shadow-pop-sm transition-all"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                       </button>
@@ -335,8 +335,8 @@ export default function ScoringManagement({
               })}
 
               {filteredTransactions.length === 0 && (
-                <div className="text-center py-10 text-zinc-500 font-mono text-xs">
-                  No matching transactions in ledger.
+                <div className="text-center py-12 text-pop-muted font-mono text-xs font-bold">
+                  No matching transactions found.
                 </div>
               )}
             </div>

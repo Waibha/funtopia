@@ -76,24 +76,24 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
   };
 
   return (
-    <div className="py-6 space-y-6 max-w-7xl mx-auto">
+    <div className="py-8 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Gamepad2 className="w-5 h-5 text-arcade-purple" />
-            <h1 className="font-bungee text-2xl sm:text-3xl text-white">
+            <Gamepad2 className="w-5 h-5 text-pop-orange" />
+            <h1 className="font-bungee text-2xl sm:text-3xl text-pop-ink">
               DISCIPLINE CATALOG
             </h1>
           </div>
-          <p className="text-arcade-muted font-sans text-xs sm:text-sm">
-            Configure arcade game cartridges, point weights, and rotation status.
+          <p className="text-pop-muted font-sans text-xs sm:text-sm font-medium">
+            Configure arcade match cartridges, point weight multipliers, and active rotation status.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="arcade-btn-yellow flex items-center gap-1.5"
+          className="btn-pop-yellow flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           <span>NEW DISCIPLINE</span>
@@ -101,100 +101,99 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
       </div>
 
       {/* Cartridge Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {games.map((game) => (
           <div
             key={game.id}
-            className={`rounded-xl p-5 border-2 border-black flex flex-col justify-between transition-all duration-150 ${
+            className={`rounded-3xl p-6 border-3 border-pop-ink flex flex-col justify-between transition-all duration-200 ${
               game.isActive
-                ? 'bg-[#15141c] shadow-arcade-sm'
-                : 'bg-[#111016] opacity-60 border-zinc-800'
+                ? 'bg-white shadow-pop hover:-translate-y-1'
+                : 'bg-pop-butter/60 opacity-60 border-pop-ink/40'
             }`}
           >
             <div>
-              <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-[#201d2a] border border-black flex items-center justify-center text-2xl">
+                  <div className="w-14 h-14 rounded-2xl bg-pop-butter border-2 border-pop-ink shadow-pop-sm flex items-center justify-center text-3xl">
                     <span>{game.icon}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black text-arcade-muted font-bold">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-pop-ink text-white font-black">
                       {game.category}
                     </span>
-                    <h3 className="font-display font-black text-base text-white mt-1">
+                    <h3 className="font-display font-black text-lg text-pop-ink mt-1">
                       {game.name}
                     </h3>
                   </div>
                 </div>
 
-                {/* Active / Inactive switch */}
                 <button
                   onClick={() => {
                     soundFx.play('click');
                     onToggleGameActive(game.id);
                   }}
-                  className={`p-1.5 rounded border border-black font-mono text-xs font-bold ${
+                  className={`p-2 rounded-xl border-2 border-pop-ink font-mono text-xs font-black shadow-pop-sm transition-all ${
                     game.isActive
-                      ? 'bg-emerald-500 text-black'
-                      : 'bg-zinc-800 text-zinc-400'
+                      ? 'bg-pop-green text-pop-ink'
+                      : 'bg-pop-butter text-pop-muted'
                   }`}
                   title={game.isActive ? 'Deactivate' : 'Activate'}
                 >
-                  <Power className="w-3.5 h-3.5" />
+                  <Power className="w-4 h-4" />
                 </button>
               </div>
 
-              <p className="text-xs text-arcade-muted font-sans mb-3 line-clamp-2">
+              <p className="text-xs text-pop-muted font-sans mb-4 line-clamp-2 font-medium">
                 {game.description}
               </p>
 
               {/* Point Specs */}
-              <div className="grid grid-cols-3 gap-2 bg-[#0e0d14] p-2.5 rounded border border-arcade-border mb-3 text-center font-mono">
+              <div className="grid grid-cols-3 gap-2 bg-pop-butter p-3 rounded-2xl border-2 border-pop-ink mb-4 text-center font-mono">
                 <div>
-                  <span className="text-[9px] text-zinc-500 block">BASE PTS</span>
-                  <span className="text-xs font-black text-arcade-yellow">
+                  <span className="text-[9px] text-pop-muted block font-bold">BASE PTS</span>
+                  <span className="text-sm font-black text-pop-coral">
                     {game.basePoints}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-zinc-500 block">MULTIPLIER</span>
-                  <span className="text-xs font-black text-white">
+                  <span className="text-[9px] text-pop-muted block font-bold">MULTIPLIER</span>
+                  <span className="text-sm font-black text-pop-ink">
                     {game.multiplier}x
                   </span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-zinc-500 block">ROUNDS</span>
-                  <span className="text-xs font-black text-arcade-muted">
+                  <span className="text-[9px] text-pop-muted block font-bold">ROUNDS</span>
+                  <span className="text-sm font-black text-pop-purple">
                     {game.maxRounds}
                   </span>
                 </div>
               </div>
 
-              <p className="text-[11px] font-mono text-zinc-400 italic mb-4 truncate">
+              <p className="text-xs font-mono text-pop-ink italic mb-4 truncate font-medium">
                 Rule: {game.rules}
               </p>
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-arcade-border">
+            <div className="flex items-center justify-between pt-4 border-t-2 border-pop-ink/20">
               <span
-                className={`text-[10px] font-mono font-bold ${
-                  game.isActive ? 'text-emerald-400' : 'text-zinc-500'
+                className={`text-xs font-mono font-black ${
+                  game.isActive ? 'text-pop-green' : 'text-pop-muted'
                 }`}
               >
                 {game.isActive ? '● IN ROTATION' : '○ BENCHED'}
               </span>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleOpenEdit(game)}
-                  className="p-1.5 rounded bg-[#201d2a] hover:bg-[#2c283a] text-white"
+                  className="p-2 rounded-xl bg-pop-butter hover:bg-pop-yellow-light text-pop-ink border border-pop-ink font-bold transition-colors"
                   title="Edit Discipline"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => handleDelete(game.id, game.name)}
-                  className="p-1.5 rounded bg-red-950/40 hover:bg-red-900/60 text-red-400"
+                  className="p-2 rounded-xl bg-pop-coral-light hover:bg-pop-coral hover:text-white text-pop-coral border border-pop-ink font-bold transition-colors"
                   title="Remove Discipline"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -207,40 +206,40 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
 
       {/* CREATE / EDIT GAME MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85">
-          <div className="relative w-full max-w-md bg-[#15141c] border-3 border-black rounded-xl p-6 shadow-arcade-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pop-ink/70 backdrop-blur-xs">
+          <div className="relative w-full max-w-md bg-white border-4 border-pop-ink rounded-3xl p-6 sm:p-8 shadow-pop-xl max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 text-arcade-muted hover:text-white font-mono text-base"
+              className="absolute top-4 right-4 text-pop-muted hover:text-pop-ink font-mono text-lg font-black"
             >
               ✕
             </button>
 
-            <h2 className="font-bungee text-xl text-white mb-1">
-              {editingGame ? 'EDIT DISCIPLINE' : 'REGISTER DISCIPLINE'}
+            <h2 className="font-bungee text-2xl text-pop-ink mb-1">
+              {editingGame ? 'EDIT DISCIPLINE' : 'NEW DISCIPLINE'}
             </h2>
-            <p className="text-xs text-arcade-muted font-sans mb-4">
-              Configure base score, multiplier, and category.
+            <p className="text-xs text-pop-muted font-sans mb-4 font-bold">
+              Configure base points, multiplier, and category.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs font-mono">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-arcade-muted mb-1 font-bold">NAME</label>
+                  <label className="block text-pop-ink mb-1 font-black">NAME</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
+                    className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral"
                   />
                 </div>
                 <div>
-                  <label className="block text-arcade-muted mb-1 font-bold">CATEGORY</label>
+                  <label className="block text-pop-ink mb-1 font-black">CATEGORY</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none"
                   >
                     {categoryOptions.map((c) => (
                       <option key={c} value={c}>
@@ -252,17 +251,17 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
               </div>
 
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">ICON</label>
+                <label className="block text-pop-ink mb-1.5 font-black">ARCADE ICON</label>
                 <div className="flex flex-wrap gap-2">
                   {iconOptions.map((ic) => (
                     <button
                       type="button"
                       key={ic}
                       onClick={() => setFormData({ ...formData, icon: ic })}
-                      className={`w-9 h-9 rounded flex items-center justify-center text-lg border ${
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border-2 border-pop-ink transition-transform ${
                         formData.icon === ic
-                          ? 'bg-arcade-yellow text-black border-black font-bold shadow-arcade-sm'
-                          : 'bg-[#0e0d14] border-arcade-border'
+                          ? 'bg-pop-yellow scale-110 shadow-pop-sm font-black'
+                          : 'bg-pop-butter hover:bg-white'
                       }`}
                     >
                       {ic}
@@ -272,29 +271,29 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
               </div>
 
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">DESCRIPTION</label>
+                <label className="block text-pop-ink mb-1 font-black">DESCRIPTION</label>
                 <textarea
                   rows="2"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-medium focus:outline-none focus:border-pop-coral"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block text-arcade-muted mb-1 font-bold">BASE PTS</label>
+                  <label className="block text-pop-ink mb-1 font-black">BASE PTS</label>
                   <input
                     type="number"
                     min={0}
                     step={10}
                     value={formData.basePoints}
                     onChange={(e) => setFormData({ ...formData, basePoints: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-arcade-muted mb-1 font-bold">MULTIPLIER</label>
+                  <label className="block text-pop-ink mb-1 font-black">MULTIPLIER</label>
                   <input
                     type="number"
                     min={0.5}
@@ -302,43 +301,43 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
                     step={0.25}
                     value={formData.multiplier}
                     onChange={(e) => setFormData({ ...formData, multiplier: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-arcade-muted mb-1 font-bold">MAX ROUNDS</label>
+                  <label className="block text-pop-ink mb-1 font-black">ROUNDS</label>
                   <input
                     type="number"
                     min={1}
                     max={10}
                     value={formData.maxRounds}
                     onChange={(e) => setFormData({ ...formData, maxRounds: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-arcade-muted mb-1 font-bold">RULES</label>
+                <label className="block text-pop-ink mb-1 font-black">RULES</label>
                 <input
                   type="text"
                   value={formData.rules}
                   onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
-                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-arcade-border">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-pop-ink">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded bg-[#201d2a] text-white"
+                  className="px-4 py-2 rounded-xl bg-pop-butter border-2 border-pop-ink text-pop-ink font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="arcade-btn-yellow"
+                  className="btn-pop-yellow"
                 >
                   {editingGame ? 'SAVE DISCIPLINE' : 'REGISTER DISCIPLINE'}
                 </button>

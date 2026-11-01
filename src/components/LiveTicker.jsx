@@ -1,20 +1,19 @@
 import React from 'react';
-import { Radio } from 'lucide-react';
 
 export default function LiveTicker({ activeEvent, transactions, teams, games }) {
   const recent = transactions.slice(-4).reverse();
 
   return (
-    <div className="bg-[#121118] border-b border-arcade-border py-2 overflow-hidden select-none">
+    <div className="bg-pop-butter border-b-2 border-pop-ink py-2 overflow-hidden select-none">
       <div className="max-w-7xl mx-auto px-4 flex items-center">
-        {/* Status Badge */}
-        <div className="flex items-center gap-1.5 bg-arcade-yellow text-black font-arcade text-[10px] px-2.5 py-1 rounded font-bold shrink-0 mr-4 border border-black shadow-arcade-sm">
-          <span className="w-2 h-2 rounded-full bg-black animate-pulse" />
+        {/* Ticker Tag */}
+        <div className="flex items-center gap-1.5 bg-pop-coral text-white font-arcade text-[10px] px-3 py-1 rounded-lg font-black shrink-0 mr-4 border-2 border-pop-ink shadow-pop-sm">
+          <span className="w-2 h-2 rounded-full bg-pop-yellow animate-ping" />
           <span>SCORE FEED</span>
         </div>
 
-        {/* Ticker Stream */}
-        <div className="overflow-hidden whitespace-nowrap flex items-center text-xs font-mono">
+        {/* Marquee Content */}
+        <div className="overflow-hidden whitespace-nowrap flex items-center text-xs font-mono font-bold">
           <div className="inline-flex items-center gap-8 animate-marquee">
             {recent.map((tx) => {
               const team = teams.find((t) => t.id === tx.teamId);
@@ -22,36 +21,36 @@ export default function LiveTicker({ activeEvent, transactions, teams, games }) 
               const isPositive = Number(tx.pointsDelta) >= 0;
 
               return (
-                <div key={tx.id} className="inline-flex items-center gap-2 text-arcade-white">
+                <div key={tx.id} className="inline-flex items-center gap-2 text-pop-ink">
                   <span
-                    className="w-2.5 h-2.5 rounded-sm shrink-0 border border-black"
-                    style={{ backgroundColor: team?.color || '#FF007F' }}
+                    className="w-3 h-3 rounded-md shrink-0 border border-pop-ink"
+                    style={{ backgroundColor: team?.color || '#FF2A6D' }}
                   />
-                  <span className="font-bold">[{team?.tag || 'CREW'}]</span>
-                  <span className="text-arcade-muted">{team?.name}</span>
+                  <span className="font-black">[{team?.tag || 'CREW'}]</span>
+                  <span className="text-pop-purple font-display">{team?.name}</span>
                   <span
-                    className={`font-bold font-mono px-1.5 py-0.2 rounded text-[11px] ${
+                    className={`font-mono text-xs px-2 py-0.5 rounded-md border border-pop-ink ${
                       isPositive
-                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                        : 'bg-red-950 text-red-400 border border-red-800'
+                        ? 'bg-pop-green text-pop-ink font-black shadow-pop-sm'
+                        : 'bg-pop-coral text-white font-black shadow-pop-sm'
                     }`}
                   >
                     {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
                   </span>
-                  <span className="text-arcade-muted">in</span>
-                  <span className="text-arcade-cyan font-bold">{game?.name || 'Match'}</span>
-                  <span className="text-arcade-border">/</span>
+                  <span className="text-pop-muted">in</span>
+                  <span className="text-pop-orange font-display">{game?.name || 'Match'}</span>
+                  <span className="text-pop-ink font-black">✦</span>
                 </div>
               );
             })}
 
-            {/* Event status note */}
-            <div className="inline-flex items-center gap-2 text-arcade-white">
-              <span className="text-arcade-yellow font-bold uppercase">
+            {/* Event note */}
+            <div className="inline-flex items-center gap-2 text-pop-ink">
+              <span className="font-arcade text-xs text-pop-purple uppercase">
                 ARENA: {activeEvent?.name}
               </span>
-              <span className="text-arcade-muted">— Prize: {activeEvent?.prizePool}</span>
-              <span className="text-arcade-border">/</span>
+              <span className="text-pop-muted">— Grand Prize: {activeEvent?.prizePool}</span>
+              <span className="text-pop-ink font-black">✦</span>
             </div>
           </div>
         </div>

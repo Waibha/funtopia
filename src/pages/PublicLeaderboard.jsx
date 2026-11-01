@@ -43,61 +43,64 @@ export default function PublicLeaderboard({
     <div
       className={`transition-all duration-300 ${
         broadcastMode
-          ? 'fixed inset-0 z-50 bg-[#0c0b10] overflow-y-auto p-4 sm:p-8'
-          : 'py-6'
+          ? 'fixed inset-0 z-50 bg-[#FAF7EE] overflow-y-auto p-4 sm:p-8'
+          : 'py-8'
       }`}
     >
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* ========================================================= */}
-        {/* RETRO ARCADE ARENA MARQUEE                                */}
+        {/* RETRO POP CHAMPIONSHIP HERO BANNER                        */}
         {/* ========================================================= */}
-        <div className="bg-[#15141c] border-2 border-black rounded-xl p-5 sm:p-6 shadow-arcade flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className="px-2 py-0.5 rounded bg-arcade-pink text-white font-arcade text-[9px] font-bold tracking-widest uppercase">
-                LIVE COMPETITION
+        <div className="bg-pop-purple rounded-3xl border-3 border-pop-ink p-6 sm:p-8 shadow-pop-lg text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+          {/* Subtle pop dot graphic accent */}
+          <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-pop-coral rounded-full border-3 border-pop-ink opacity-30 pointer-events-none" />
+
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <span className="px-3 py-1 rounded-full bg-pop-yellow text-pop-ink font-arcade text-[10px] font-black uppercase border-2 border-pop-ink shadow-pop-sm">
+                ● LIVE CHAMPIONSHIP
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#201d2a] text-arcade-yellow font-mono text-xs font-bold border border-arcade-border">
+              <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-mono text-xs font-bold border border-white/40">
                 {activeEvent?.code || 'CRC-26'}
               </span>
-              <span className="text-xs font-mono text-arcade-muted">
+              <span className="text-xs font-mono text-purple-200">
                 {activeEvent?.location}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-bungee tracking-wide text-arcade-white">
-              {activeEvent?.name || 'ARCADE CHAMPIONSHIP 2026'}
+            <h1 className="text-3xl sm:text-5xl font-bungee tracking-wide text-pop-yellow drop-shadow-[2px_2px_0px_#180A28]">
+              {activeEvent?.name || 'FUNTOPIA CHAMPIONSHIP'}
             </h1>
-            <p className="text-arcade-muted font-sans text-xs sm:text-sm mt-1 max-w-2xl">
+            <p className="text-purple-100 font-sans text-sm sm:text-base mt-1.5 max-w-2xl font-medium">
               {activeEvent?.description}
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-3 shrink-0 self-stretch md:self-auto justify-end">
+          <div className="flex items-center gap-3 shrink-0 self-stretch md:self-auto justify-end relative z-10">
             <button
               onClick={() => {
                 soundFx.play('fanfare');
                 triggerCelebration();
               }}
-              className="arcade-btn-pink flex items-center gap-1.5"
+              className="btn-pop-yellow flex items-center gap-2"
             >
-              <Sparkles className="w-3.5 h-3.5 text-arcade-yellow" />
+              <Sparkles className="w-4 h-4 text-pop-coral fill-pop-coral" />
               <span>CELEBRATE</span>
             </button>
 
             <button
               onClick={toggleBroadcast}
-              className="arcade-btn-ghost flex items-center gap-1.5 font-mono text-xs"
+              className="btn-pop-white flex items-center gap-1.5 font-mono text-xs"
             >
               {broadcastMode ? (
                 <>
-                  <Minimize2 className="w-3.5 h-3.5" />
+                  <Minimize2 className="w-4 h-4" />
                   <span>WINDOWED</span>
                 </>
               ) : (
                 <>
-                  <Maximize2 className="w-3.5 h-3.5" />
+                  <Maximize2 className="w-4 h-4" />
                   <span>STAGE MODE</span>
                 </>
               )}
@@ -106,16 +109,16 @@ export default function PublicLeaderboard({
         </div>
 
         {/* ========================================================= */}
-        {/* RETRO ARCADE PODIUM                                       */}
+        {/* RETRO POP PODIUM                                          */}
         {/* ========================================================= */}
-        <section aria-label="Winner Podium">
-          <div className="flex items-center justify-between px-2 mb-1">
-            <div className="flex items-center gap-2 font-arcade text-xs text-arcade-yellow">
-              <Trophy className="w-4 h-4" />
+        <section aria-label="Championship Podium">
+          <div className="flex items-center justify-between px-2 mb-2">
+            <div className="flex items-center gap-2 font-arcade text-xs text-pop-ink font-black">
+              <Trophy className="w-4 h-4 text-pop-orange" />
               <span>CHAMPIONSHIP PODIUM</span>
             </div>
-            <span className="text-[11px] font-mono text-arcade-muted hidden sm:inline">
-              Select any crew to inspect match history
+            <span className="text-xs font-mono text-pop-muted hidden sm:inline font-bold">
+              ✦ Click any crew to inspect match history
             </span>
           </div>
 
@@ -125,19 +128,19 @@ export default function PublicLeaderboard({
         {/* ========================================================= */}
         {/* DISCIPLINE FILTER TABS                                    */}
         {/* ========================================================= */}
-        <div className="flex items-center justify-between gap-3 flex-wrap bg-[#15141c] p-2.5 rounded-lg border border-arcade-border">
-          <div className="flex items-center gap-2 font-display text-xs font-bold text-arcade-muted tracking-wider">
-            <Gamepad2 className="w-4 h-4 text-arcade-cyan" />
-            <span>FILTER:</span>
+        <div className="flex items-center justify-between gap-3 flex-wrap bg-white p-3 rounded-2xl border-3 border-pop-ink shadow-pop">
+          <div className="flex items-center gap-2 font-display text-xs font-black text-pop-ink tracking-wider">
+            <Gamepad2 className="w-4 h-4 text-pop-purple" />
+            <span>DISCIPLINE:</span>
           </div>
 
-          <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+          <div className="flex items-center gap-2 overflow-x-auto py-1">
             <button
               onClick={() => handleFilterClick('all')}
-              className={`px-3 py-1 rounded text-xs font-mono font-bold transition-all ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-black transition-all ${
                 filterGameId === 'all'
-                  ? 'bg-arcade-yellow text-black border border-black shadow-arcade-sm'
-                  : 'bg-[#1e1c27] text-arcade-muted hover:text-white'
+                  ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
+                  : 'bg-pop-butter text-pop-ink hover:bg-pop-yellow-light border border-pop-ink/30'
               }`}
             >
               All Matches
@@ -146,10 +149,10 @@ export default function PublicLeaderboard({
               <button
                 key={g.id}
                 onClick={() => handleFilterClick(g.id)}
-                className={`px-3 py-1 rounded text-xs font-mono font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-black whitespace-nowrap transition-all flex items-center gap-1.5 ${
                   filterGameId === g.id
-                    ? 'bg-arcade-yellow text-black border border-black shadow-arcade-sm'
-                    : 'bg-[#1e1c27] text-arcade-muted hover:text-white'
+                    ? 'bg-pop-coral text-white border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
+                    : 'bg-pop-butter text-pop-ink hover:bg-pop-coral-light border border-pop-ink/30'
                 }`}
               >
                 <span>{g.icon}</span>
@@ -160,14 +163,14 @@ export default function PublicLeaderboard({
         </div>
 
         {/* ========================================================= */}
-        {/* ARCADE SCOREBOARD TABLE & LIVE FEED                       */}
+        {/* SCOREBOARD TABLE & ACTIVITY RECEIPT                       */}
         {/* ========================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Scoreboard List (2 cols) */}
-          <div className="lg:col-span-2 space-y-2.5">
-            <div className="flex items-center justify-between px-3 text-xs font-mono text-arcade-muted uppercase font-bold">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Standings List (2 cols) */}
+          <div className="lg:col-span-2 space-y-3">
+            <div className="flex items-center justify-between px-3 text-xs font-mono text-pop-muted uppercase font-black">
               <span>RANK & COMPETITIVE CREW</span>
-              <span>GAME MATRIX / TOTAL</span>
+              <span>GAME BREAKDOWN / POINTS</span>
             </div>
 
             {leaderboard.map((team) => {
@@ -183,36 +186,36 @@ export default function PublicLeaderboard({
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && handleTeamClick(team)}
-                  className={`p-3.5 rounded-xl border-2 border-black shadow-arcade-sm transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 ${
+                  className={`p-4 rounded-2xl border-3 border-pop-ink shadow-pop transition-all duration-150 cursor-pointer flex items-center justify-between gap-4 ${
                     team.rank === 1
-                      ? 'bg-[#1e1a14] hover:bg-[#252015]'
+                      ? 'bg-pop-yellow-light hover:bg-pop-yellow/30'
                       : team.rank === 2
-                      ? 'bg-[#17171d] hover:bg-[#1e1e26]'
+                      ? 'bg-pop-purple-light hover:bg-purple-100'
                       : team.rank === 3
-                      ? 'bg-[#1a1514] hover:bg-[#221c1a]'
-                      : 'bg-[#15141c] hover:bg-[#1c1b26]'
+                      ? 'bg-pop-orange-light hover:bg-orange-100'
+                      : 'bg-white hover:bg-pop-butter'
                   }`}
                 >
                   {/* Rank & Team Identity */}
-                  <div className="flex items-center gap-3">
-                    {/* Rank Number */}
+                  <div className="flex items-center gap-3.5">
+                    {/* Rank Token */}
                     <div
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center font-arcade text-xs font-black shrink-0 border border-black ${
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-arcade text-xs font-black shrink-0 border-2 border-pop-ink shadow-pop-sm ${
                         team.rank === 1
-                          ? 'bg-arcade-yellow text-black'
+                          ? 'bg-pop-yellow text-pop-ink'
                           : team.rank === 2
-                          ? 'bg-zinc-300 text-black'
+                          ? 'bg-pop-purple text-white'
                           : team.rank === 3
-                          ? 'bg-amber-600 text-white'
-                          : 'bg-[#201d2a] text-arcade-muted'
+                          ? 'bg-pop-orange text-white'
+                          : 'bg-pop-butter text-pop-ink'
                       }`}
                     >
-                      {team.rank}
+                      #{team.rank}
                     </div>
 
                     {/* Team Avatar */}
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0 border-2 border-black"
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 border-2 border-pop-ink shadow-pop-sm"
                       style={{ backgroundColor: team.color }}
                     >
                       <span>{team.avatar}</span>
@@ -221,51 +224,54 @@ export default function PublicLeaderboard({
                     {/* Team Name & Tag */}
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-display font-bold text-sm sm:text-base text-white">
+                        <span className="font-display font-black text-base sm:text-lg text-pop-ink">
                           {team.name}
                         </span>
-                        <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-arcade-muted font-bold">
+                        <span
+                          className="font-mono text-xs px-2 py-0.5 rounded-md font-black border border-pop-ink"
+                          style={{ backgroundColor: `${team.color}25`, color: team.color }}
+                        >
                           [{team.tag}]
                         </span>
                       </div>
-                      <p className="text-[11px] text-arcade-muted font-sans hidden sm:block truncate max-w-xs">
+                      <p className="text-xs text-pop-muted font-sans hidden sm:block truncate max-w-xs font-medium mt-0.5">
                         {team.motto}
                       </p>
                     </div>
                   </div>
 
-                  {/* Discipline Pills & Score */}
+                  {/* Discipline Matrix & Total Score */}
                   <div className="flex items-center gap-4">
                     {/* Game-wise breakdown tags */}
-                    <div className="hidden md:flex items-center gap-1">
+                    <div className="hidden md:flex items-center gap-1.5">
                       {games.map((g) => (
                         <div
                           key={g.id}
                           title={`${g.name}: ${team.gameBreakdown[g.id] || 0} PTS`}
-                          className="px-2 py-1 rounded bg-[#0e0d14] border border-arcade-border text-center text-[10px] font-mono"
+                          className="px-2.5 py-1 rounded-lg bg-white border-2 border-pop-ink text-center text-xs font-mono shadow-pop-sm"
                         >
-                          <span className="text-arcade-muted block text-[9px]">{g.icon}</span>
-                          <span className="font-bold text-white">
+                          <span className="block text-[10px] text-pop-muted">{g.icon}</span>
+                          <span className="font-black text-pop-ink">
                             {team.gameBreakdown[g.id] || 0}
                           </span>
                         </div>
                       ))}
                     </div>
 
-                    {/* Total Score Readout with token symbol */}
+                    {/* Total Score Readout */}
                     <div className="text-right shrink-0">
-                      <div className="font-mono text-lg sm:text-xl font-black text-white flex items-center justify-end gap-1">
-                        <span className="text-arcade-yellow">🪙</span>
+                      <div className="font-mono text-xl sm:text-2xl font-black text-pop-ink flex items-center justify-end gap-1.5">
+                        <span className="text-lg">🪙</span>
                         <span>{pointsDisplay.toLocaleString()}</span>
-                        <span className="text-xs text-arcade-muted font-mono">PTS</span>
+                        <span className="text-xs text-pop-muted font-mono font-bold">PTS</span>
                       </div>
                       {team.diffFromFirst > 0 ? (
-                        <span className="text-[10px] font-mono text-red-400 font-bold">
-                          -{team.diffFromFirst} to #1
+                        <span className="text-[11px] font-mono text-pop-coral font-black">
+                          -{team.diffFromFirst} behind #1
                         </span>
                       ) : (
-                        <span className="text-[10px] font-mono text-arcade-yellow font-black">
-                          LEADER
+                        <span className="text-[11px] font-mono text-pop-green font-black">
+                          ★ CHAMPION
                         </span>
                       )}
                     </div>
@@ -275,15 +281,16 @@ export default function PublicLeaderboard({
             })}
           </div>
 
-          {/* Right Column: Live Scoring Stream */}
-          <div className="space-y-4">
-            <div className="bg-[#15141c] border-2 border-black rounded-xl p-4 shadow-arcade-sm">
-              <div className="flex items-center justify-between mb-3 border-b border-arcade-border pb-2">
-                <div className="flex items-center gap-2 font-arcade text-xs text-white">
-                  <Activity className="w-3.5 h-3.5 text-arcade-pink" />
+          {/* Right Column: Live Feed & Disciplines */}
+          <div className="space-y-6">
+            {/* Live Scoring Stream Card */}
+            <div className="bg-white border-3 border-pop-ink rounded-3xl p-5 shadow-pop">
+              <div className="flex items-center justify-between mb-4 border-b-2 border-pop-ink pb-3">
+                <div className="flex items-center gap-2 font-arcade text-xs text-pop-ink font-black">
+                  <Activity className="w-4 h-4 text-pop-coral" />
                   <span>ACTIVITY LEDGER</span>
                 </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-pop-green animate-ping" />
               </div>
 
               <div className="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
@@ -298,21 +305,23 @@ export default function PublicLeaderboard({
                     return (
                       <div
                         key={tx.id}
-                        className="p-2.5 rounded bg-[#100f16] border border-arcade-border text-xs font-mono"
+                        className="p-3 rounded-xl bg-pop-butter border-2 border-pop-ink text-xs font-mono"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-white">
+                          <span className="font-black text-pop-ink">
                             {team?.avatar} {team?.name}
                           </span>
                           <span
-                            className={`font-black font-mono text-xs ${
-                              isPositive ? 'text-emerald-400' : 'text-red-400'
+                            className={`font-black font-mono px-2 py-0.5 rounded border border-pop-ink ${
+                              isPositive
+                                ? 'bg-pop-green text-pop-ink'
+                                : 'bg-pop-coral text-white'
                             }`}
                           >
                             {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
                           </span>
                         </div>
-                        <div className="text-arcade-muted text-[11px] flex justify-between mt-0.5">
+                        <div className="text-pop-muted text-[11px] flex justify-between mt-1 font-bold">
                           <span>
                             {game?.icon} {game?.name}
                           </span>
@@ -323,7 +332,7 @@ export default function PublicLeaderboard({
                             })}
                           </span>
                         </div>
-                        <p className="text-[10px] text-zinc-400 mt-1 italic truncate">
+                        <p className="text-[11px] text-pop-ink mt-1 italic font-medium truncate">
                           "{tx.reason}"
                         </p>
                       </div>
@@ -332,22 +341,22 @@ export default function PublicLeaderboard({
               </div>
             </div>
 
-            {/* Discipline Summary List */}
-            <div className="bg-[#15141c] border-2 border-black rounded-xl p-4 shadow-arcade-sm">
-              <span className="font-arcade text-xs text-white block mb-2">
+            {/* Disciplines Box */}
+            <div className="bg-pop-yellow rounded-3xl border-3 border-pop-ink p-5 shadow-pop">
+              <span className="font-arcade text-xs text-pop-ink font-black block mb-3">
                 TOURNAMENT DISCIPLINES
               </span>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {games.map((g) => (
                   <div
                     key={g.id}
-                    className="flex items-center justify-between p-2 rounded bg-[#100f16] text-xs font-mono"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-white border-2 border-pop-ink text-xs font-mono font-bold"
                   >
-                    <div className="flex items-center gap-1.5">
-                      <span>{g.icon}</span>
-                      <span className="font-bold text-white">{g.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{g.icon}</span>
+                      <span className="text-pop-ink font-black">{g.name}</span>
                     </div>
-                    <span className="text-arcade-yellow font-bold">
+                    <span className="bg-pop-butter px-2 py-0.5 rounded border border-pop-ink text-pop-purple font-black">
                       {g.basePoints} PTS
                     </span>
                   </div>
@@ -359,60 +368,60 @@ export default function PublicLeaderboard({
 
         {/* Team Inspection Modal */}
         {selectedTeam && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85">
-            <div className="relative w-full max-w-md bg-[#15141c] border-3 border-black rounded-xl p-6 shadow-arcade-lg">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pop-ink/70 backdrop-blur-xs">
+            <div className="relative w-full max-w-md bg-white border-4 border-pop-ink rounded-3xl p-6 sm:p-8 shadow-pop-xl">
               <button
                 onClick={() => setSelectedTeam(null)}
-                className="absolute top-4 right-4 text-arcade-muted hover:text-white font-mono text-base"
+                className="absolute top-4 right-4 text-pop-muted hover:text-pop-ink font-mono text-lg font-black"
               >
                 ✕
               </button>
 
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-4 mb-4">
                 <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl border-2 border-black"
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl border-3 border-pop-ink shadow-pop"
                   style={{ backgroundColor: selectedTeam.color }}
                 >
                   {selectedTeam.avatar}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-black text-white font-bold">
+                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-pop-ink text-white font-black">
                       [{selectedTeam.tag}]
                     </span>
-                    <span className="font-arcade text-xs text-arcade-yellow">
+                    <span className="font-arcade text-xs text-pop-coral font-black">
                       Rank #{selectedTeam.rank}
                     </span>
                   </div>
-                  <h3 className="font-bungee text-xl text-white mt-0.5">
+                  <h3 className="font-bungee text-2xl text-pop-ink mt-0.5">
                     {selectedTeam.name}
                   </h3>
-                  <p className="text-xs text-arcade-muted font-mono">
-                    Captain: {selectedTeam.captain}
+                  <p className="text-xs text-pop-muted font-mono font-bold">
+                    Captain: {selectedTeam.captain} • {selectedTeam.membersCount} Crew
                   </p>
                 </div>
               </div>
 
-              <div className="bg-[#0e0d14] p-3 rounded border border-arcade-border mb-4 text-xs">
-                <span className="text-arcade-muted uppercase block font-mono text-[9px] mb-0.5">
+              <div className="bg-pop-butter p-3.5 rounded-xl border-2 border-pop-ink mb-4 text-xs">
+                <span className="text-pop-muted uppercase block font-mono text-[9px] mb-0.5 font-bold">
                   CREW MOTTO
                 </span>
-                <p className="italic text-white">"{selectedTeam.motto}"</p>
+                <p className="italic text-pop-ink font-semibold">"{selectedTeam.motto}"</p>
               </div>
 
               {/* Discipline Breakdown */}
-              <div className="space-y-1.5 mb-5">
-                <span className="text-xs font-arcade text-arcade-muted block">
+              <div className="space-y-2 mb-6">
+                <span className="text-xs font-arcade text-pop-ink font-black block">
                   SCORES BY GAME:
                 </span>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   {games.map((g) => (
                     <div
                       key={g.id}
-                      className="p-2 rounded bg-[#0e0d14] border border-arcade-border flex items-center justify-between text-xs font-mono"
+                      className="p-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink flex items-center justify-between text-xs font-mono font-bold"
                     >
                       <span className="truncate">{g.name}</span>
-                      <span className="font-bold text-arcade-yellow">
+                      <span className="font-black text-pop-purple">
                         {selectedTeam.gameBreakdown[g.id] || 0}
                       </span>
                     </div>
@@ -420,9 +429,9 @@ export default function PublicLeaderboard({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-arcade-border">
-                <span className="font-mono text-xs text-arcade-muted">Total Score:</span>
-                <span className="font-mono text-2xl font-black text-arcade-yellow flex items-center gap-1">
+              <div className="flex items-center justify-between pt-4 border-t-2 border-pop-ink">
+                <span className="font-mono text-xs text-pop-muted font-bold">Total Score:</span>
+                <span className="font-mono text-2xl font-black text-pop-ink flex items-center gap-1">
                   🪙 {selectedTeam.totalPoints.toLocaleString()} PTS
                 </span>
               </div>
