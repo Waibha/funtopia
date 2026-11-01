@@ -10,6 +10,7 @@ import {
 export default function ParticipantRegistration({
   onRegisterParticipant,
   onParticipantLogin,
+  startingCoins = 0,
   registeredList = [],
 }) {
   const [mode, setMode] = useState('register'); // 'register' | 'verify' | 'login'
@@ -65,6 +66,7 @@ export default function ParticipantRegistration({
         email: formData.email,
         password: formData.password,
         avatar: formData.avatar,
+        startingCoins: Number(startingCoins ?? 0),
         existingParticipants: registeredList,
       });
 

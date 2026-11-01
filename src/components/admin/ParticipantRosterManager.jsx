@@ -110,18 +110,24 @@ export default function ParticipantRosterManager({
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  soundFx.play('scoreDown');
-                  if (window.confirm(`Remove participant "${p.name}"?`)) {
-                    onRemoveParticipant(p.id);
-                  }
-                }}
-                className="p-2.5 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-600 border-2 border-[#0D0518] shadow-pixel-sm transition-all"
-                title="Remove Participant"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="font-mono font-black text-xs text-[#FF7A00] bg-[#FAF7EE] px-3 py-1.5 rounded-xl border-2 border-[#0D0518] shadow-pixel-sm">
+                  🪙 {p.coins ?? 0} COINS
+                </span>
+
+                <button
+                  onClick={() => {
+                    soundFx.play('scoreDown');
+                    if (window.confirm(`Remove participant "${p.name}"?`)) {
+                      onRemoveParticipant(p.id);
+                    }
+                  }}
+                  className="p-2.5 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-600 border-2 border-[#0D0518] shadow-pixel-sm transition-all"
+                  title="Remove Participant"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ))}
 

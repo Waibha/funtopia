@@ -23,12 +23,12 @@ export default function AdminDashboard({
 
   const stats = [
     {
-      label: 'COMPETITION',
-      value: 'FUNTOPIA LIVE',
-      subtext: 'Arcade Championship',
-      icon: Gamepad2,
-      colorBar: 'bg-[#FF5FA0]',
-      action: () => setCurrentView('games'),
+      label: 'STARTING COINS',
+      value: `${data.settings?.startingCoins ?? 0} COINS`,
+      subtext: 'Auto-granted on registration',
+      icon: Coins,
+      colorBar: 'bg-[#FFDE25]',
+      action: () => setCurrentView('coins'),
     },
     {
       label: 'GAMES',
@@ -50,7 +50,7 @@ export default function AdminDashboard({
       label: 'DISPATCHED POINTS',
       value: `${totalPoints.toLocaleString()} PTS`,
       subtext: `${(data.transactions || []).length} Verified Entries`,
-      icon: Coins,
+      icon: Trophy,
       colorBar: 'bg-[#28C76F]',
       action: () => setCurrentView('scoring'),
     },
@@ -84,19 +84,30 @@ export default function AdminDashboard({
             }}
             className="btn-pixel-yellow flex items-center gap-2"
           >
-            <Coins className="w-4 h-4" />
+            <Trophy className="w-4 h-4" />
             <span>UPDATE SCORES</span>
           </button>
 
           <button
             onClick={() => {
               soundFx.play('click');
-              setCurrentView('participants');
+              setCurrentView('coins');
+            }}
+            className="btn-pixel-green flex items-center gap-1.5"
+          >
+            <Coins className="w-4 h-4" />
+            <span>COIN SETTINGS</span>
+          </button>
+
+          <button
+            onClick={() => {
+              soundFx.play('click');
+              setCurrentView('games');
             }}
             className="btn-pixel-white flex items-center gap-1.5"
           >
-            <Plus className="w-4 h-4" />
-            <span>PARTICIPANTS</span>
+            <Gamepad2 className="w-4 h-4" />
+            <span>GAMES</span>
           </button>
 
           <button

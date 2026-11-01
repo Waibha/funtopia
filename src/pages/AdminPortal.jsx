@@ -5,6 +5,7 @@ import {
   Users,
   Gamepad2,
   Coins,
+  Trophy,
   LogOut,
   ArrowLeft,
   Sparkles,
@@ -15,6 +16,7 @@ import AdminDashboard from './AdminDashboard';
 import GameManagement from './GameManagement';
 import ScoringManagement from './ScoringManagement';
 import ParticipantRosterManager from '../components/admin/ParticipantRosterManager';
+import CoinEconomyManager from '../components/admin/CoinEconomyManager';
 import AdminLogin from '../components/admin/AdminLogin';
 import LiveTicker from '../components/LiveTicker';
 import { soundFx } from '../utilities/soundFx';
@@ -30,13 +32,15 @@ export default function AdminPortal({
   onRollbackTransaction,
   onAddParticipant,
   onRemoveParticipant,
+  onUpdateStartingCoins,
+  onAdjustParticipantCoins,
   triggerCelebration,
 }) {
   const navigate = useNavigate();
   const [adminSession, setAdminSession] = useState(() => getAdminSession());
   const [isVerifyingSession, setIsVerifyingSession] = useState(true);
 
-  const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'participants' | 'games' | 'scoring'
+  const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'games' | 'participants' | 'coins' | 'scoring'
   const [quickScoreParticipantId, setQuickScoreParticipantId] = useState(null);
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
@@ -117,7 +121,8 @@ export default function AdminPortal({
     { id: 'overview', label: 'OVERVIEW', icon: LayoutDashboard },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
     { id: 'participants', label: 'PARTICIPANTS', icon: Users },
-    { id: 'scoring', label: 'SCORING', icon: Coins },
+    { id: 'coins', label: 'COINS', icon: Coins },
+    { id: 'scoring', label: 'SCORING', icon: Trophy },
   ];
 
   return (
@@ -264,6 +269,14 @@ export default function AdminPortal({
               onSaveGame={onSaveGame}
               onDeleteGame={onDeleteGame}
               onToggleGameActive={onToggleGameActive}
+            />
+          )}
+
+          {currentTab === 'coins' && (
+            <CoinEconomyManager
+              data={data}
+              onUpdateStartingCoins={onUpdateStartingCoins}
+              onAdjustParticipantCoins={onAdjustParticipantCoins}
             />
           )}
 

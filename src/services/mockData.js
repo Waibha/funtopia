@@ -1,10 +1,10 @@
 /**
- * FUNTOPIA - Clean Production Data Store
- * Zero demo content, zero fictional participants, zero sample games.
- * Clean slate ready for real administrator and participant testing.
+ * FUNTOPIA - Clean Production Data Store v2
+ * Supports Admin-controlled Starting Coins, Independent Coin Economy,
+ * Games Catalog, Participant Profiles, and Competition Points Ledger.
  */
 
-const STORAGE_KEY = 'funtopia_production_v1';
+const STORAGE_KEY = 'funtopia_production_v2';
 
 export const INITIAL_DATA = {
   activeCompetition: {
@@ -12,14 +12,20 @@ export const INITIAL_DATA = {
     name: 'FUNTOPIA Championship',
     description: 'Official arcade competition and tournament platform.',
   },
+  // Admin-controlled system settings
+  settings: {
+    startingCoins: 5, // Configurable by administrator; applies to future registrations
+    lastUpdated: new Date().toISOString(),
+  },
   games: [],
   participants: [],
-  transactions: [],
+  transactions: [], // Competition performance points (Leaderboard ranking)
+  coinTransactions: [], // Virtual coin audit trail (Entry fees, starting allocations, admin adjustments)
 };
 
 /**
  * Loads stored data from localStorage.
- * Initializes with completely clean empty arrays if no existing data is found.
+ * Initializes with clean empty state and configured settings if no existing data is found.
  */
 export function loadStoredData() {
   try {
@@ -30,9 +36,13 @@ export function loadStoredData() {
     const parsed = JSON.parse(raw);
     return {
       activeCompetition: parsed.activeCompetition || INITIAL_DATA.activeCompetition,
+      settings: parsed.settings && typeof parsed.settings.startingCoins === 'number'
+        ? parsed.settings
+        : INITIAL_DATA.settings,
       games: Array.isArray(parsed.games) ? parsed.games : [],
       participants: Array.isArray(parsed.participants) ? parsed.participants : [],
       transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
+      coinTransactions: Array.isArray(parsed.coinTransactions) ? parsed.coinTransactions : [],
     };
   } catch (e) {
     console.error('Error loading stored Funtopia data, defaulting to clean database', e);

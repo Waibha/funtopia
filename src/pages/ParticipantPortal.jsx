@@ -14,6 +14,8 @@ import {
   Activity,
   Play,
   CheckCircle2,
+  AlertTriangle,
+  X,
 } from 'lucide-react';
 import PublicLeaderboard from './PublicLeaderboard';
 import ParticipantRegistration from '../components/participant/ParticipantRegistration';
@@ -26,6 +28,7 @@ export default function ParticipantPortal({
   data,
   leaderboard,
   onRegisterParticipant,
+  onJoinGame,
   triggerCelebration,
   soundEnabled,
   setSoundEnabled,
@@ -36,13 +39,17 @@ export default function ParticipantPortal({
 
   // Authenticated participant session
   const [session, setSession] = useState(() => getParticipantSession());
-  const [walletCoins, setWalletCoins] = useState(500);
+  const [joinedGames, setJoinedGames] = useState({});
+  const [isJoining, setIsJoining] = useState(false);
+  const [joinStatusBanner, setJoinStatusBanner] = useState(null); // { type: 'success' | 'error', message }
 
   // Synchronize session profile
   const loggedInParticipant = useMemo(() => {
     if (!session?.participantId) return null;
     return (data.participants || []).find((p) => p.id === session.participantId) || null;
   }, [session, data.participants]);
+
+  const currentCoins = loggedInParticipant ? Number(loggedInParticipant.coins ?? 0) : 0;
 
   // Total competition points for logged in participant
   const myTotalPoints = useMemo(() => {
@@ -81,7 +88,6 @@ export default function ParticipantPortal({
       email: participant.email,
       avatar: participant.avatar,
     });
-    setWalletCoins(participant.coins || 500);
     setActiveTab('leaderboard');
   };
 
@@ -91,23 +97,59 @@ export default function ParticipantPortal({
     setSession(null);
   };
 
-  // Play game action (spends arcade coins)
-  const handlePlayGame = (game) => {
-    const cost = Number(game.cost || 0);
-    if (walletCoins < cost) {
-      soundFx.play('scoreDown');
-      alert(`Insufficient arcade coins! Cost: ${cost} coins, Wallet: ${walletCoins} coins. Reload coins to enter.`);
+  // Join / Enter game action with atomic coin validation & double-click protection
+  const handleJoinGameClick = async (game) => {
+    if (!loggedInParticipant) {
+      soundFx.play('click');
+      setJoinStatusBanner({
+        type: 'error',
+        message: 'Please sign in or register to join championship games.',
+      });
+      setActiveTab('register');
       return;
     }
 
-    soundFx.play('spend');
-    setWalletCoins((prev) => prev - cost);
+    if (isJoining) return; // Prevent duplicate clicks
 
-    setTimeout(() => {
-      soundFx.play('coin');
-      triggerCelebration();
-      alert(`Entered ${game.name}! Spent ${cost} arcade coins from wallet.`);
-    }, 300);
+    setIsJoining(true);
+    setJoinStatusBanner(null);
+
+    try {
+      if (onJoinGame) {
+        const res = onJoinGame({
+          participantId: loggedInParticipant.id,
+          gameId: game.id,
+        });
+
+        if (!res.success) {
+          soundFx.play('scoreDown');
+          setJoinStatusBanner({
+            type: 'error',
+            message: res.error || `Insufficient coins! Entry costs ${game.cost} coins, but your balance is ${currentCoins} coins.`,
+          });
+          setIsJoining(false);
+          return;
+        }
+
+        soundFx.play('spend');
+        soundFx.play('coin');
+        triggerCelebration();
+
+        setJoinedGames((prev) => ({ ...prev, [game.id]: true }));
+        setJoinStatusBanner({
+          type: 'success',
+          message: `✓ Successfully joined ${game.name}! Deducted ${res.cost} virtual coins. New balance: ${res.newBalance} coins.`,
+        });
+      }
+    } catch (err) {
+      soundFx.play('scoreDown');
+      setJoinStatusBanner({
+        type: 'error',
+        message: 'An error occurred while joining the game. Please retry.',
+      });
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   return (
@@ -206,7 +248,7 @@ export default function ParticipantPortal({
                       <span className="text-sm">🪙</span>
                       <div>
                         <span className="text-[8px] text-[#FFDE25] block font-arcade font-black leading-none">COINS</span>
-                        <span className="font-black text-white text-xs">{walletCoins}</span>
+                        <span className="font-black text-white text-xs">{currentCoins}</span>
                       </div>
                     </div>
 
@@ -328,7 +370,7 @@ export default function ParticipantPortal({
               <div className="flex items-center gap-4 font-mono text-xs">
                 <div className="text-center bg-[#200B3B] px-3.5 py-1.5 rounded-xl border border-[#FFDE25]">
                   <span className="text-[9px] text-[#FFDE25] block font-arcade font-black">GAME COINS</span>
-                  <span className="font-black text-base text-white">🪙 {walletCoins}</span>
+                  <span className="font-black text-base text-white">🪙 {currentCoins}</span>
                 </div>
                 <div className="text-center bg-[#200B3B] px-3.5 py-1.5 rounded-xl border border-[#28C76F]">
                   <span className="text-[9px] text-[#28C76F] block font-arcade font-black">TOTAL POINTS</span>
@@ -353,12 +395,42 @@ export default function ParticipantPortal({
             <ParticipantRegistration
               onRegisterParticipant={onRegisterParticipant}
               onParticipantLogin={handleParticipantLogin}
+              startingCoins={data.settings?.startingCoins ?? 0}
               registeredList={data.participants || []}
             />
           )}
 
           {activeTab === 'games' && (
             <div className="space-y-6">
+              {/* Join Status Feedback Notification Banner */}
+              {joinStatusBanner && (
+                <div
+                  className={`p-4 rounded-2xl border-3 border-[#0D0518] shadow-pixel flex items-center justify-between gap-3 animate-in fade-in duration-200 ${
+                    joinStatusBanner.type === 'success'
+                      ? 'bg-[#28C76F] text-[#0D0518]'
+                      : 'bg-[#FF3366] text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {joinStatusBanner.type === 'success' ? (
+                      <CheckCircle2 className="w-6 h-6 shrink-0 text-[#0D0518]" />
+                    ) : (
+                      <AlertTriangle className="w-6 h-6 shrink-0 text-white" />
+                    )}
+                    <span className="font-mono text-xs sm:text-sm font-black">
+                      {joinStatusBanner.message}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setJoinStatusBanner(null)}
+                    className="p-1 rounded hover:bg-black/20 text-current transition-colors"
+                    title="Dismiss notification"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+
               {/* Header */}
               <div className="bg-[#40186D] text-white rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div>
@@ -369,80 +441,107 @@ export default function ParticipantPortal({
                     CHAMPIONSHIP GAMES
                   </h2>
                   <p className="text-purple-200 font-sans text-xs sm:text-sm mt-1 max-w-2xl font-medium">
-                    Games created by the tournament organizer. Spend arcade coins to enter games and compete for points.
+                    Games created by tournament operators. Virtual coins are spent to enter games. Points are earned through gameplay and rank you on the leaderboard.
                   </p>
                 </div>
 
                 {/* Player Token Bank Widget */}
-                <div className="bg-[#200B3B] p-4 rounded-2xl border-3 border-[#FFDE25] shadow-pixel text-center shrink-0">
+                <div className="bg-[#200B3B] p-5 rounded-2xl border-3 border-[#FFDE25] shadow-pixel text-center shrink-0 min-w-[200px]">
                   <span className="text-[10px] font-arcade text-[#FFDE25] block font-black">YOUR ARCADE COINS</span>
                   <div className="font-display font-black text-2xl text-white mt-1 flex items-center justify-center gap-1.5">
                     <span>🪙</span>
-                    <span>{walletCoins} COINS</span>
+                    <span>{currentCoins} COINS</span>
                   </div>
-                  <button
-                    onClick={() => {
-                      soundFx.play('coin');
-                      setWalletCoins((prev) => prev + 250);
-                    }}
-                    className="mt-2 text-[10px] font-mono font-black text-[#FFDE25] hover:underline block"
-                  >
-                    + Reload 250 Coins
-                  </button>
+                  <span className="text-[10px] font-mono text-purple-200 block mt-1.5">
+                    {loggedInParticipant ? 'Active Wallet Balance' : 'Sign in to access your coins'}
+                  </span>
                 </div>
               </div>
 
               {/* Games Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {data.games.map((g) => (
-                  <div
-                    key={g.id}
-                    className="p-6 rounded-3xl bg-[#FAF7EE] text-[#0D0518] border-4 border-[#0D0518] shadow-pixel-xl space-y-4 hover:-translate-y-1 transition-all"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3.5">
-                        <div className="w-14 h-14 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-3xl shrink-0">
-                          🕹️
+                {data.games.map((g) => {
+                  const entryCost = Number(g.cost || 0);
+                  const isJoined = Boolean(joinedGames[g.id]);
+                  const canAfford = loggedInParticipant ? currentCoins >= entryCost : false;
+
+                  return (
+                    <div
+                      key={g.id}
+                      className="p-6 rounded-3xl bg-[#FAF7EE] text-[#0D0518] border-4 border-[#0D0518] shadow-pixel-xl space-y-4 hover:-translate-y-1 transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-14 h-14 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-3xl shrink-0">
+                            🕹️
+                          </div>
+                          <div>
+                            <h3 className="font-display font-black text-2xl text-[#0D0518]">
+                              {g.name}
+                            </h3>
+                            <span className="text-xs font-mono text-gray-500 font-bold block mt-0.5">
+                              GAME ID: {g.id}
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-display font-black text-2xl text-[#0D0518]">
-                            {g.name}
-                          </h3>
-                          <span className="text-xs font-mono text-gray-500 font-bold block mt-0.5">
-                            ID: {g.id}
-                          </span>
-                        </div>
+
+                        <span className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black border-2 border-[#0D0518] ${
+                          g.isActive ? 'bg-[#28C76F] text-[#0D0518]' : 'bg-gray-200 text-gray-500'
+                        }`}>
+                          {g.isActive ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
                       </div>
 
-                      <span className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black border-2 border-[#0D0518] ${
-                        g.isActive ? 'bg-[#28C76F] text-[#0D0518]' : 'bg-gray-200 text-gray-500'
-                      }`}>
-                        {g.isActive ? 'ACTIVE' : 'INACTIVE'}
-                      </span>
-                    </div>
+                      <div className="bg-white p-4 rounded-2xl border-3 border-[#0D0518] text-center font-mono flex items-center justify-between px-6">
+                        <span className="text-xs text-gray-500 font-black uppercase">ENTRY FEE</span>
+                        <span className="text-xl font-black text-[#FF5FA0] flex items-center gap-1">
+                          <Coins className="w-4 h-4 text-[#FFDE25]" />
+                          {entryCost} COINS
+                        </span>
+                      </div>
 
-                    <div className="bg-white p-4 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
-                      <span className="text-[10px] text-gray-500 block font-bold uppercase">ENTRY COST</span>
-                      <span className="text-xl font-black text-[#FF5FA0] flex items-center justify-center gap-1 mt-0.5">
-                        <Coins className="w-4 h-4 text-[#FFDE25]" />
-                        {Number(g.cost || 0)} COINS
-                      </span>
+                      <button
+                        onClick={() => handleJoinGameClick(g)}
+                        disabled={!g.isActive || isJoining}
+                        className={`w-full py-3 rounded-2xl font-display font-black text-sm uppercase border-3 border-[#0D0518] shadow-pixel transition-all flex items-center justify-center gap-2 ${
+                          !g.isActive
+                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : isJoined
+                            ? 'bg-[#28C76F] text-[#0D0518] hover:bg-[#34e280]'
+                            : !loggedInParticipant
+                            ? 'bg-[#FFDE25] text-[#0D0518] hover:bg-yellow-300'
+                            : !canAfford
+                            ? 'bg-[#FF3366] text-white hover:bg-red-600'
+                            : 'bg-[#FFDE25] text-[#0D0518] hover:bg-yellow-300 active:translate-y-0.5'
+                        }`}
+                      >
+                        {!g.isActive ? (
+                          <span>GAME CURRENTLY OFFLINE</span>
+                        ) : !loggedInParticipant ? (
+                          <>
+                            <User className="w-4 h-4" />
+                            <span>SIGN IN TO ENTER ({entryCost} COINS)</span>
+                          </>
+                        ) : isJoined ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4 text-[#0D0518]" />
+                            <span>ENTERED • PLAY AGAIN ({entryCost} COINS)</span>
+                          </>
+                        ) : !canAfford ? (
+                          <>
+                            <AlertTriangle className="w-4 h-4 text-white" />
+                            <span>INSUFFICIENT COINS (NEED {entryCost - currentCoins} MORE)</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4" />
+                            <span>ENTER GAME ({entryCost} COINS)</span>
+                          </>
+                        )}
+                      </button>
                     </div>
-
-                    <button
-                      onClick={() => handlePlayGame(g)}
-                      disabled={!g.isActive}
-                      className={`w-full py-3 rounded-2xl font-display font-black text-sm uppercase border-3 border-[#0D0518] shadow-pixel transition-all flex items-center justify-center gap-2 ${
-                        g.isActive
-                          ? 'bg-[#FFDE25] text-[#0D0518] hover:bg-yellow-300 active:translate-y-0.5'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      <Play className="w-4 h-4" />
-                      <span>ENTER GAME ({Number(g.cost || 0)} COINS)</span>
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {data.games.length === 0 && (

@@ -83,11 +83,128 @@ export default function App() {
     }));
   };
 
+  // Starting Coins Setting Handler (Admin controlled, applies to future registrations only)
+  const handleUpdateStartingCoins = (amount) => {
+    const val = Math.max(0, Number(amount || 0));
+    setData((prev) => ({
+      ...prev,
+      settings: {
+        ...(prev.settings || {}),
+        startingCoins: val,
+        lastUpdated: new Date().toISOString(),
+      },
+    }));
+  };
+
+  // Manual Coin Adjustment Handler (Admin adds/deducts coins with audit trail)
+  const handleAdjustParticipantCoins = ({ participantId, amountDelta, reason, admin = 'Admin Operator' }) => {
+    const delta = Number(amountDelta || 0);
+    if (delta === 0) return;
+
+    setData((prev) => {
+      const participant = (prev.participants || []).find((p) => p.id === participantId);
+      if (!participant) return prev;
+
+      const newBalance = Math.max(0, Number(participant.coins || 0) + delta);
+      const updatedParticipants = prev.participants.map((p) =>
+        p.id === participantId ? { ...p, coins: newBalance } : p
+      );
+
+      const coinTx = {
+        id: `ctx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        participantId,
+        participantName: participant.name,
+        amountDelta: delta,
+        newBalance,
+        type: 'admin_adjustment',
+        reason: reason || (delta > 0 ? 'Admin bonus credit' : 'Admin manual debit'),
+        timestamp: new Date().toISOString(),
+        admin,
+      };
+
+      return {
+        ...prev,
+        participants: updatedParticipants,
+        coinTransactions: [coinTx, ...(prev.coinTransactions || [])],
+      };
+    });
+  };
+
+  // Participant Join Game Handler (Atomic coin deduction, validation, duplicate protection)
+  const handleJoinGame = ({ participantId, gameId }) => {
+    const participant = (data.participants || []).find((p) => p.id === participantId);
+    const game = (data.games || []).find((g) => g.id === gameId);
+
+    if (!participant) {
+      return { success: false, error: 'Participant profile not found. Please log in.' };
+    }
+    if (!game) {
+      return { success: false, error: 'Game not found in tournament rotation.' };
+    }
+
+    const currentCoins = Number(participant.coins || 0);
+    const entryCost = Number(game.cost || 0);
+
+    if (currentCoins < entryCost) {
+      return {
+        success: false,
+        error: `Insufficient virtual coins! ${game.name} requires ${entryCost} coins, but your current balance is ${currentCoins} coins.`,
+        required: entryCost,
+        current: currentCoins,
+      };
+    }
+
+    const newBalance = currentCoins - entryCost;
+
+    const coinTx = {
+      id: `ctx-game-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      participantId,
+      participantName: participant.name,
+      gameId,
+      gameName: game.name,
+      amountDelta: -entryCost,
+      newBalance,
+      type: 'game_entry',
+      reason: `Entered ${game.name}`,
+      timestamp: new Date().toISOString(),
+      admin: 'Participant Action',
+    };
+
+    setData((prev) => ({
+      ...prev,
+      participants: prev.participants.map((p) =>
+        p.id === participantId ? { ...p, coins: newBalance } : p
+      ),
+      coinTransactions: [coinTx, ...(prev.coinTransactions || [])],
+    }));
+
+    return {
+      success: true,
+      newBalance,
+      gameName: game.name,
+      cost: entryCost,
+    };
+  };
+
   // Participant Handlers
   const handleRegisterParticipant = (newParticipant) => {
+    const allocatedCoins = Number(newParticipant.coins || 0);
+    const startingAllocationTx = {
+      id: `ctx-start-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      participantId: newParticipant.id,
+      participantName: newParticipant.name,
+      amountDelta: allocatedCoins,
+      newBalance: allocatedCoins,
+      type: 'starting_allocation',
+      reason: 'Welcome Starting Coin Allocation',
+      timestamp: new Date().toISOString(),
+      admin: 'System Automation',
+    };
+
     setData((prev) => ({
       ...prev,
       participants: [...(prev.participants || []), newParticipant],
+      coinTransactions: [startingAllocationTx, ...(prev.coinTransactions || [])],
     }));
   };
 
@@ -96,6 +213,7 @@ export default function App() {
       ...prev,
       participants: (prev.participants || []).filter((p) => p.id !== participantId),
       transactions: (prev.transactions || []).filter((tx) => tx.participantId !== participantId),
+      coinTransactions: (prev.coinTransactions || []).filter((tx) => tx.participantId !== participantId),
     }));
   };
 
@@ -125,6 +243,7 @@ export default function App() {
               data={data}
               leaderboard={leaderboard}
               onRegisterParticipant={handleRegisterParticipant}
+              onJoinGame={handleJoinGame}
               triggerCelebration={triggerCelebration}
               soundEnabled={soundEnabled}
               setSoundEnabled={setSoundEnabled}
@@ -146,6 +265,8 @@ export default function App() {
               onRollbackTransaction={handleRollbackTransaction}
               onAddParticipant={handleRegisterParticipant}
               onRemoveParticipant={handleRemoveParticipant}
+              onUpdateStartingCoins={handleUpdateStartingCoins}
+              onAdjustParticipantCoins={handleAdjustParticipantCoins}
               triggerCelebration={triggerCelebration}
             />
           }

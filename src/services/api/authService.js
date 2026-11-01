@@ -157,6 +157,7 @@ export async function initiateParticipantRegistration({
   email,
   password,
   avatar = '👾',
+  startingCoins = 0,
   existingParticipants = [],
 }) {
   if (!name || name.trim().length < 2) {
@@ -196,7 +197,7 @@ export async function initiateParticipantRegistration({
     avatar: avatar || '👾',
     verificationCode,
     isEmailVerified: false,
-    coins: 500, // Standard starting casino-arcade coin budget
+    coins: Number(startingCoins ?? 0), // Allocated automatically based on current admin setting
     createdAt: Date.now(),
     expiresAt: Date.now() + 15 * 60 * 1000, // 15 minute verification window
   };
@@ -255,7 +256,7 @@ export async function completeParticipantVerification({ email, code }) {
     passwordHash: pending.passwordHash,
     avatar: pending.avatar,
     isEmailVerified: true,
-    coins: pending.coins || 500,
+    coins: typeof pending.coins === 'number' ? pending.coins : 0,
     registeredAt: new Date().toISOString(),
   };
 
