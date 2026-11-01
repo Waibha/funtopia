@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight, Trophy, Play, LogIn, Compass } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
 export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, triggerCelebration }) {
@@ -29,7 +29,6 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
       {/* ========================================================================= */}
       {/* LAYER 1: VIBRANT RETRO ARCADE SKY & PIXEL CITYSCAPE BACKGROUND            */}
       {/* ========================================================================= */}
-      {/* Subtle Dot Grid */}
       <div
         className="absolute inset-0 opacity-[0.07] pointer-events-none"
         style={{
@@ -38,10 +37,9 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           backgroundPosition: '0 0, 12px 12px',
         }}
       />
-      {/* Atmospheric vignette */}
       <div className="absolute inset-0 bg-radial-at-t from-purple-600/25 via-transparent to-[#1F0738]/90 pointer-events-none" />
 
-      {/* Floating Pixel Clouds (Reference Image Screen 1, 3, 9) */}
+      {/* Floating Pixel Clouds */}
       <div className="absolute top-16 left-6 sm:left-20 opacity-85 pointer-events-none animate-bounce-subtle">
         <svg width="120" height="50" viewBox="0 0 120 50" fill="none">
           <rect x="28" y="0" width="48" height="14" fill="#E9D5FF" />
@@ -60,13 +58,12 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
         </svg>
       </div>
 
-      {/* Pixel Full Moon (Reference Image Screen 4) */}
+      {/* Pixel Full Moon */}
       <div className="absolute top-12 left-1/2 -translate-x-1/2 sm:translate-x-64 opacity-90 pointer-events-none hidden md:block">
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
           <rect x="24" y="0" width="32" height="80" fill="#FFDE25" />
           <rect x="8" y="8" width="64" height="64" fill="#FFDE25" />
           <rect x="0" y="24" width="80" height="32" fill="#FFDE25" />
-          {/* Craters */}
           <rect x="20" y="28" width="12" height="12" fill="#E6C200" />
           <rect x="48" y="44" width="16" height="16" fill="#E6C200" />
           <rect x="40" y="16" width="8" height="8" fill="#E6C200" />
@@ -96,7 +93,6 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
       {/* TOP HEADER: ARCADE UTILITY & AUDIO SYNTHESIZER BAR                        */}
       {/* ========================================================================= */}
       <header className="relative z-20 px-6 py-5 flex items-center justify-between max-w-7xl mx-auto w-full">
-        {/* Arcade Cabinet Specs */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel-sm flex items-center justify-center font-arcade text-black text-lg font-black">
             👾
@@ -111,41 +107,19 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </div>
         </div>
 
-        {/* Quick Nav & Audio Toggle */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              soundFx.play('switch');
-              navigate('/participant');
-            }}
-            className="hidden sm:inline-flex btn-pixel-white text-[11px] py-1.5 px-3"
-          >
-            LEADERBOARD
-          </button>
-
-          <button
-            onClick={() => {
-              soundFx.play('switch');
-              navigate('/admin');
-            }}
-            className="hidden sm:inline-flex btn-pixel-white text-[11px] py-1.5 px-3"
-          >
-            OPERATOR
-          </button>
-
-          <button
-            onClick={handleSoundToggle}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-3 border-[#0D0518] text-xs font-mono font-black shadow-pixel-sm transition-all ${
-              soundEnabled
-                ? 'bg-[#FFDE25] text-[#0D0518]'
-                : 'bg-[#2E1052] text-purple-200'
-            }`}
-            title={soundEnabled ? '8-Bit Audio On' : 'Audio Muted'}
-          >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-gray-400" />}
-            <span className="font-arcade text-[10px]">{soundEnabled ? 'SFX ON' : 'MUTED'}</span>
-          </button>
-        </div>
+        {/* Audio Synthesizer Toggle */}
+        <button
+          onClick={handleSoundToggle}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-3 border-[#0D0518] text-xs font-mono font-black shadow-pixel-sm transition-all ${
+            soundEnabled
+              ? 'bg-[#FFDE25] text-[#0D0518]'
+              : 'bg-[#2E1052] text-purple-200'
+          }`}
+          title={soundEnabled ? '8-Bit Audio On' : 'Audio Muted'}
+        >
+          {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-gray-400" />}
+          <span className="font-arcade text-[10px]">{soundEnabled ? 'SFX ON' : 'MUTED'}</span>
+        </button>
       </header>
 
       {/* ========================================================================= */}
@@ -155,7 +129,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
         {/* Retro Header Tag */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FF5FA0] text-white font-arcade text-xs font-black uppercase tracking-widest border-3 border-[#0D0518] shadow-pixel-sm mb-3 animate-bounce">
           <Sparkles className="w-3.5 h-3.5 text-[#FFDE25]" />
-          <span>✦ LET'S PLAY ✦</span>
+          <span>✦ PLAYER 1 READY ✦</span>
         </div>
 
         {/* Grand Marquee Arcade Title "FUNTOPIA" */}
@@ -170,9 +144,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           THE INDIE ARCADE CHAMPIONSHIP PLATFORM
         </p>
 
-        {/* ======================================================================= */}
-        {/* ORIGINAL ILLUSTRATED ARCADE CABINET CONTROL PANEL WITH JOYSTICK & COIN  */}
-        {/* ======================================================================= */}
+        {/* ORIGINAL ILLUSTRATED ARCADE CABINET CONTROL PANEL WITH JOYSTICK & COIN */}
         <div className="w-72 sm:w-96 h-36 mb-6 relative flex items-center justify-center">
           <svg
             viewBox="0 0 340 130"
@@ -205,72 +177,37 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </svg>
         </div>
 
-        {/* ======================================================================= */}
-        {/* INTERACTIVE 'ENTER FUNTOPIA' CALL TO ACTION & PILL BUTTONS              */}
-        {/* ======================================================================= */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-lg mb-4">
-          {/* Main Giant Enter Button */}
-          <button
-            onClick={handleStart}
-            disabled={insertCoinActive}
-            className={`group relative px-8 py-4 sm:px-10 sm:py-4.5 rounded-2xl bg-[#FFDE25] text-[#0D0518] font-bungee text-lg sm:text-2xl tracking-wider uppercase border-4 border-[#0D0518] shadow-pixel-xl transition-all duration-150 hover:-translate-y-1 hover:shadow-pixel-lg active:translate-x-1 active:translate-y-1 active:shadow-none flex items-center justify-center gap-3 ${
-              insertCoinActive ? 'scale-95 bg-[#FF5FA0] text-white animate-pulse' : ''
-            }`}
-          >
-            <Gamepad2 className="w-6 h-6 text-[#0D0518] group-hover:rotate-12 transition-transform" />
-            <span>{insertCoinActive ? 'INSERTING COIN...' : 'ENTER FUNTOPIA'}</span>
-            <ArrowRight className="w-6 h-6 text-[#0D0518] group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+        {/* PRIMARY 'ENTER FUNTOPIA' / 'PRESS START' INTERACTION */}
+        <button
+          onClick={handleStart}
+          disabled={insertCoinActive}
+          className={`group relative px-8 py-4 sm:px-12 sm:py-5 rounded-2xl bg-[#FFDE25] text-[#0D0518] font-bungee text-xl sm:text-3xl tracking-wider uppercase border-4 border-[#0D0518] shadow-pixel-xl transition-all duration-150 hover:-translate-y-1 hover:shadow-pixel-lg active:translate-x-1 active:translate-y-1 active:shadow-none flex items-center justify-center gap-3 ${
+            insertCoinActive ? 'scale-95 bg-[#FF5FA0] text-white animate-pulse' : ''
+          }`}
+        >
+          <Gamepad2 className="w-7 h-7 text-[#0D0518] group-hover:rotate-12 transition-transform" />
+          <span>{insertCoinActive ? 'INSERTING COIN...' : 'ENTER FUNTOPIA'}</span>
+          <ArrowRight className="w-7 h-7 text-[#0D0518] group-hover:translate-x-1 transition-transform" />
+        </button>
 
-        {/* 3 Secondary Navigation Pills (Direct reference to Screen 3 of Reference Image) */}
-        <div className="flex items-center justify-center gap-3 flex-wrap mt-2">
-          <button
-            onClick={() => {
-              soundFx.play('click');
-              navigate('/admin');
-            }}
-            className="btn-pixel-yellow text-xs py-2 px-4 flex items-center gap-1.5"
-          >
-            <LogIn className="w-3.5 h-3.5" />
-            <span>OPERATOR SIGN IN</span>
-          </button>
-
-          <button
-            onClick={() => {
-              soundFx.play('click');
-              navigate('/participant');
-            }}
-            className="btn-pixel-green text-xs py-2 px-4 flex items-center gap-1.5"
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span>PUBLIC ARENA</span>
-          </button>
-        </div>
-
-        {/* Character Dialogue Bubble (Reference Screen 4 & 7) */}
+        {/* Character Dialogue Bubble */}
         <div className="mt-6 max-w-md bg-white text-[#0D0518] rounded-2xl border-4 border-[#0D0518] shadow-pixel p-3.5 relative text-xs font-mono font-bold flex items-center gap-3">
           <span className="text-3xl shrink-0">👾</span>
           <p className="text-left text-xs leading-relaxed font-semibold">
-            Ready to compete? Press <strong className="text-[#FF5FA0]">ENTER FUNTOPIA</strong> to view individual scores or register!
+            Press <strong className="text-[#FF5FA0]">ENTER FUNTOPIA</strong> to proceed to portal selection!
           </p>
         </div>
       </main>
 
-      {/* ========================================================================= */}
-      {/* FOOTER: PIXEL GRASS & BRICK PLATFORM WALKWAY BASELINE                      */}
-      {/* ========================================================================= */}
+      {/* FOOTER: PIXEL GRASS & BRICK PLATFORM WALKWAY BASELINE */}
       <footer className="relative z-20 w-full select-none">
-        {/* Emerald Pixel Grass Baseline */}
         <div className="pixel-grass-strip h-3.5 w-full" />
-
-        {/* Terracotta Pixel Brick Platform */}
         <div className="pixel-brick-strip py-3.5 px-6">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-white font-bold gap-2">
             <div className="flex items-center gap-2">
               <span className="text-xl">⭐</span>
               <span className="text-[#FFDE25] font-arcade text-[10px]">16-BIT CHAMPIONSHIP ENGINE</span>
-              <span className="text-purple-200 text-[10px] hidden md:inline">• INSERT 25¢ TO PLAY</span>
+              <span className="text-purple-200 text-[10px] hidden md:inline">• PRESS START TO CHOOSE PORTAL</span>
             </div>
             <div className="text-[10px] font-arcade text-white/90">
               HIGH SCORE: 999,990 • SYSTEM LIVE
