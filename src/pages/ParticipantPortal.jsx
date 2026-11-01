@@ -43,6 +43,17 @@ export default function ParticipantPortal({
   const [isJoining, setIsJoining] = useState(false);
   const [joinStatusBanner, setJoinStatusBanner] = useState(null); // { type: 'success' | 'error', message }
 
+  // Forward to auth callback if confirmation code, error, or token is present in URL
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const search = window.location.search;
+      const hash = window.location.hash;
+      if (search.includes('code=') || search.includes('error=') || hash.includes('access_token=') || hash.includes('error=')) {
+        navigate(`/auth/callback${search}${hash}`, { replace: true });
+      }
+    }
+  }, [navigate]);
+
   // Synchronize session profile
   const loggedInParticipant = useMemo(() => {
     if (!session?.participantId) return null;

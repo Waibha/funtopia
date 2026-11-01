@@ -216,6 +216,10 @@ export async function initiateParticipantRegistration({
   // If Supabase is configured, use real Supabase Auth email confirmation
   if (supabase) {
     try {
+      const redirectUrl = (typeof window !== 'undefined' && window.location?.origin)
+        ? `${window.location.origin}/auth/callback`
+        : 'http://localhost:5173/auth/callback';
+
       const { data, error } = await supabase.auth.signUp({
         email: cleanEmail,
         password,
@@ -225,7 +229,7 @@ export async function initiateParticipantRegistration({
             avatar: avatar || '👾',
             startingCoins: Number(startingCoins ?? 0),
           },
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/participant` : undefined,
+          emailRedirectTo: redirectUrl,
         },
       });
 
@@ -365,11 +369,15 @@ export async function resendParticipantVerification({ email }) {
 
   if (supabase) {
     try {
+      const redirectUrl = (typeof window !== 'undefined' && window.location?.origin)
+        ? `${window.location.origin}/auth/callback`
+        : 'http://localhost:5173/auth/callback';
+
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: cleanEmail,
         options: {
-          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/participant` : undefined,
+          emailRedirectTo: redirectUrl,
         },
       });
 

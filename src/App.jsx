@@ -5,6 +5,8 @@ import WelcomeHomepage from './pages/WelcomeHomepage';
 import PortalSelectPage from './pages/PortalSelectPage';
 import ParticipantPortal from './pages/ParticipantPortal';
 import AdminPortal from './pages/AdminPortal';
+import AuthCallback from './pages/AuthCallback';
+import { supabase } from './services/supabaseClient';
 import { loadStoredData, saveStoredData, INITIAL_DATA } from './services/mockData';
 import { calculateLeaderboard } from './utilities/leaderboardEngine';
 import { soundFx } from './utilities/soundFx';
@@ -20,6 +22,40 @@ export default function App() {
   useEffect(() => {
     saveStoredData(data);
   }, [data]);
+
+  // Synchronize authenticated Supabase session on auth state changes
+  useEffect(() => {
+    if (!supabase) return;
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        const user = session?.user;
+        if (user && user.email) {
+          setData((prev) => {
+            const cleanEmail = (user.email || '').toLowerCase();
+            const exists = (prev.participants || []).some(
+              (p) => (p.email || '').toLowerCase() === cleanEmail || p.id === user.id
+            );
+            if (exists) {
+              return {
+                ...prev,
+                participants: prev.participants.map((p) =>
+                  (p.email || '').toLowerCase() === cleanEmail || p.id === user.id
+                    ? { ...p, isEmailVerified: true }
+                    : p
+                ),
+              };
+            }
+            return prev;
+          });
+        }
+      }
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
 
   // Dynamic individual leaderboard computed in real-time
   const leaderboard = useMemo(() => {
@@ -188,24 +224,44 @@ export default function App() {
 
   // Participant Handlers
   const handleRegisterParticipant = (newParticipant) => {
-    const allocatedCoins = Number(newParticipant.coins || 0);
-    const startingAllocationTx = {
-      id: `ctx-start-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      participantId: newParticipant.id,
-      participantName: newParticipant.name,
-      amountDelta: allocatedCoins,
-      newBalance: allocatedCoins,
-      type: 'starting_allocation',
-      reason: 'Welcome Starting Coin Allocation',
-      timestamp: new Date().toISOString(),
-      admin: 'System Automation',
-    };
+    setData((prev) => {
+      const cleanEmail = (newParticipant.email || '').trim().toLowerCase();
+      const existingIdx = (prev.participants || []).findIndex(
+        (p) => p.id === newParticipant.id || ((p.email || '').trim().toLowerCase() === cleanEmail && cleanEmail.length > 0)
+      );
 
-    setData((prev) => ({
-      ...prev,
-      participants: [...(prev.participants || []), newParticipant],
-      coinTransactions: [startingAllocationTx, ...(prev.coinTransactions || [])],
-    }));
+      if (existingIdx !== -1) {
+        const updated = [...prev.participants];
+        updated[existingIdx] = {
+          ...updated[existingIdx],
+          ...newParticipant,
+          isEmailVerified: true,
+        };
+        return {
+          ...prev,
+          participants: updated,
+        };
+      }
+
+      const allocatedCoins = Number(newParticipant.coins || 0);
+      const startingAllocationTx = {
+        id: `ctx-start-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        participantId: newParticipant.id,
+        participantName: newParticipant.name,
+        amountDelta: allocatedCoins,
+        newBalance: allocatedCoins,
+        type: 'starting_allocation',
+        reason: 'Welcome Starting Coin Allocation',
+        timestamp: new Date().toISOString(),
+        admin: 'System Automation',
+      };
+
+      return {
+        ...prev,
+        participants: [...(prev.participants || []), newParticipant],
+        coinTransactions: [startingAllocationTx, ...(prev.coinTransactions || [])],
+      };
+    });
   };
 
   const handleRemoveParticipant = (participantId) => {
@@ -234,6 +290,18 @@ export default function App() {
 
         {/* Portal Selection Screen */}
         <Route path="/select-portal" element={<PortalSelectPage />} />
+
+        {/* Supabase Email Confirmation & PKCE Exchange Callback */}
+        <Route
+          path="/auth/callback"
+          element={
+            <AuthCallback
+              onRegisterParticipant={handleRegisterParticipant}
+              startingCoins={data.settings?.startingCoins ?? 0}
+              triggerCelebration={triggerCelebration}
+            />
+          }
+        />
 
         {/* Experience 2: Participant Portal */}
         <Route
