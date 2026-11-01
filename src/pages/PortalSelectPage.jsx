@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, ShieldCheck, ArrowRight, ArrowLeft, Users, Lock } from 'lucide-react';
+import { Trophy, ShieldCheck, ArrowRight, ArrowLeft, Users, Lock, Sparkles } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
 export default function PortalSelectPage() {
@@ -17,155 +17,190 @@ export default function PortalSelectPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#150A26] text-white flex flex-col justify-between p-4 sm:p-8 select-none">
+    <div className="relative min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between select-none overflow-x-hidden">
       {/* Background Graphic Grid */}
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="absolute inset-0 opacity-[0.08] pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(#F5EE00 1px, transparent 1px), linear-gradient(90deg, #F5EE00 1px, transparent 1px)`,
-          backgroundSize: '32px 32px',
+          backgroundImage: `linear-gradient(#FFDE25 1px, transparent 1px), linear-gradient(90deg, #FFDE25 1px, transparent 1px)`,
+          backgroundSize: '28px 28px',
         }}
       />
 
       {/* Top Header */}
-      <div className="relative z-10 max-w-6xl mx-auto w-full flex items-center justify-between">
+      <div className="relative z-10 max-w-6xl mx-auto w-full flex items-center justify-between p-4 sm:p-6">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#26123D] border-2 border-black text-xs font-mono font-bold text-purple-200 hover:bg-pop-purple hover:text-white shadow-pop-sm transition-all"
+          className="btn-pixel-white text-[11px] py-1.5 px-3 flex items-center gap-1.5"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>RETURN TO TITLE</span>
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>TITLE</span>
         </button>
 
-        <div className="flex items-center gap-2 font-mono text-xs text-pop-yellow font-bold">
-          <span className="w-2 h-2 rounded-full bg-pop-green animate-ping" />
-          <span>SELECT ACCESS LEVEL</span>
+        <div className="flex items-center gap-2 font-arcade text-[10px] text-[#FFDE25]">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#28C76F] animate-ping" />
+          <span>STAGE SELECT</span>
         </div>
       </div>
 
       {/* Main Choice Stage */}
-      <main className="relative z-10 max-w-5xl mx-auto w-full my-auto py-8">
-        <div className="text-center mb-10">
-          <span className="px-3 py-1 rounded-full bg-pop-purple text-white font-arcade text-[10px] font-black uppercase border-2 border-black shadow-pop-sm inline-block mb-3">
-            STAGE SELECT
+      <main className="relative z-10 max-w-5xl mx-auto w-full my-auto py-6 px-4">
+        <div className="text-center mb-8">
+          <span className="px-3 py-1 rounded-full bg-[#FF5FA0] text-white font-arcade text-[10px] font-black uppercase border-3 border-[#0D0518] shadow-pixel-sm inline-block mb-3">
+            SELECT ACCESS LEVEL
           </span>
-          <h2 className="font-bungee text-3xl sm:text-5xl text-pop-yellow tracking-wide drop-shadow-[2px_2px_0px_#180A28]">
+          <h2 className="font-bungee text-4xl sm:text-6xl text-[#FFDE25] pixel-title-yellow tracking-wide">
             CHOOSE YOUR PORTAL
           </h2>
-          <p className="text-purple-200 font-sans text-sm sm:text-base mt-2 max-w-md mx-auto">
-            Select your destination in the Funtopia championship universe.
+          <p className="text-purple-200 font-mono text-xs sm:text-sm mt-2 max-w-md mx-auto">
+            Choose whether to join the tournament as an individual participant or operate as tournament admin.
           </p>
         </div>
 
         {/* Dual Portal Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
           {/* ========================================================= */}
-          {/* PARTICIPANT PORTAL                                        */}
+          {/* PARTICIPANT PORTAL (Character Card Style - Screen 5)       */}
           {/* ========================================================= */}
           <div
             onClick={() => handleSelect('/participant')}
-            className="group cursor-pointer rounded-3xl bg-[#FAF7EE] text-[#180A28] border-4 border-black p-8 shadow-pop-lg hover:-translate-y-2 hover:shadow-pop-xl transition-all duration-200 flex flex-col justify-between"
+            className="group cursor-pointer rounded-3xl bg-white text-[#0D0518] border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-lg hover:-translate-y-2 hover:shadow-pixel-xl transition-all duration-200 flex flex-col justify-between"
           >
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <span className="px-3 py-1 rounded-full bg-pop-green text-[#180A28] font-arcade text-[9px] font-black uppercase border-2 border-black">
-                  OPEN PUBLIC ACCESS
+              <div className="flex items-center justify-between mb-4">
+                <span className="px-3 py-1 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518]">
+                  OPEN PUBLIC ARENA
                 </span>
-                <span className="w-10 h-10 rounded-xl bg-pop-yellow border-2 border-black shadow-pop-sm flex items-center justify-center text-xl">
+                <span className="w-10 h-10 rounded-xl bg-[#FFDE25] border-2 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-xl">
                   👾
                 </span>
               </div>
 
-              <div className="w-16 h-16 rounded-2xl bg-pop-coral border-3 border-black shadow-pop flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
-                <Trophy className="w-8 h-8 text-pop-yellow fill-pop-yellow" />
+              <div className="w-14 h-14 rounded-2xl bg-[#FF5FA0] border-3 border-[#0D0518] shadow-pixel flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                <Trophy className="w-7 h-7 text-[#FFDE25] fill-[#FFDE25]" />
               </div>
 
-              <h3 className="font-bungee text-2xl sm:text-3xl text-pop-ink mb-2">
+              <h3 className="font-bungee text-2xl sm:text-3xl text-[#0D0518] mb-2">
                 PARTICIPANT PORTAL
               </h3>
 
-              <p className="text-pop-muted font-sans text-sm font-medium mb-6">
-                Join the championship circuit! Register your player profile, view tournament standings, check game schedules, and track live scores in real time.
+              <p className="text-[#6B5E78] font-sans text-xs sm:text-sm font-medium mb-5">
+                Register your individual player handle, view verified podium standings, track active games, and earn points.
               </p>
 
-              <div className="space-y-2 text-xs font-mono font-bold text-pop-ink mb-8 bg-pop-butter p-4 rounded-2xl border-2 border-pop-ink">
+              {/* Character Sprites Preview (Direct tribute to screen 5: Choose your character) */}
+              <div className="bg-[#FFFDF5] p-3 rounded-2xl border-2 border-[#0D0518] mb-6">
+                <span className="font-arcade text-[9px] text-[#6B5E78] uppercase block mb-2 font-black">
+                  AVAILABLE SPRITES
+                </span>
+                <div className="flex items-center justify-around text-2xl">
+                  <span>👾</span>
+                  <span>🚀</span>
+                  <span>⚡</span>
+                  <span>⭐</span>
+                  <span>🔥</span>
+                  <span>🎯</span>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-xs font-mono font-bold text-[#0D0518] mb-6 bg-[#FAF7EE] p-3.5 rounded-2xl border-2 border-[#0D0518]">
                 <div className="flex items-center gap-2">
-                  <span>✓</span>
-                  <span>Individual Participant Registration</span>
+                  <span className="text-[#28C76F]">✓</span>
+                  <span>Individual Registration</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>✓</span>
-                  <span>Individual Leaderboard & Podium</span>
+                  <span className="text-[#28C76F]">✓</span>
+                  <span>Podium Standings & Leaderboard</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span>✓</span>
-                  <span>Game Rules & Point Schedules</span>
+                  <span className="text-[#28C76F]">✓</span>
+                  <span>Game Costs & Point Values</span>
                 </div>
               </div>
             </div>
 
-            <button className="w-full py-4 rounded-2xl bg-pop-coral text-white font-display font-black text-sm uppercase tracking-wider border-3 border-black shadow-pop group-hover:bg-pop-yellow group-hover:text-pop-ink transition-colors flex items-center justify-center gap-2">
+            <button className="btn-pixel-yellow w-full text-center justify-center">
               <span>ENTER AS PARTICIPANT</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
           {/* ========================================================= */}
-          {/* RESTRICTED ADMIN PORTAL                                   */}
+          {/* RESTRICTED ADMIN PORTAL (Classic 90s OS Window - Screen 2) */}
           {/* ========================================================= */}
           <div
             onClick={() => handleSelect('/admin')}
-            className="group cursor-pointer rounded-3xl bg-[#26123D] text-white border-4 border-black p-8 shadow-pop-lg hover:-translate-y-2 hover:shadow-pop-xl transition-all duration-200 flex flex-col justify-between"
+            className="group cursor-pointer rounded-3xl bg-[#D1D5DB] text-[#0D0518] border-4 border-[#0D0518] shadow-pixel-lg hover:-translate-y-2 hover:shadow-pixel-xl transition-all duration-200 flex flex-col justify-between overflow-hidden"
           >
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <span className="px-3 py-1 rounded-full bg-pop-coral text-white font-arcade text-[9px] font-black uppercase border-2 border-black">
-                  RESTRICTED / AUTHORIZED
-                </span>
-                <span className="w-10 h-10 rounded-xl bg-pop-purple border-2 border-black shadow-pop-sm flex items-center justify-center text-xl">
-                  🔒
-                </span>
-              </div>
-
-              <div className="w-16 h-16 rounded-2xl bg-pop-yellow border-3 border-black shadow-pop flex items-center justify-center text-pop-ink mb-6 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="w-8 h-8 text-pop-ink" />
-              </div>
-
-              <h3 className="font-bungee text-2xl sm:text-3xl text-pop-yellow mb-2">
-                ADMIN PORTAL
-              </h3>
-
-              <p className="text-purple-200 font-sans text-sm font-medium mb-6">
-                Owner & tournament administrator operating console. Requires Supabase authentication and verified server-side invitation clearance.
-              </p>
-
-              <div className="space-y-2 text-xs font-mono font-bold text-purple-200 mb-8 bg-[#180A28] p-4 rounded-2xl border-2 border-pop-ink">
-                <div className="flex items-center gap-2 text-pop-yellow">
-                  <span>🔒</span>
-                  <span>Invitation Hash / Server-Side RLS Protected</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>✦</span>
-                  <span>Event, Participant & Game Management</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>✦</span>
-                  <span>Live Point Dispatch & Score Transaction Ledger</span>
-                </div>
-              </div>
+            {/* Classic 90s Titlebar matching Screen 2 */}
+            <div className="bg-[#000080] text-white font-mono font-black text-xs px-4 py-2 flex items-center justify-between border-b-3 border-[#0D0518]">
+              <span className="flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5" />
+                <span>ADMIN_GATEWAY.EXE</span>
+              </span>
+              <span className="text-xs">✕</span>
             </div>
 
-            <button className="w-full py-4 rounded-2xl bg-pop-yellow text-pop-ink font-display font-black text-sm uppercase tracking-wider border-3 border-black shadow-pop group-hover:bg-pop-purple group-hover:text-white transition-colors flex items-center justify-center gap-2">
-              <span>ACCESS ADMIN STATION</span>
-              <Lock className="w-4 h-4" />
-            </button>
+            <div className="p-6 sm:p-8 flex flex-col justify-between flex-grow">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="px-3 py-1 rounded-full bg-[#FF5FA0] text-white font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518]">
+                    RESTRICTED
+                  </span>
+                  <span className="w-10 h-10 rounded-xl bg-[#40186D] border-2 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-xl text-[#FFDE25]">
+                    🔒
+                  </span>
+                </div>
+
+                {/* "ARE YOU READY?" dialogue box recreation */}
+                <div className="bg-white border-3 border-[#0D0518] p-4 text-center rounded-xl mb-4 shadow-pixel-sm">
+                  <span className="font-arcade text-xs text-[#0D0518] block font-black mb-1">
+                    ARE YOU READY ?
+                  </span>
+                  <span className="text-[10px] font-mono text-gray-500 font-bold">
+                    AUTHORIZED OPERATORS ONLY
+                  </span>
+                </div>
+
+                <h3 className="font-bungee text-2xl sm:text-3xl text-[#0D0518] mb-2">
+                  ADMIN CONSOLE
+                </h3>
+
+                <p className="text-gray-700 font-sans text-xs sm:text-sm font-medium mb-5">
+                  Restricted to the Owner and authorized tournament operators. Requires verified authentication.
+                </p>
+
+                <div className="space-y-2 text-xs font-mono font-bold text-[#0D0518] mb-6 bg-white p-3.5 rounded-2xl border-2 border-[#0D0518]">
+                  <div className="flex items-center gap-2 text-[#000080]">
+                    <span>🔒</span>
+                    <span>Protected Operator Console</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>✦</span>
+                    <span>Event & Game Budget Management</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>✦</span>
+                    <span>Direct Score Dispatch & Reversals</span>
+                  </div>
+                </div>
+              </div>
+
+              <button className="btn-pixel-pink w-full text-center justify-center">
+                <span>ENTER ADMIN CONSOLE</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 max-w-6xl mx-auto w-full text-center text-xs font-mono text-purple-400">
-        FUNTOPIA GAMING CIRCUIT • PROTECTED BY SUPABASE ROW LEVEL SECURITY
+      {/* Footer Brick Platform */}
+      <footer className="relative z-10 w-full mt-6">
+        <div className="pixel-grass-strip h-3 w-full" />
+        <div className="pixel-brick-strip py-3 px-6 text-center text-xs font-arcade text-[#FFDE25]">
+          FUNTOPIA CHAMPIONSHIP CIRCUIT
+        </div>
       </footer>
     </div>
   );

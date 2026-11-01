@@ -30,81 +30,81 @@ export default function ParticipantPortal({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF7EE] text-[#180A28] flex flex-col justify-between selection:bg-pop-yellow selection:text-pop-ink font-sans">
+    <div className="min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between selection:bg-[#FFDE25] selection:text-[#0D0518] font-sans">
       {/* Background Graphic Texture */}
       <div
-        className="fixed inset-0 opacity-[0.04] pointer-events-none"
+        className="fixed inset-0 opacity-[0.06] pointer-events-none"
         style={{
-          backgroundImage: `linear-gradient(#180A28 1px, transparent 1px), linear-gradient(90deg, #180A28 1px, transparent 1px)`,
-          backgroundSize: '28px 28px',
+          backgroundImage: `linear-gradient(#FFDE25 1px, transparent 1px), linear-gradient(90deg, #FFDE25 1px, transparent 1px)`,
+          backgroundSize: '24px 24px',
         }}
       />
 
       <div className="relative z-10 flex flex-col flex-grow">
         {/* Universal Participant Header */}
-        <header className="sticky top-0 z-40 bg-[#FAF7EE]/95 backdrop-blur-md border-b-3 border-pop-ink select-none">
+        <header className="sticky top-0 z-40 bg-[#40186D]/95 backdrop-blur-md border-b-4 border-[#0D0518] select-none">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex items-center justify-between h-20 py-3">
               {/* Brand and Breadcrumb */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => navigate('/select-portal')}
-                  className="w-10 h-10 rounded-xl bg-pop-butter border-2 border-pop-ink flex items-center justify-center text-pop-ink hover:bg-pop-yellow transition-colors shadow-pop-sm"
+                  className="btn-pixel-white p-2.5 rounded-xl"
                   title="Switch Portal"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-4 h-4" />
                 </button>
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bungee text-xl sm:text-2xl tracking-wide text-pop-ink">
+                    <span className="font-bungee text-xl sm:text-2xl tracking-wide text-[#FFDE25] pixel-title-yellow">
                       FUNTOPIA
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-pop-green text-[#180A28] font-arcade text-[9px] font-black uppercase border border-pop-ink shadow-pop-sm">
-                      PARTICIPANT PORTAL
+                    <span className="px-2 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm">
+                      PARTICIPANT ARENA
                     </span>
                   </div>
-                  <p className="text-[10px] font-mono text-pop-muted tracking-wider font-bold">
+                  <p className="text-[10px] font-mono text-purple-200 tracking-wider font-bold">
                     EVENT: {activeEvent?.name}
                   </p>
                 </div>
               </div>
 
-              {/* Navigation Tabs */}
-              <nav className="hidden sm:flex items-center gap-2 bg-pop-butter p-1.5 rounded-2xl border-2 border-pop-ink shadow-pop-sm">
+              {/* Navigation Tabs (Inspired by the Pill Buttons in Screen 3) */}
+              <nav className="hidden sm:flex items-center gap-2 bg-[#2B0E4C] p-1.5 rounded-2xl border-3 border-[#0D0518] shadow-pixel-sm">
                 <button
                   onClick={() => handleTabChange('leaderboard')}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-arcade font-black tracking-wider transition-all ${
                     activeTab === 'leaderboard'
-                      ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
-                      : 'text-pop-ink hover:bg-white/80'
+                      ? 'bg-[#FFDE25] text-[#0D0518] border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                      : 'text-purple-200 hover:text-white'
                   }`}
                 >
-                  <Trophy className="w-4 h-4" />
-                  <span>LEADERBOARD</span>
+                  <Trophy className="w-3.5 h-3.5" />
+                  <span>STANDINGS</span>
                 </button>
 
                 <button
                   onClick={() => handleTabChange('register')}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-arcade font-black tracking-wider transition-all ${
                     activeTab === 'register'
-                      ? 'bg-pop-coral text-white border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
-                      : 'text-pop-ink hover:bg-white/80'
+                      ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                      : 'text-purple-200 hover:text-white'
                   }`}
                 >
-                  <UserPlus className="w-4 h-4" />
+                  <UserPlus className="w-3.5 h-3.5" />
                   <span>REGISTER</span>
                 </button>
 
                 <button
                   onClick={() => handleTabChange('games')}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-arcade font-black tracking-wider transition-all ${
                     activeTab === 'games'
-                      ? 'bg-pop-purple text-white border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
-                      : 'text-pop-ink hover:bg-white/80'
+                      ? 'bg-[#28C76F] text-[#0D0518] border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                      : 'text-purple-200 hover:text-white'
                   }`}
                 >
-                  <Gamepad2 className="w-4 h-4" />
+                  <Gamepad2 className="w-3.5 h-3.5" />
                   <span>GAMES</span>
                 </button>
               </nav>
@@ -113,8 +113,8 @@ export default function ParticipantPortal({
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleSoundToggle}
-                  className={`p-2.5 rounded-xl border-2 border-pop-ink shadow-pop-sm transition-all ${
-                    soundEnabled ? 'bg-pop-purple text-white' : 'bg-white text-pop-muted'
+                  className={`p-2.5 rounded-xl border-3 border-[#0D0518] shadow-pixel-sm transition-all ${
+                    soundEnabled ? 'bg-[#FFDE25] text-[#0D0518]' : 'bg-[#2B0E4C] text-purple-200'
                   }`}
                 >
                   {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -125,36 +125,36 @@ export default function ParticipantPortal({
                     soundFx.play('fanfare');
                     triggerCelebration();
                   }}
-                  className="p-2.5 rounded-xl bg-pop-coral text-white border-2 border-pop-ink shadow-pop-sm hover:-translate-y-0.5 transition-all"
+                  className="btn-pixel-pink p-2.5"
                   title="Celebrate"
                 >
-                  <Sparkles className="w-4 h-4 text-pop-yellow" />
+                  <Sparkles className="w-4 h-4 text-[#FFDE25]" />
                 </button>
               </div>
             </div>
 
             {/* Mobile Tab Bar */}
-            <div className="flex sm:hidden items-center justify-between py-2 border-t-2 border-pop-ink/20 gap-1">
+            <div className="flex sm:hidden items-center justify-between py-2 border-t-2 border-[#0D0518] gap-1">
               <button
                 onClick={() => handleTabChange('leaderboard')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
-                  activeTab === 'leaderboard' ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink' : 'text-pop-muted'
+                className={`flex-1 py-1.5 rounded-lg text-[10px] font-arcade font-black text-center ${
+                  activeTab === 'leaderboard' ? 'bg-[#FFDE25] text-[#0D0518] border-2 border-[#0D0518]' : 'text-purple-200'
                 }`}
               >
-                LEADERBOARD
+                STANDINGS
               </button>
               <button
                 onClick={() => handleTabChange('register')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
-                  activeTab === 'register' ? 'bg-pop-coral text-white border-2 border-pop-ink' : 'text-pop-muted'
+                className={`flex-1 py-1.5 rounded-lg text-[10px] font-arcade font-black text-center ${
+                  activeTab === 'register' ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518]' : 'text-purple-200'
                 }`}
               >
                 REGISTER
               </button>
               <button
                 onClick={() => handleTabChange('games')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
-                  activeTab === 'games' ? 'bg-pop-purple text-white border-2 border-pop-ink' : 'text-pop-muted'
+                className={`flex-1 py-1.5 rounded-lg text-[10px] font-arcade font-black text-center ${
+                  activeTab === 'games' ? 'bg-[#28C76F] text-[#0D0518] border-2 border-[#0D0518]' : 'text-purple-200'
                 }`}
               >
                 GAMES
@@ -172,7 +172,7 @@ export default function ParticipantPortal({
         />
 
         {/* Participant Main Body */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-grow">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-grow py-6">
           {activeTab === 'leaderboard' && (
             <PublicLeaderboard
               leaderboard={leaderboard}
@@ -193,55 +193,57 @@ export default function ParticipantPortal({
           )}
 
           {activeTab === 'games' && (
-            <div className="py-8 space-y-6">
-              <div className="bg-pop-purple text-white rounded-3xl border-3 border-pop-ink p-6 sm:p-8 shadow-pop-lg">
-                <span className="px-3 py-1 rounded-full bg-pop-yellow text-pop-ink font-arcade text-[10px] font-black uppercase border-2 border-pop-ink shadow-pop-sm inline-block mb-2">
-                  EVENT GAMES
+            <div className="space-y-6">
+              {/* Rules & Format Header (Direct homage to Screen 6: "RULES!") */}
+              <div className="bg-[#40186D] text-white rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-lg">
+                <span className="px-3 py-1 rounded-full bg-[#FF5FA0] text-white font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
+                  RULEBOOK & FORMAT
                 </span>
-                <h2 className="font-bungee text-3xl sm:text-4xl text-pop-yellow">
+                <h2 className="font-bungee text-4xl sm:text-5xl text-[#FFDE25] pixel-title-yellow">
                   CHAMPIONSHIP GAMES
                 </h2>
-                <p className="text-purple-100 font-sans text-sm mt-1 max-w-2xl font-medium">
-                  Review costs, point values, and active status for all games in {activeEvent?.name}.
+                <p className="text-purple-200 font-mono text-xs sm:text-sm mt-1 max-w-2xl font-medium">
+                  Review costs/budgets, point values, and active status for all games in {activeEvent?.name}.
                 </p>
               </div>
 
+              {/* Game Cartridges Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {data.games.map((g) => (
                   <div
                     key={g.id}
-                    className="p-6 rounded-3xl bg-white border-3 border-pop-ink shadow-pop space-y-4"
+                    className="p-6 rounded-3xl bg-white text-[#0D0518] border-4 border-[#0D0518] shadow-pixel-lg space-y-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h3 className="font-display font-black text-2xl text-pop-ink">
+                        <h3 className="font-display font-black text-2xl text-[#0D0518]">
                           {g.name}
                         </h3>
                         {g.description && (
-                          <p className="text-sm font-sans text-pop-muted font-medium mt-1">
+                          <p className="text-xs font-mono text-gray-600 font-medium mt-1">
                             {g.description}
                           </p>
                         )}
                       </div>
 
-                      <span className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black border-2 border-pop-ink ${
-                        g.isActive ? 'bg-pop-green text-[#180A28]' : 'bg-pop-butter text-pop-muted'
+                      <span className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black border-2 border-[#0D0518] ${
+                        g.isActive ? 'bg-[#28C76F] text-[#0D0518]' : 'bg-gray-200 text-gray-500'
                       }`}>
                         {g.isActive ? 'ACTIVE' : 'INACTIVE'}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 bg-pop-butter p-4 rounded-2xl border-2 border-pop-ink text-center font-mono">
+                    <div className="grid grid-cols-2 gap-3 bg-[#FAF7EE] p-4 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
                       <div>
-                        <span className="text-[10px] text-pop-muted block font-bold">GAME COST / BUDGET</span>
-                        <span className="text-xl font-black text-pop-coral flex items-center justify-center gap-1">
+                        <span className="text-[10px] text-gray-500 block font-bold uppercase">GAME COST / BUDGET</span>
+                        <span className="text-xl font-black text-[#FF5FA0] flex items-center justify-center gap-1">
                           <Coins className="w-4 h-4" />
                           ${Number(g.cost || 0).toLocaleString()}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-pop-muted block font-bold">POINTS VALUE</span>
-                        <span className="text-xl font-black text-pop-purple">
+                        <span className="text-[10px] text-gray-500 block font-bold uppercase">POINTS VALUE</span>
+                        <span className="text-xl font-black text-[#5C2D91]">
                           {Number(g.points || 0).toLocaleString()} PTS
                         </span>
                       </div>
@@ -253,16 +255,19 @@ export default function ParticipantPortal({
           )}
         </main>
 
-        {/* Footer */}
-        <footer className="border-t-3 border-pop-ink py-6 bg-pop-butter mt-16 text-center text-xs font-mono text-pop-muted select-none">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div className="flex items-center gap-2 font-bold text-pop-ink">
-              <span className="font-bungee text-sm">FUNTOPIA</span>
-              <span>•</span>
-              <span>PARTICIPANT EXPERIENCE</span>
-            </div>
-            <div className="text-xs font-bold text-pop-ink">
-              INDIVIDUAL STANDINGS
+        {/* Footer: Pixel Brick Platform */}
+        <footer className="w-full mt-16 select-none">
+          <div className="pixel-grass-strip h-3 w-full" />
+          <div className="pixel-brick-strip py-4 px-6 text-center text-xs font-mono text-white">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div className="flex items-center gap-2 font-black text-[#FFDE25]">
+                <span className="font-arcade text-xs">FUNTOPIA</span>
+                <span>•</span>
+                <span>PARTICIPANT EXPERIENCE</span>
+              </div>
+              <div className="text-xs font-arcade text-white/90">
+                16-BIT CHAMPIONSHIP ENGINE
+              </div>
             </div>
           </div>
         </footer>

@@ -56,24 +56,24 @@ export default function EventManagement({
   };
 
   return (
-    <div className="py-8 space-y-8 max-w-7xl mx-auto">
+    <div className="py-4 space-y-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Calendar className="w-5 h-5 text-pop-coral" />
-            <h1 className="font-bungee text-2xl sm:text-3xl text-pop-ink">
+            <Calendar className="w-5 h-5 text-[#FF5FA0]" />
+            <h1 className="font-bungee text-2xl sm:text-4xl text-[#FFDE25] pixel-title-yellow">
               EVENTS
             </h1>
           </div>
-          <p className="text-pop-muted font-sans text-xs sm:text-sm font-medium">
+          <p className="text-purple-200 font-mono text-xs sm:text-sm font-medium">
             Create and manage events. The active event sets the stage for scores and standings.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="btn-pop-coral flex items-center gap-2"
+          className="btn-pixel-pink flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           <span>CREATE EVENT</span>
@@ -88,40 +88,40 @@ export default function EventManagement({
           return (
             <div
               key={evt.id}
-              className={`rounded-3xl p-6 border-3 border-pop-ink flex flex-col justify-between transition-all duration-200 ${
+              className={`rounded-3xl p-6 border-4 border-[#0D0518] flex flex-col justify-between transition-all duration-200 text-[#0D0518] ${
                 isActive
-                  ? 'bg-pop-yellow-light shadow-pop-lg'
-                  : 'bg-white shadow-pop hover:-translate-y-1'
+                  ? 'bg-[#FFDE25] shadow-pixel-xl'
+                  : 'bg-white shadow-pixel-lg hover:-translate-y-1'
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span
-                    className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black uppercase border-2 border-pop-ink shadow-pop-sm ${
+                    className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm ${
                       isActive
-                        ? 'bg-pop-yellow text-pop-ink'
-                        : 'bg-pop-butter text-pop-muted'
+                        ? 'bg-[#0D0518] text-[#FFDE25]'
+                        : 'bg-[#FAF7EE] text-gray-600'
                     }`}
                   >
-                    {isActive ? 'ACTIVE EVENT' : 'EVENT'}
+                    {isActive ? 'ACTIVE EVENT' : 'TOURNAMENT'}
                   </span>
                 </div>
 
-                <h3 className="font-display font-black text-2xl text-pop-ink mb-2">
+                <h3 className="font-display font-black text-2xl text-[#0D0518] mb-2">
                   {evt.name}
                 </h3>
                 {evt.description && (
-                  <p className="text-pop-muted font-sans text-sm font-medium mb-4">
+                  <p className="text-gray-700 font-mono text-xs font-medium mb-4">
                     {evt.description}
                   </p>
                 )}
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between pt-4 border-t-2 border-pop-ink/20 gap-2">
+              <div className="flex items-center justify-between pt-4 border-t-2 border-[#0D0518]/30 gap-2">
                 <button
                   onClick={() => handleOpenEdit(evt)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-pop-butter text-pop-ink border-2 border-pop-ink font-mono text-xs font-bold shadow-pop-sm transition-all"
+                  className="btn-pixel-white text-xs py-1.5 px-3 flex items-center gap-1.5"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                   <span>Edit</span>
@@ -130,15 +130,15 @@ export default function EventManagement({
                 {!isActive ? (
                   <button
                     onClick={() => handleActivateEvent(evt.id)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-pop-yellow hover:bg-yellow-300 text-pop-ink font-display font-black text-xs uppercase border-2 border-pop-ink shadow-pop-sm transition-all"
+                    className="btn-pixel-yellow text-xs py-1.5 px-3 flex items-center gap-1.5"
                   >
-                    <Play className="w-3.5 h-3.5 fill-pop-ink" />
+                    <Play className="w-3.5 h-3.5 fill-[#0D0518]" />
                     <span>Set Active</span>
                   </button>
                 ) : (
-                  <span className="text-xs font-arcade text-pop-ink font-black flex items-center gap-1 bg-pop-yellow px-2.5 py-1 rounded-lg border border-pop-ink">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-pop-coral" />
-                    <span>CURRENT ACTIVE</span>
+                  <span className="text-xs font-arcade text-[#0D0518] font-black flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border-2 border-[#0D0518] shadow-pixel-sm">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#28C76F]" />
+                    <span>ACTIVE</span>
                   </span>
                 )}
               </div>
@@ -149,25 +149,25 @@ export default function EventManagement({
 
       {/* CREATE / EDIT EVENT MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pop-ink/70 backdrop-blur-xs">
-          <div className="relative w-full max-w-md bg-white border-4 border-pop-ink rounded-3xl p-6 sm:p-8 shadow-pop-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0D0518]/80 backdrop-blur-xs">
+          <div className="relative w-full max-w-md bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 sm:p-8 shadow-pixel-xl">
             <button
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 text-pop-muted hover:text-pop-ink font-mono text-lg font-black"
+              className="absolute top-4 right-4 text-gray-500 hover:text-[#0D0518] font-mono text-lg font-black"
             >
               ✕
             </button>
 
-            <h2 className="font-bungee text-2xl text-pop-ink mb-1">
+            <h2 className="font-bungee text-2xl text-[#0D0518] mb-1">
               {editingEvent ? 'EDIT EVENT' : 'CREATE EVENT'}
             </h2>
-            <p className="text-xs text-pop-muted font-sans mb-5 font-bold">
+            <p className="text-xs text-gray-600 font-mono mb-5 font-bold">
               Enter the event name and an optional short description.
             </p>
 
             <form onSubmit={handleFormSubmit} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="block text-pop-ink mb-1.5 font-black text-sm">
+                <label className="block text-[#0D0518] mb-1.5 font-black text-sm">
                   EVENT NAME *
                 </label>
                 <input
@@ -176,12 +176,12 @@ export default function EventManagement({
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. Summer Championship 2026"
-                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral text-sm"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0] text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-pop-ink mb-1.5 font-black text-sm">
+                <label className="block text-[#0D0518] mb-1.5 font-black text-sm">
                   SHORT DESCRIPTION (OPTIONAL)
                 </label>
                 <textarea
@@ -189,22 +189,22 @@ export default function EventManagement({
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="e.g. Annual competitive tournament across all games."
-                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-medium focus:outline-none focus:border-pop-coral text-sm"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-medium focus:outline-none focus:border-[#FF5FA0] text-sm"
                 />
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-pop-ink">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-[#0D0518]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-pop-butter border-2 border-pop-ink text-pop-ink font-mono font-bold"
+                  className="btn-pixel-white text-xs py-2 px-4"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-pop-coral"
+                  className="btn-pixel-pink text-xs py-2 px-4"
                 >
                   {editingEvent ? 'SAVE EVENT' : 'CREATE EVENT'}
                 </button>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { soundFx } from '../../utilities/soundFx';
 
 export default function ParticipantRegistration({
@@ -15,7 +15,21 @@ export default function ParticipantRegistration({
 
   const [registeredCard, setRegisteredCard] = useState(null);
 
-  const avatars = ['👾', '🚀', '⚡', '🦅', '⚔️', '🌀', '🛡️', '🔥', '🦊', '🐺', '🐉', '⭐'];
+  // Diverse pixel adventure character sprites referencing Screen 5: "CHOOSE YOUR CHARACTER"
+  const avatars = [
+    { icon: '👾', name: 'Alien Pixel' },
+    { icon: '🤠', name: 'Ranger' },
+    { icon: '🧕', name: 'Mystic' },
+    { icon: '🦊', name: 'Fox Pilot' },
+    { icon: '🧑‍🎤', name: 'Arcade Punk' },
+    { icon: '🐻', name: 'Bruin' },
+    { icon: '🚀', name: 'Cosmonaut' },
+    { icon: '⚡', name: 'Volt Striker' },
+    { icon: '⚔️', name: 'Knight' },
+    { icon: '🐉', name: 'Dragon' },
+    { icon: '🔥', name: 'Blaze' },
+    { icon: '⭐', name: 'Starlight' },
+  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,67 +51,67 @@ export default function ParticipantRegistration({
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 py-6 select-none">
-      {/* Registration Header */}
-      <div className="bg-pop-yellow rounded-3xl border-3 border-pop-ink p-6 sm:p-8 shadow-pop-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* Header Banner - Directly Inspired by Screen 5: "CHOOSE YOUR CHARACTER" */}
+      <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <span className="px-3 py-1 rounded-full bg-pop-coral text-white font-arcade text-[10px] font-black uppercase border-2 border-pop-ink shadow-pop-sm inline-block mb-2">
-            PARTICIPANT REGISTRATION
+          <span className="px-3 py-1 rounded-full bg-[#FF5FA0] text-white font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
+            PLAYER ONBOARDING
           </span>
-          <h2 className="font-bungee text-3xl sm:text-4xl text-pop-ink">
-            JOIN THE LEADERBOARD
+          <h2 className="font-bungee text-3xl sm:text-4xl text-[#FFDE25] pixel-title-yellow">
+            CHOOSE YOUR CHARACTER
           </h2>
-          <p className="text-pop-ink font-sans text-sm font-semibold mt-1">
-            Register yourself for <span className="font-bold underline">{activeEvent?.name}</span> to earn individual points.
+          <p className="text-purple-200 font-mono text-xs sm:text-sm mt-1">
+            Register your player profile for <span className="text-[#FFDE25] font-black underline">{activeEvent?.name}</span>.
           </p>
         </div>
 
-        <div className="text-right shrink-0">
-          <span className="font-mono text-xs text-pop-muted block font-bold">TOTAL PARTICIPANTS</span>
-          <span className="font-mono text-2xl font-black text-pop-ink">
-            {registeredList.length} REGISTERED
+        <div className="text-right shrink-0 bg-[#0D0518]/50 p-3 rounded-2xl border-2 border-[#0D0518]">
+          <span className="font-arcade text-[9px] text-[#FF5FA0] block font-black">REGISTERED</span>
+          <span className="font-arcade text-xl text-[#FFDE25] font-black">
+            {registeredList.length} PLAYERS
           </span>
         </div>
       </div>
 
-      {/* Confirmation Badge Card if registered */}
+      {/* Confirmation Card if registered */}
       {registeredCard ? (
-        <div className="bg-white rounded-3xl border-4 border-pop-ink p-8 shadow-pop-xl text-center space-y-6 animate-fade-in">
-          <div className="w-20 h-20 rounded-full bg-pop-green border-3 border-pop-ink shadow-pop mx-auto flex items-center justify-center text-4xl">
+        <div className="bg-white text-[#0D0518] rounded-3xl border-4 border-[#0D0518] p-8 shadow-pixel-xl text-center space-y-6">
+          <div className="w-20 h-20 rounded-full bg-[#28C76F] border-3 border-[#0D0518] shadow-pixel mx-auto flex items-center justify-center text-4xl text-white">
             ✓
           </div>
 
           <div>
-            <span className="px-3 py-1 rounded-full bg-pop-purple text-white font-arcade text-[10px] font-black uppercase border-2 border-pop-ink shadow-pop-sm inline-block mb-2">
-              REGISTRATION CONFIRMED
+            <span className="px-3 py-1 rounded-full bg-[#5C2D91] text-white font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
+              CHARACTER CREATED
             </span>
-            <h3 className="font-bungee text-3xl text-pop-ink">
-              YOU'RE REGISTERED!
+            <h3 className="font-bungee text-3xl text-[#0D0518]">
+              REGISTRATION CONFIRMED!
             </h3>
-            <p className="text-pop-muted font-sans text-sm font-medium mt-1">
-              Your profile is live on the individual leaderboard.
+            <p className="text-gray-600 font-mono text-xs mt-1">
+              Your player pass is active on the championship leaderboard.
             </p>
           </div>
 
-          {/* Participant Badge Preview */}
-          <div className="max-w-sm mx-auto bg-pop-butter border-3 border-pop-ink rounded-2xl p-6 shadow-pop text-left space-y-3">
-            <div className="flex items-center justify-between border-b-2 border-pop-ink pb-3">
-              <span className="font-arcade text-xs text-pop-coral font-black">FUNTOPIA PARTICIPANT</span>
-              <span className="text-3xl">{registeredCard.avatar}</span>
+          {/* Player Badge Styled as Retro Dialogue Pass */}
+          <div className="max-w-sm mx-auto bg-[#FFFDF5] border-3 border-[#0D0518] rounded-2xl p-6 shadow-pixel text-left space-y-3">
+            <div className="flex items-center justify-between border-b-2 border-[#0D0518] pb-3">
+              <span className="font-arcade text-xs text-[#FF5FA0] font-black">PLAYER CARD</span>
+              <span className="text-4xl">{registeredCard.avatar}</span>
             </div>
 
             <div>
-              <span className="text-[10px] font-mono text-pop-muted uppercase font-bold block">PARTICIPANT NAME</span>
-              <span className="font-display font-black text-2xl text-pop-ink tracking-wider">
+              <span className="text-[10px] font-mono text-gray-500 uppercase font-black block">PLAYER NAME</span>
+              <span className="font-display font-black text-2xl text-[#0D0518] tracking-wider">
                 {registeredCard.name}
               </span>
             </div>
 
-            <div className="text-xs font-mono font-bold pt-2 border-t border-pop-ink/20 text-pop-muted">
+            <div className="text-xs font-mono font-bold pt-2 border-t border-[#0D0518]/20 text-gray-600">
               Email: {registeredCard.email}
             </div>
 
-            <div className="text-[10px] font-mono text-pop-muted">
-              Participant ID: {registeredCard.id} • Active
+            <div className="text-[10px] font-mono text-gray-500">
+              Player ID: {registeredCard.id} • Active
             </div>
           </div>
 
@@ -106,76 +120,91 @@ export default function ParticipantRegistration({
               setRegisteredCard(null);
               setFormData({ name: '', email: '', avatar: '👾' });
             }}
-            className="btn-pop-yellow text-xs font-mono font-black"
+            className="btn-pixel-yellow text-xs"
           >
             Register Another Participant
           </button>
         </div>
       ) : (
         /* Registration Form */
-        <div className="bg-white rounded-3xl border-3 border-pop-ink p-6 sm:p-8 shadow-pop">
+        <div className="bg-white text-[#0D0518] rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-lg">
           <form onSubmit={handleSubmit} className="space-y-6 text-xs font-mono">
+            {/* Character Sprite Selection Row (Screen 5 Tribute) */}
             <div>
-              <label className="block text-pop-ink mb-1.5 font-black text-sm">
-                FULL NAME *
+              <label className="block text-[#0D0518] mb-2 font-black text-sm">
+                1. SELECT YOUR SPRITE / AVATAR
               </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g. Alex Rivera"
-                className="w-full px-4 py-3 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral text-sm"
-              />
-            </div>
 
-            <div>
-              <label className="block text-pop-ink mb-1.5 font-black text-sm">
-                EMAIL ADDRESS *
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="participant@example.com"
-                className="w-full px-4 py-3 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral text-sm"
-              />
-            </div>
+              {/* Character selection tiles on pixel grass footing */}
+              <div className="bg-[#FAF7EE] p-4 rounded-2xl border-3 border-[#0D0518]">
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5">
+                  {avatars.map((av) => (
+                    <button
+                      type="button"
+                      key={av.icon}
+                      onClick={() => {
+                        soundFx.play('click');
+                        setFormData({ ...formData, avatar: av.icon });
+                      }}
+                      className={`p-3 rounded-2xl flex flex-col items-center justify-center border-3 border-[#0D0518] transition-all ${
+                        formData.avatar === av.icon
+                          ? 'bg-[#FFDE25] scale-105 shadow-pixel -translate-y-1'
+                          : 'bg-white hover:bg-[#FFFDF5]'
+                      }`}
+                    >
+                      <span className="text-3xl mb-1">{av.icon}</span>
+                      <span className="text-[9px] font-arcade truncate max-w-full font-black text-[#0D0518]">
+                        {formData.avatar === av.icon ? 'READY' : ''}
+                      </span>
+                    </button>
+                  ))}
+                </div>
 
-            {/* Avatar Selection */}
-            <div>
-              <label className="block text-pop-ink mb-2 font-black text-sm">
-                CHOOSE AVATAR
-              </label>
-              <div className="flex flex-wrap gap-2.5">
-                {avatars.map((av) => (
-                  <button
-                    type="button"
-                    key={av}
-                    onClick={() => setFormData({ ...formData, avatar: av })}
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl border-2 border-pop-ink transition-transform ${
-                      formData.avatar === av
-                        ? 'bg-pop-yellow scale-110 shadow-pop-sm font-black'
-                        : 'bg-pop-butter hover:bg-white'
-                    }`}
-                  >
-                    {av}
-                  </button>
-                ))}
+                <div className="pixel-grass-strip h-3 w-full mt-3 rounded" />
               </div>
             </div>
 
-            <div className="pt-4 border-t-2 border-pop-ink flex items-center justify-between">
-              <span className="text-xs text-pop-muted font-bold">
-                ✓ Instant entry into individual standings
+            {/* Form Inputs */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm">
+                  2. FULL NAME *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. Alex Rivera"
+                  className="w-full px-4 py-3 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0] text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm">
+                  3. EMAIL ADDRESS *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="player@example.com"
+                  className="w-full px-4 py-3 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0] text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 border-t-3 border-[#0D0518] flex items-center justify-between">
+              <span className="text-xs text-gray-500 font-bold">
+                ✓ Ready for immediate tournament entry
               </span>
 
               <button
                 type="submit"
-                className="btn-pop-coral flex items-center gap-2"
+                className="btn-pixel-pink flex items-center gap-2"
               >
-                <span>REGISTER PARTICIPANT</span>
+                <span>CONFIRM REGISTRATION</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

@@ -92,39 +92,39 @@ export default function AdminPortal({
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF7EE] text-[#180A28] flex flex-col justify-between selection:bg-pop-yellow selection:text-pop-ink font-sans">
+    <div className="min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between selection:bg-[#FFDE25] selection:text-[#0D0518] font-sans">
       <div className="relative z-10 flex flex-col flex-grow">
         {/* Admin Header */}
-        <header className="sticky top-0 z-40 bg-[#FAF7EE]/95 backdrop-blur-md border-b-3 border-pop-ink select-none">
+        <header className="sticky top-0 z-40 bg-[#40186D]/95 backdrop-blur-md border-b-4 border-[#0D0518] select-none">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex items-center justify-between h-20 py-3">
               {/* Brand & Portal Switch */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => navigate('/select-portal')}
-                  className="w-10 h-10 rounded-xl bg-pop-butter border-2 border-pop-ink flex items-center justify-center text-pop-ink hover:bg-pop-yellow transition-colors shadow-pop-sm"
+                  className="btn-pixel-white p-2.5 rounded-xl"
                   title="Return to Portal Selection"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-4 h-4" />
                 </button>
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bungee text-xl sm:text-2xl tracking-wide text-pop-ink">
+                    <span className="font-bungee text-xl sm:text-2xl tracking-wide text-[#FFDE25] pixel-title-yellow">
                       FUNTOPIA
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-pop-yellow text-pop-ink font-arcade text-[9px] font-black uppercase border border-pop-ink shadow-pop-sm">
-                      ADMIN PORTAL
+                    <span className="px-2 py-0.5 rounded-full bg-[#FFDE25] text-[#0D0518] font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm">
+                      RESTRICTED ADMIN
                     </span>
                   </div>
-                  <p className="text-[10px] font-mono text-pop-muted tracking-wider font-bold">
+                  <p className="text-[10px] font-mono text-purple-200 tracking-wider font-bold">
                     OPERATOR: {adminSession.email}
                   </p>
                 </div>
               </div>
 
               {/* Navigation Tabs */}
-              <nav className="hidden md:flex items-center gap-1.5 bg-pop-butter p-1.5 rounded-2xl border-2 border-pop-ink shadow-pop-sm">
+              <nav className="hidden md:flex items-center gap-1.5 bg-[#2B0E4C] p-1.5 rounded-2xl border-3 border-[#0D0518] shadow-pixel-sm">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentTab === item.id;
@@ -132,10 +132,10 @@ export default function AdminPortal({
                     <button
                       key={item.id}
                       onClick={() => handleTabChange(item.id)}
-                      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-arcade font-black tracking-wider transition-all ${
                         isActive
-                          ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
-                          : 'text-pop-ink hover:bg-white/80'
+                          ? 'bg-[#FFDE25] text-[#0D0518] border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                          : 'text-purple-200 hover:text-white'
                       }`}
                     >
                       <Icon className="w-3.5 h-3.5" />
@@ -152,25 +152,25 @@ export default function AdminPortal({
                     soundFx.play('fanfare');
                     triggerCelebration();
                   }}
-                  className="p-2.5 rounded-xl bg-pop-coral text-white border-2 border-pop-ink shadow-pop-sm hover:-translate-y-0.5 transition-all"
+                  className="btn-pixel-pink p-2.5"
                   title="Test Fanfare"
                 >
-                  <Sparkles className="w-4 h-4 text-pop-yellow" />
+                  <Sparkles className="w-4 h-4 text-[#FFDE25]" />
                 </button>
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pop-butter hover:bg-pop-coral hover:text-white border-2 border-pop-ink text-xs font-mono font-bold shadow-pop-sm transition-all"
+                  className="btn-pixel-white flex items-center gap-1.5 text-xs py-2 px-3"
                   title="Log out"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">LOGOUT</span>
+                  <span className="hidden sm:inline font-mono">LOGOUT</span>
                 </button>
               </div>
             </div>
 
             {/* Mobile / Tablet Tab Bar */}
-            <div className="flex md:hidden items-center gap-1 py-2 border-t-2 border-pop-ink/20 overflow-x-auto">
+            <div className="flex md:hidden items-center gap-1 py-2 border-t-2 border-[#0D0518] overflow-x-auto">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentTab === item.id;
@@ -178,10 +178,10 @@ export default function AdminPortal({
                   <button
                     key={item.id}
                     onClick={() => handleTabChange(item.id)}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-display font-black whitespace-nowrap ${
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] font-arcade font-black whitespace-nowrap ${
                       isActive
-                        ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink'
-                        : 'text-pop-muted hover:text-pop-ink'
+                        ? 'bg-[#FFDE25] text-[#0D0518] border-2 border-[#0D0518]'
+                        : 'text-purple-200 hover:text-white'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -202,7 +202,7 @@ export default function AdminPortal({
         />
 
         {/* Admin Modules Body */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-grow">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-grow py-6">
           {currentTab === 'overview' && (
             <AdminDashboard
               data={data}
@@ -251,15 +251,18 @@ export default function AdminPortal({
         </main>
 
         {/* Footer */}
-        <footer className="border-t-3 border-pop-ink py-6 bg-pop-butter mt-16 text-center text-xs font-mono text-pop-muted select-none">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div className="flex items-center gap-2 font-bold text-pop-ink">
-              <span className="font-bungee text-sm">FUNTOPIA</span>
-              <span>•</span>
-              <span>ADMIN CONSOLE</span>
-            </div>
-            <div className="text-xs font-bold text-pop-ink">
-              AUTHENTICATED SESSION
+        <footer className="w-full mt-16 select-none">
+          <div className="pixel-grass-strip h-3 w-full" />
+          <div className="pixel-brick-strip py-4 px-6 text-center text-xs font-mono text-white">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div className="flex items-center gap-2 font-black text-[#FFDE25]">
+                <span className="font-arcade text-xs">FUNTOPIA</span>
+                <span>•</span>
+                <span>ADMIN CONSOLE</span>
+              </div>
+              <div className="text-xs font-arcade text-white/90">
+                16-BIT RETRO CONTROLLER
+              </div>
             </div>
           </div>
         </footer>

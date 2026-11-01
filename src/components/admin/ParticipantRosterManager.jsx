@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Search, Trash2, Plus, UserPlus } from 'lucide-react';
+import { Users, Search, Trash2, Plus } from 'lucide-react';
 import { soundFx } from '../../utilities/soundFx';
 
 export default function ParticipantRosterManager({
@@ -16,7 +16,7 @@ export default function ParticipantRosterManager({
     avatar: '👾',
   });
 
-  const avatars = ['👾', '🚀', '⚡', '🦅', '⚔️', '🌀', '🛡️', '🔥', '🦊', '🐺', '🐉', '⭐'];
+  const avatars = ['👾', '🤠', '🧕', '🦊', '🧑‍🎤', '🐻', '🚀', '⚡', '⚔️', '🐉', '🔥', '⭐'];
 
   const filtered = participants.filter((p) => {
     return (
@@ -44,67 +44,67 @@ export default function ParticipantRosterManager({
   };
 
   return (
-    <div className="py-6 space-y-6 max-w-7xl mx-auto select-none">
+    <div className="py-4 space-y-6 max-w-7xl mx-auto select-none">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Users className="w-5 h-5 text-pop-purple" />
-            <h1 className="font-bungee text-2xl sm:text-3xl text-pop-ink">
-              PARTICIPANTS
+            <Users className="w-5 h-5 text-[#FF5FA0]" />
+            <h1 className="font-bungee text-2xl sm:text-4xl text-[#FFDE25] pixel-title-yellow">
+              PARTICIPANTS ROSTER
             </h1>
           </div>
-          <p className="text-pop-muted font-sans text-xs sm:text-sm font-medium">
+          <p className="text-purple-200 font-mono text-xs sm:text-sm font-medium">
             Manage individual registered participants competing in events.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="font-mono text-xs font-black bg-pop-yellow text-pop-ink px-4 py-2 rounded-xl border-2 border-pop-ink shadow-pop-sm">
+          <div className="font-arcade text-[10px] font-black bg-[#FFDE25] text-[#0D0518] px-4 py-2 rounded-xl border-3 border-[#0D0518] shadow-pixel-sm">
             {participants.length} REGISTERED
           </div>
           <button
             onClick={() => setModalOpen(true)}
-            className="btn-pop-coral flex items-center gap-1.5"
+            className="btn-pixel-pink flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
-            <span>ADD PARTICIPANT</span>
+            <span>ADD PLAYER</span>
           </button>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border-3 border-pop-ink shadow-pop flex items-center justify-between gap-4">
+      <div className="bg-white text-[#0D0518] p-4 rounded-2xl border-4 border-[#0D0518] shadow-pixel-lg flex items-center justify-between gap-4">
         <div className="relative w-full max-w-md">
-          <Search className="w-4 h-4 text-pop-muted absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search participant name or email..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono font-bold text-pop-ink focus:outline-none"
+            className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono font-bold text-[#0D0518] focus:outline-none"
           />
         </div>
       </div>
 
       {/* Roster Cards List */}
-      <div className="bg-white border-3 border-pop-ink rounded-3xl p-6 shadow-pop">
+      <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 shadow-pixel-lg">
         <div className="space-y-3">
           {filtered.map((p) => (
             <div
               key={p.id}
-              className="p-4 rounded-2xl bg-pop-butter border-2 border-pop-ink flex items-center justify-between gap-4"
+              className="p-4 rounded-2xl bg-[#FFFDF5] border-3 border-[#0D0518] flex items-center justify-between gap-4 hover:bg-[#FAF7EE] transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white border-2 border-pop-ink flex items-center justify-center text-2xl shadow-pop-sm">
+                <div className="w-12 h-12 rounded-xl bg-white border-2 border-[#0D0518] flex items-center justify-center text-2xl shadow-pixel-sm">
                   {p.avatar || '👾'}
                 </div>
 
                 <div>
-                  <h3 className="font-display font-black text-base text-pop-ink">
+                  <h3 className="font-display font-black text-base text-[#0D0518]">
                     {p.name}
                   </h3>
-                  <div className="text-xs font-mono text-pop-muted font-medium mt-0.5">
+                  <div className="text-xs font-mono text-gray-500 font-medium mt-0.5">
                     {p.email} • ID: {p.id}
                   </div>
                 </div>
@@ -117,7 +117,7 @@ export default function ParticipantRosterManager({
                     onRemoveParticipant(p.id);
                   }
                 }}
-                className="p-2.5 rounded-xl bg-white hover:bg-pop-coral hover:text-white text-pop-coral border-2 border-pop-ink shadow-pop-sm transition-all"
+                className="p-2.5 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-600 border-2 border-[#0D0518] shadow-pixel-sm transition-all"
                 title="Remove Participant"
               >
                 <Trash2 className="w-4 h-4" />
@@ -126,7 +126,7 @@ export default function ParticipantRosterManager({
           ))}
 
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-pop-muted font-mono text-xs font-bold">
+            <div className="text-center py-12 text-gray-500 font-mono text-xs font-bold">
               No participants found matching "{searchQuery}".
             </div>
           )}
@@ -135,59 +135,59 @@ export default function ParticipantRosterManager({
 
       {/* ADD PARTICIPANT MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pop-ink/70 backdrop-blur-xs">
-          <div className="relative w-full max-w-md bg-white border-4 border-pop-ink rounded-3xl p-6 sm:p-8 shadow-pop-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0D0518]/80 backdrop-blur-xs">
+          <div className="relative w-full max-w-md bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 sm:p-8 shadow-pixel-xl">
             <button
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 text-pop-muted hover:text-pop-ink font-mono text-lg font-black"
+              className="absolute top-4 right-4 text-gray-500 hover:text-[#0D0518] font-mono text-lg font-black"
             >
               ✕
             </button>
 
-            <h2 className="font-bungee text-2xl text-pop-ink mb-1">
+            <h2 className="font-bungee text-2xl text-[#0D0518] mb-1">
               ADD PARTICIPANT
             </h2>
-            <p className="text-xs text-pop-muted font-sans mb-4 font-bold">
+            <p className="text-xs text-gray-600 font-mono mb-4 font-bold">
               Add a new individual participant directly to the roster.
             </p>
 
             <form onSubmit={handleAddSubmit} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="block text-pop-ink mb-1 font-black text-sm">FULL NAME *</label>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm">FULL NAME *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. Jordan Lee"
-                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral text-sm"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0] text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-pop-ink mb-1 font-black text-sm">EMAIL ADDRESS *</label>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm">EMAIL ADDRESS *</label>
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="jordan@example.com"
-                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral text-sm"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0] text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-pop-ink mb-2 font-black text-sm">CHOOSE AVATAR</label>
+                <label className="block text-[#0D0518] mb-2 font-black text-sm">CHOOSE AVATAR</label>
                 <div className="flex flex-wrap gap-2">
                   {avatars.map((av) => (
                     <button
                       type="button"
                       key={av}
                       onClick={() => setFormData({ ...formData, avatar: av })}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border-2 border-pop-ink transition-transform ${
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border-2 border-[#0D0518] transition-transform ${
                         formData.avatar === av
-                          ? 'bg-pop-yellow scale-110 shadow-pop-sm font-black'
-                          : 'bg-pop-butter hover:bg-white'
+                          ? 'bg-[#FFDE25] scale-110 shadow-pixel-sm font-black'
+                          : 'bg-[#FFFDF5] hover:bg-white'
                       }`}
                     >
                       {av}
@@ -196,17 +196,17 @@ export default function ParticipantRosterManager({
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-pop-ink">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-[#0D0518]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-pop-butter border-2 border-pop-ink text-pop-ink font-bold"
+                  className="btn-pixel-white text-xs py-2 px-4"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn-pop-coral"
+                  className="btn-pixel-pink text-xs py-2 px-4"
                 >
                   ADD PARTICIPANT
                 </button>

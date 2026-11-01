@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Lock, ShieldCheck, Key, ArrowRight, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { Lock, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { soundFx } from '../../utilities/soundFx';
 
 export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [accessCode, setAccessCode] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isAuthorizing, setIsAuthorizing] = useState(false);
 
@@ -15,10 +14,7 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
     setErrorMsg('');
     soundFx.play('click');
 
-    // Simulate server-side verification check
     setTimeout(() => {
-      // In production, this calls supabase.auth.signInWithPassword()
-      // followed by RPC redeem_admin_invitation(access_code)
       if (email.trim().length > 3 && password.length >= 6) {
         soundFx.play('fanfare');
         setIsAuthorizing(false);
@@ -30,123 +26,131 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
       } else {
         soundFx.play('scoreDown');
         setIsAuthorizing(false);
-        setErrorMsg('Authentication error: Invalid credentials or unverified invitation code.');
+        setErrorMsg('Authentication error: Invalid credentials. Password must be at least 6 characters.');
       }
     }, 600);
   };
 
   return (
-    <div className="min-h-screen bg-[#150A26] text-white flex flex-col justify-between p-4 sm:p-8 select-none">
-      <div className="max-w-md mx-auto w-full flex items-center justify-between">
+    <div className="min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between p-4 sm:p-8 select-none">
+      {/* Background Graphic Grid */}
+      <div
+        className="absolute inset-0 opacity-[0.06] pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(#FFDE25 1px, transparent 1px), linear-gradient(90deg, #FFDE25 1px, transparent 1px)`,
+          backgroundSize: '24px 24px',
+        }}
+      />
+
+      <div className="relative z-10 max-w-md mx-auto w-full flex items-center justify-between">
         <button
           onClick={onReturnToPortals}
-          className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#26123D] border-2 border-black text-xs font-mono font-bold text-purple-200 hover:bg-pop-purple hover:text-white shadow-pop-sm transition-all"
+          className="btn-pixel-white text-[11px] py-1.5 px-3 flex items-center gap-1.5"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>PORTAL SELECTION</span>
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>PORTALS</span>
         </button>
 
-        <span className="font-arcade text-[10px] text-pop-coral font-black">
+        <span className="font-arcade text-[10px] text-[#FF5FA0] font-black">
           RESTRICTED GATEWAY
         </span>
       </div>
 
-      <div className="max-w-md mx-auto w-full my-auto py-8">
-        <div className="bg-[#26123D] border-4 border-black rounded-3xl p-6 sm:p-8 shadow-pop-xl">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-pop-yellow border-3 border-black shadow-pop mx-auto flex items-center justify-center text-pop-ink mb-4">
-              <Lock className="w-8 h-8" />
+      {/* Main 90s OS Retro Window (Direct homage to Screen 2: "ARE YOU READY?") */}
+      <div className="relative z-10 max-w-md mx-auto w-full my-auto py-6">
+        <div className="retro-os-window rounded-2xl">
+          {/* Classic 90s Blue Header Bar */}
+          <div className="retro-os-titlebar py-2 px-3">
+            <div className="flex items-center gap-2">
+              <Lock className="w-3.5 h-3.5" />
+              <span>AUTHENTICATION_GATEWAY.EXE</span>
             </div>
-
-            <span className="px-3 py-1 rounded-full bg-pop-coral text-white font-arcade text-[9px] font-black uppercase border-2 border-black shadow-pop-sm inline-block mb-2">
-              ADMIN AUTHORIZATION
-            </span>
-            <h2 className="font-bungee text-2xl sm:text-3xl text-pop-yellow">
-              OPERATOR ACCESS
-            </h2>
-            <p className="text-xs text-purple-200 font-sans mt-1">
-              Restricted to the Owner and authorized tournament marshals.
-            </p>
+            <div className="flex items-center gap-1">
+              <span className="px-1.5 py-0.2 bg-[#D1D5DB] text-[#0D0518] border border-[#0D0518] text-[10px] cursor-pointer">_</span>
+              <span className="px-1.5 py-0.2 bg-[#D1D5DB] text-[#0D0518] border border-[#0D0518] text-[10px] cursor-pointer">✕</span>
+            </div>
           </div>
 
-          {errorMsg && (
-            <div className="mb-4 p-3 rounded-xl bg-red-950/80 border-2 border-red-500 text-red-200 text-xs font-mono flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono">
-            <div>
-              <label className="block text-purple-200 mb-1 font-bold">
-                ADMINISTRATOR EMAIL
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@funtopia.arcade"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#180A28] border-2 border-black text-white font-bold focus:outline-none focus:border-pop-yellow"
-              />
-            </div>
-
-            <div>
-              <label className="block text-purple-200 mb-1 font-bold">
-                PASSWORD
-              </label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#180A28] border-2 border-black text-white font-bold focus:outline-none focus:border-pop-yellow"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-pop-yellow font-bold">
-                  INVITATION ACCESS CODE / HASH
-                </label>
-                <span className="text-[10px] text-purple-300">Server verified</span>
+          <div className="p-6 bg-[#D1D5DB]">
+            {/* "ARE YOU READY?" dialogue box banner */}
+            <div className="bg-white border-3 border-[#0D0518] p-4 text-center rounded-xl mb-5 shadow-pixel-sm">
+              <div className="flex items-center justify-center gap-3 mb-1">
+                <span className="text-xl">👾</span>
+                <span className="font-arcade text-sm text-[#0D0518] font-black">
+                  ARE YOU READY ?
+                </span>
+                <span className="text-xl">👾</span>
               </div>
-              <div className="relative">
-                <Key className="w-4 h-4 text-pop-yellow absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={accessCode}
-                  onChange={(e) => setAccessCode(e.target.value)}
-                  placeholder="e.g. FNT-MASTER-99"
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-[#180A28] border-2 border-black text-pop-yellow font-mono font-bold uppercase focus:outline-none focus:border-pop-yellow"
-                />
-              </div>
-              <p className="text-[10px] text-purple-300/80 mt-1">
-                Single-use invitation token issued by the Owner. Never validated on client.
+              <p className="text-[11px] font-mono text-gray-600 font-bold">
+                ENTER OPERATOR CREDENTIALS
               </p>
             </div>
 
-            <button
-              type="submit"
-              disabled={isAuthorizing}
-              className="w-full mt-2 py-3.5 rounded-2xl bg-pop-yellow text-pop-ink font-display font-black text-sm uppercase tracking-wider border-3 border-black shadow-pop hover:-translate-y-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-2"
-            >
-              <span>{isAuthorizing ? 'VALIDATING CLEARANCE...' : 'AUTHORIZE ADMIN SESSION'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
+            {errorMsg && (
+              <div className="mb-4 p-3 rounded-xl bg-red-100 border-2 border-red-600 text-red-900 text-xs font-mono flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
-          <div className="mt-6 pt-4 border-t-2 border-black/40 text-center text-[10px] font-mono text-purple-300/70">
-            Protected by Supabase PostgreSQL Row Level Security (RLS)
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono text-[#0D0518]">
+              <div>
+                <label className="block text-[#0D0518] mb-1 font-black">
+                  OPERATOR EMAIL *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@funtopia.arcade"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#0D0518] mb-1 font-black">
+                  PASSWORD *
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0]"
+                />
+              </div>
+
+              {/* Action Buttons styled like the [ Yes ] [ No ] dialog buttons */}
+              <div className="pt-2 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={onReturnToPortals}
+                  className="btn-pixel-white text-center justify-center text-xs py-3"
+                >
+                  NO / CANCEL
+                </button>
+                <button
+                  type="submit"
+                  disabled={isAuthorizing}
+                  className="btn-pixel-yellow text-center justify-center text-xs py-3"
+                >
+                  {isAuthorizing ? 'VERIFYING...' : 'YES / ENTER'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto w-full text-center text-xs font-mono text-purple-400">
-        FUNTOPIA RESTRICTED GATEWAY • PRIVILEGED ACCESS ONLY
-      </div>
+      {/* Footer Platform */}
+      <footer className="relative z-10 w-full select-none">
+        <div className="pixel-grass-strip h-3 w-full" />
+        <div className="pixel-brick-strip py-3 px-6 text-center text-xs font-arcade text-[#FFDE25]">
+          SECURE OPERATOR TERMINAL • ROM v2.6
+        </div>
+      </footer>
     </div>
   );
 }
