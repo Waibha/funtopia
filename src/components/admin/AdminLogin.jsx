@@ -112,6 +112,9 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
                     value={passkey}
                     onChange={(e) => setPasskey(e.target.value)}
                     placeholder="••••••••••••••••"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck="false"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-white border-3 border-[#0D0518] text-[#0D0518] font-mono font-bold focus:outline-none focus:border-[#FF5FA0]"
                   />
                   <KeyRound className="w-4 h-4 text-gray-400 absolute right-3 top-3.5 pointer-events-none" />
@@ -123,10 +126,13 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
                   OPERATOR EMAIL / IDENTITY
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   value={operatorEmail}
                   onChange={(e) => setOperatorEmail(e.target.value)}
                   placeholder="operator@funtopia.arcade"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-white border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0]"
                 />
               </div>

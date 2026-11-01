@@ -152,7 +152,7 @@ export default function AdminPortal({
                     </span>
                   </div>
                   <p className="text-[10px] font-mono text-purple-200 tracking-wider font-bold">
-                    OPERATOR: {adminSession.email}
+                    OPERATOR: {adminSession.email || adminSession.operator || 'ADMIN'}
                   </p>
                 </div>
               </div>
