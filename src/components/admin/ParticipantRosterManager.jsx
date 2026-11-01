@@ -126,8 +126,10 @@ export default function ParticipantRosterManager({
           ))}
 
           {filtered.length === 0 && (
-            <div className="text-center py-12 text-gray-500 font-mono text-xs font-bold">
-              No participants found matching "{searchQuery}".
+            <div className="text-center py-16 text-gray-500 font-mono text-xs font-bold">
+              {participants.length === 0
+                ? "No participants registered yet. When a participant registers via the Participant Portal, they will appear here automatically."
+                : `No participants found matching "${searchQuery}".`}
             </div>
           )}
         </div>

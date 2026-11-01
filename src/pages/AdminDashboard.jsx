@@ -18,33 +18,33 @@ export default function AdminDashboard({
   onOpenQuickScore,
   triggerCelebration,
 }) {
-  const activeEvent = data.events.find((e) => e.id === data.activeEventId) || data.events[0];
   const totalPoints = (data.transactions || []).reduce((sum, tx) => sum + Number(tx.pointsDelta || 0), 0);
+  const activeGamesCount = (data.games || []).filter((g) => g.isActive).length;
 
   const stats = [
     {
-      label: 'ACTIVE EVENT',
-      value: activeEvent ? activeEvent.name : 'None Selected',
-      subtext: `${activeEvent?.description || 'Active Tournament'}`,
-      icon: Calendar,
+      label: 'COMPETITION',
+      value: 'FUNTOPIA LIVE',
+      subtext: 'Arcade Championship',
+      icon: Gamepad2,
       colorBar: 'bg-[#FF5FA0]',
-      action: () => setCurrentView('events'),
-    },
-    {
-      label: 'PARTICIPANTS',
-      value: `${(data.participants || []).length} PLAYERS`,
-      subtext: 'Individual Competitors',
-      icon: Users,
-      colorBar: 'bg-[#5C2D91]',
-      action: () => setCurrentView('participants'),
+      action: () => setCurrentView('games'),
     },
     {
       label: 'GAMES',
       value: `${(data.games || []).length} GAMES`,
-      subtext: `${(data.games || []).filter((g) => g.isActive).length} Active In Rotation`,
+      subtext: `${activeGamesCount} Active In Rotation`,
       icon: Gamepad2,
       colorBar: 'bg-[#FF7A00]',
       action: () => setCurrentView('games'),
+    },
+    {
+      label: 'PARTICIPANTS',
+      value: `${(data.participants || []).length} PLAYERS`,
+      subtext: 'Verified Registered Users',
+      icon: Users,
+      colorBar: 'bg-[#5C2D91]',
+      action: () => setCurrentView('participants'),
     },
     {
       label: 'DISPATCHED POINTS',

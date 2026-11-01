@@ -147,11 +147,11 @@ export default function ScoringManagement({
 
     const tx = {
       id: `tx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      eventId: data.activeEventId,
+      competitionId: data.activeCompetition?.id || 'funtopia-championship',
       participantId: selectedParticipant.id,
       gameId: selectedGame.id,
       pointsDelta: finalDelta,
-      note: note.trim() || (isDeduction ? `Deduction for ${selectedGame.name}` : `Award for ${selectedGame.name}`),
+      note: note.trim() || (isDeduction ? `Score deduction for ${selectedGame.name}` : `Points award for ${selectedGame.name}`),
       timestamp: new Date().toISOString(),
       admin: 'Admin Operator',
     };
@@ -404,7 +404,7 @@ export default function ScoringManagement({
                           {selectedGame.name}
                         </span>
                         <span className="text-[10px] text-gray-500 truncate block font-bold">
-                          Cost: ${selectedGame.cost || 0} • Value: {selectedGame.points || 0} pts
+                          Entry Cost: {selectedGame.cost || 0} Arcade Coins
                         </span>
                       </div>
                     </div>
@@ -456,7 +456,7 @@ export default function ScoringManagement({
                                   {g.name}
                                 </div>
                                 <div className="text-[10px] text-gray-600 truncate font-semibold">
-                                  Cost: ${g.cost || 0} • Value: {g.points || 0} pts
+                                  Entry Cost: {g.cost || 0} Arcade Coins
                                 </div>
                               </div>
                             </div>

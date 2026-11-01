@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Trophy,
@@ -6,18 +6,21 @@ import {
   Gamepad2,
   ArrowLeft,
   Sparkles,
-  Volume2,
   Sliders,
   Coins,
+  ShieldCheck,
+  LogOut,
+  User,
+  Activity,
   Play,
   CheckCircle2,
-  Flame,
 } from 'lucide-react';
 import PublicLeaderboard from './PublicLeaderboard';
 import ParticipantRegistration from '../components/participant/ParticipantRegistration';
 import LiveTicker from '../components/LiveTicker';
 import AudioSettingsModal from '../components/AudioSettingsModal';
 import { soundFx } from '../utilities/soundFx';
+import { getParticipantSession, revokeParticipantSession } from '../services/api/authService';
 
 export default function ParticipantPortal({
   data,
@@ -28,37 +31,83 @@ export default function ParticipantPortal({
   setSoundEnabled,
 }) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('leaderboard'); // 'leaderboard' | 'register' | 'games'
+  const [activeTab, setActiveTab] = useState('leaderboard'); // 'leaderboard' | 'games' | 'register' | 'profile'
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
-  // Casino-arcade participant wallet balance
-  const [walletBalance, setWalletBalance] = useState(1250);
-  const [lastPlayedGame, setLastPlayedGame] = useState(null);
+  // Authenticated participant session
+  const [session, setSession] = useState(() => getParticipantSession());
+  const [walletCoins, setWalletCoins] = useState(500);
 
-  const activeEvent = data.events.find((e) => e.id === data.activeEventId) || data.events[0];
+  // Synchronize session profile
+  const loggedInParticipant = useMemo(() => {
+    if (!session?.participantId) return null;
+    return (data.participants || []).find((p) => p.id === session.participantId) || null;
+  }, [session, data.participants]);
+
+  // Total competition points for logged in participant
+  const myTotalPoints = useMemo(() => {
+    if (!loggedInParticipant) return 0;
+    return (data.transactions || [])
+      .filter((tx) => tx.participantId === loggedInParticipant.id)
+      .reduce((sum, tx) => sum + Number(tx.pointsDelta || 0), 0);
+  }, [loggedInParticipant, data.transactions]);
+
+  // Breakdown of games played by this participant
+  const myGamesBreakdown = useMemo(() => {
+    if (!loggedInParticipant) return [];
+    const map = {};
+    (data.transactions || [])
+      .filter((tx) => tx.participantId === loggedInParticipant.id)
+      .forEach((tx) => {
+        const game = (data.games || []).find((g) => g.id === tx.gameId);
+        const gName = game ? game.name : 'Arcade Challenge';
+        map[gName] = (map[gName] || 0) + Number(tx.pointsDelta || 0);
+      });
+    return Object.entries(map).map(([name, points]) => ({ name, points }));
+  }, [loggedInParticipant, data.transactions, data.games]);
+
+  const competition = data.activeCompetition || { name: 'FUNTOPIA Championship' };
 
   const handleTabChange = (tabId) => {
     soundFx.play('switch');
     setActiveTab(tabId);
   };
 
-  const handlePlayGameDemo = (game) => {
-    if (walletBalance < game.cost) {
+  const handleParticipantLogin = (participant) => {
+    setSession({
+      role: 'participant',
+      participantId: participant.id,
+      name: participant.name,
+      email: participant.email,
+      avatar: participant.avatar,
+    });
+    setWalletCoins(participant.coins || 500);
+    setActiveTab('leaderboard');
+  };
+
+  const handleLogout = () => {
+    soundFx.play('click');
+    revokeParticipantSession();
+    setSession(null);
+  };
+
+  // Play game action (spends arcade coins)
+  const handlePlayGame = (game) => {
+    const cost = Number(game.cost || 0);
+    if (walletCoins < cost) {
       soundFx.play('scoreDown');
-      alert(`Insufficient arcade coins! Cost: $${game.cost}, Balance: $${walletBalance}`);
+      alert(`Insufficient arcade coins! Cost: ${cost} coins, Wallet: ${walletCoins} coins. Reload coins to enter.`);
       return;
     }
 
-    // Play coin spend mechanical sound
     soundFx.play('spend');
-    setWalletBalance((prev) => prev - game.cost);
-    setLastPlayedGame(game.name);
+    setWalletCoins((prev) => prev - cost);
 
     setTimeout(() => {
       soundFx.play('coin');
       triggerCelebration();
-      alert(`Played ${game.name}! Spent $${game.cost} game cost and earned ${game.points} tournament points!`);
-    }, 400);
+      alert(`Entered ${game.name}! Spent ${cost} arcade coins from wallet.`);
+    }, 300);
   };
 
   return (
@@ -97,16 +146,16 @@ export default function ParticipantPortal({
                       FUNTOPIA
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm">
-                      PARTICIPANT LOBBY
+                      PARTICIPANT ARENA
                     </span>
                   </div>
                   <p className="text-[10px] font-mono text-purple-200 tracking-wider font-bold">
-                    CIRCUIT: {activeEvent?.name}
+                    CIRCUIT: {competition?.name}
                   </p>
                 </div>
               </div>
 
-              {/* Navigation Tabs (High-End Tactile Buttons) */}
+              {/* Navigation Tabs */}
               <nav className="hidden sm:flex items-center gap-2 bg-[#2B0E4C] p-1.5 rounded-2xl border-3 border-[#0D0518] shadow-pixel-sm">
                 <button
                   onClick={() => handleTabChange('leaderboard')}
@@ -121,18 +170,6 @@ export default function ParticipantPortal({
                 </button>
 
                 <button
-                  onClick={() => handleTabChange('register')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
-                    activeTab === 'register'
-                      ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
-                      : 'text-purple-200 hover:text-white'
-                  }`}
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>REGISTER</span>
-                </button>
-
-                <button
                   onClick={() => handleTabChange('games')}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
                     activeTab === 'games'
@@ -141,43 +178,87 @@ export default function ParticipantPortal({
                   }`}
                 >
                   <Gamepad2 className="w-3.5 h-3.5" />
-                  <span>GAMES CATALOG</span>
+                  <span>GAMES ({data.games.length})</span>
+                </button>
+
+                <button
+                  onClick={() => handleTabChange('register')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                    activeTab === 'register'
+                      ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                      : 'text-purple-200 hover:text-white'
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>{loggedInParticipant ? 'SWITCH USER' : 'REGISTER / LOGIN'}</span>
                 </button>
               </nav>
 
-              {/* Right Side: Arcade Coin Wallet & Audio Master Settings */}
+              {/* Right Side: Logged-in Participant Badge, Coins Wallet, & Audio */}
               <div className="flex items-center gap-2.5">
-                {/* Interactive Casino-Style Coin Wallet */}
-                <div
-                  title="Player Arcade Coin Wallet"
-                  className="hidden md:flex items-center gap-2 bg-[#200B3B] px-3.5 py-1.5 rounded-xl border-2 border-[#FFDE25] shadow-pixel-sm text-xs font-mono"
-                >
-                  <span className="text-base animate-bounce-subtle">🪙</span>
-                  <div>
-                    <span className="text-[9px] text-[#FFDE25] block font-arcade font-black leading-none">WALLET</span>
-                    <span className="font-black text-white text-xs">${walletBalance.toLocaleString()}</span>
+                {loggedInParticipant ? (
+                  <div className="flex items-center gap-2">
+                    {/* Coin Wallet Balance */}
+                    <div
+                      title="Arcade Coins (Used to enter games)"
+                      className="hidden md:flex items-center gap-1.5 bg-[#200B3B] px-3 py-1.5 rounded-xl border-2 border-[#FFDE25] shadow-pixel-sm text-xs font-mono"
+                    >
+                      <span className="text-sm">🪙</span>
+                      <div>
+                        <span className="text-[8px] text-[#FFDE25] block font-arcade font-black leading-none">COINS</span>
+                        <span className="font-black text-white text-xs">{walletCoins}</span>
+                      </div>
+                    </div>
+
+                    {/* Competition Points Score */}
+                    <div
+                      title="Tournament Points (Competition Ranking)"
+                      className="hidden lg:flex items-center gap-1.5 bg-[#200B3B] px-3 py-1.5 rounded-xl border-2 border-[#28C76F] shadow-pixel-sm text-xs font-mono"
+                    >
+                      <span className="text-sm">🏆</span>
+                      <div>
+                        <span className="text-[8px] text-[#28C76F] block font-arcade font-black leading-none">POINTS</span>
+                        <span className="font-black text-[#28C76F] text-xs">{myTotalPoints} PTS</span>
+                      </div>
+                    </div>
+
+                    {/* Participant Profile Pill */}
+                    <div className="flex items-center gap-2 bg-white text-[#0D0518] px-3 py-1.5 rounded-xl border-2 border-[#0D0518] shadow-pixel-sm">
+                      <span className="text-xl">{loggedInParticipant.avatar || '👾'}</span>
+                      <div className="hidden sm:block text-left font-mono">
+                        <span className="font-black text-xs block leading-tight truncate max-w-[100px]">
+                          {loggedInParticipant.name}
+                        </span>
+                        <span className="text-[9px] text-[#28C76F] font-bold flex items-center gap-0.5">
+                          <ShieldCheck className="w-2.5 h-2.5" /> Verified
+                        </span>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="text-gray-400 hover:text-red-600 p-1 rounded"
+                        title="Sign Out"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <button
+                    onClick={() => handleTabChange('register')}
+                    className="btn-pixel-yellow text-xs py-2 px-3 flex items-center gap-1.5"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span>SIGN IN / REGISTER</span>
+                  </button>
+                )}
 
                 {/* Audio Master Modal Toggle */}
                 <button
                   onClick={() => setIsAudioModalOpen(true)}
-                  className="btn-pixel-yellow p-2 rounded-xl flex items-center gap-1.5 text-xs"
-                  title="Audio & Atmosphere Settings"
+                  className="btn-pixel-white p-2 rounded-xl text-xs"
+                  title="Audio Settings"
                 >
                   <Sliders className="w-4 h-4" />
-                  <span className="hidden lg:inline font-mono">AUDIO</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    soundFx.play('fanfare');
-                    triggerCelebration();
-                  }}
-                  className="btn-pixel-pink p-2 rounded-xl"
-                  title="Celebrate"
-                >
-                  <Sparkles className="w-4 h-4 text-[#FFDE25]" />
                 </button>
               </div>
             </div>
@@ -193,14 +274,6 @@ export default function ParticipantPortal({
                 STANDINGS
               </button>
               <button
-                onClick={() => handleTabChange('register')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
-                  activeTab === 'register' ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518]' : 'text-purple-200'
-                }`}
-              >
-                REGISTER
-              </button>
-              <button
                 onClick={() => handleTabChange('games')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
                   activeTab === 'games' ? 'bg-[#28C76F] text-[#0D0518] border-2 border-[#0D0518]' : 'text-purple-200'
@@ -208,13 +281,21 @@ export default function ParticipantPortal({
               >
                 GAMES
               </button>
+              <button
+                onClick={() => handleTabChange('register')}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
+                  activeTab === 'register' ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518]' : 'text-purple-200'
+                }`}
+              >
+                {loggedInParticipant ? 'PROFILE' : 'REGISTER'}
+              </button>
             </div>
           </div>
         </header>
 
         {/* Live Score Ticker Tape */}
         <LiveTicker
-          activeEvent={activeEvent}
+          activeEvent={competition}
           transactions={data.transactions}
           participants={data.participants}
           games={data.games}
@@ -222,10 +303,45 @@ export default function ParticipantPortal({
 
         {/* Participant Main Body */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-grow py-6">
+          {/* Active Player Profile Banner (when logged in) */}
+          {loggedInParticipant && activeTab !== 'register' && (
+            <div className="mb-6 bg-[#32125A] rounded-2xl border-3 border-[#0D0518] p-4 shadow-pixel-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-3xl border-2 border-[#0D0518] shadow-pixel-sm">
+                  {loggedInParticipant.avatar || '👾'}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-display font-black text-lg text-[#FFDE25]">
+                      {loggedInParticipant.name}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[8px] font-black uppercase border border-[#0D0518]">
+                      VERIFIED GMAIL
+                    </span>
+                  </div>
+                  <span className="text-xs font-mono text-purple-200">
+                    {loggedInParticipant.email}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 font-mono text-xs">
+                <div className="text-center bg-[#200B3B] px-3.5 py-1.5 rounded-xl border border-[#FFDE25]">
+                  <span className="text-[9px] text-[#FFDE25] block font-arcade font-black">GAME COINS</span>
+                  <span className="font-black text-base text-white">🪙 {walletCoins}</span>
+                </div>
+                <div className="text-center bg-[#200B3B] px-3.5 py-1.5 rounded-xl border border-[#28C76F]">
+                  <span className="text-[9px] text-[#28C76F] block font-arcade font-black">TOTAL POINTS</span>
+                  <span className="font-black text-base text-[#28C76F]">{myTotalPoints} PTS</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'leaderboard' && (
             <PublicLeaderboard
               leaderboard={leaderboard}
-              activeEvent={activeEvent}
+              activeEvent={competition}
               games={data.games}
               transactions={data.transactions}
               participants={data.participants}
@@ -235,15 +351,15 @@ export default function ParticipantPortal({
 
           {activeTab === 'register' && (
             <ParticipantRegistration
-              activeEvent={activeEvent}
               onRegisterParticipant={onRegisterParticipant}
+              onParticipantLogin={handleParticipantLogin}
               registeredList={data.participants || []}
             />
           )}
 
           {activeTab === 'games' && (
             <div className="space-y-6">
-              {/* Rules & Format Header */}
+              {/* Header */}
               <div className="bg-[#40186D] text-white rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div>
                   <span className="px-3 py-1 rounded-full bg-[#FF5FA0] text-white font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
@@ -253,30 +369,30 @@ export default function ParticipantPortal({
                     CHAMPIONSHIP GAMES
                   </h2>
                   <p className="text-purple-200 font-sans text-xs sm:text-sm mt-1 max-w-2xl font-medium">
-                    Review required entry costs, point values, and active tournament rotation for {activeEvent?.name}.
+                    Games created by the tournament organizer. Spend arcade coins to enter games and compete for points.
                   </p>
                 </div>
 
                 {/* Player Token Bank Widget */}
                 <div className="bg-[#200B3B] p-4 rounded-2xl border-3 border-[#FFDE25] shadow-pixel text-center shrink-0">
-                  <span className="text-[10px] font-arcade text-[#FFDE25] block font-black">YOUR ARCADE BALANCE</span>
+                  <span className="text-[10px] font-arcade text-[#FFDE25] block font-black">YOUR ARCADE COINS</span>
                   <div className="font-display font-black text-2xl text-white mt-1 flex items-center justify-center gap-1.5">
                     <span>🪙</span>
-                    <span>${walletBalance.toLocaleString()}</span>
+                    <span>{walletCoins} COINS</span>
                   </div>
                   <button
                     onClick={() => {
                       soundFx.play('coin');
-                      setWalletBalance((prev) => prev + 500);
+                      setWalletCoins((prev) => prev + 250);
                     }}
-                    className="mt-2 text-[10px] font-mono font-black text-[#FFDE25] hover:underline"
+                    className="mt-2 text-[10px] font-mono font-black text-[#FFDE25] hover:underline block"
                   >
-                    + Reload 500 Tokens
+                    + Reload 250 Coins
                   </button>
                 </div>
               </div>
 
-              {/* Game Cartridges Grid with Interactive Gameplay Simulation */}
+              {/* Games Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {data.games.map((g) => (
                   <div
@@ -286,20 +402,15 @@ export default function ParticipantPortal({
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3.5">
                         <div className="w-14 h-14 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-3xl shrink-0">
-                          {g.name.toLowerCase().includes('race') || g.name.toLowerCase().includes('racer') ? '🏎️' :
-                           g.name.toLowerCase().includes('pixel') || g.name.toLowerCase().includes('blast') ? '👾' :
-                           g.name.toLowerCase().includes('puzzle') ? '🧩' :
-                           g.name.toLowerCase().includes('pinball') ? '⚡' : '🕹️'}
+                          🕹️
                         </div>
                         <div>
                           <h3 className="font-display font-black text-2xl text-[#0D0518]">
                             {g.name}
                           </h3>
-                          {g.description && (
-                            <p className="text-xs font-sans text-gray-600 font-medium mt-0.5">
-                              {g.description}
-                            </p>
-                          )}
+                          <span className="text-xs font-mono text-gray-500 font-bold block mt-0.5">
+                            ID: {g.id}
+                          </span>
                         </div>
                       </div>
 
@@ -310,62 +421,66 @@ export default function ParticipantPortal({
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 bg-white p-4 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
-                      <div>
-                        <span className="text-[10px] text-gray-500 block font-bold uppercase">GAME COST / BUDGET</span>
-                        <span className="text-xl font-black text-[#FF5FA0] flex items-center justify-center gap-1">
-                          <Coins className="w-4 h-4" />
-                          ${Number(g.cost || 0).toLocaleString()}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-gray-500 block font-bold uppercase">POINTS VALUE</span>
-                        <span className="text-xl font-black text-[#5C2D91]">
-                          {Number(g.points || 0).toLocaleString()} PTS
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Interactive Play / Enter Game Simulation */}
-                    <div className="pt-2 flex items-center justify-between border-t-2 border-[#0D0518]/20">
-                      <span className="text-xs font-mono text-gray-600 font-bold">
-                        Entry Fee: ${g.cost || 0}
+                    <div className="bg-white p-4 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
+                      <span className="text-[10px] text-gray-500 block font-bold uppercase">ENTRY COST</span>
+                      <span className="text-xl font-black text-[#FF5FA0] flex items-center justify-center gap-1 mt-0.5">
+                        <Coins className="w-4 h-4 text-[#FFDE25]" />
+                        {Number(g.cost || 0)} COINS
                       </span>
-
-                      <button
-                        onClick={() => handlePlayGameDemo(g)}
-                        className="btn-pixel-yellow text-xs py-2 px-4 flex items-center gap-1.5"
-                      >
-                        <Play className="w-3.5 h-3.5 fill-[#0D0518]" />
-                        <span>ENTER MATCH (-${g.cost || 0})</span>
-                      </button>
                     </div>
+
+                    <button
+                      onClick={() => handlePlayGame(g)}
+                      disabled={!g.isActive}
+                      className={`w-full py-3 rounded-2xl font-display font-black text-sm uppercase border-3 border-[#0D0518] shadow-pixel transition-all flex items-center justify-center gap-2 ${
+                        g.isActive
+                          ? 'bg-[#FFDE25] text-[#0D0518] hover:bg-yellow-300 active:translate-y-0.5'
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      <Play className="w-4 h-4" />
+                      <span>ENTER GAME ({Number(g.cost || 0)} COINS)</span>
+                    </button>
                   </div>
                 ))}
               </div>
+
+              {data.games.length === 0 && (
+                <div className="p-16 text-center bg-white rounded-3xl border-4 border-[#0D0518] shadow-pixel text-[#0D0518]">
+                  <Gamepad2 className="w-12 h-12 text-[#FF7A00] mx-auto mb-3" />
+                  <h3 className="font-bungee text-2xl">NO ACTIVE GAMES YET</h3>
+                  <p className="font-mono text-xs text-gray-600 mt-1 max-w-md mx-auto">
+                    The tournament organizer has not created any games yet. Log in to the Admin Portal to add games.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </main>
 
-        {/* Footer: Pixel Brick Platform */}
-        <footer className="w-full mt-16 select-none">
-          <div className="pixel-grass-strip h-3 w-full" />
-          <div className="pixel-brick-strip py-4 px-6 text-center text-xs font-mono text-white">
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-              <div className="flex items-center gap-2 font-black text-[#FFDE25]">
-                <span className="font-arcade text-xs">FUNTOPIA</span>
-                <span>•</span>
-                <span>PARTICIPANT EXPERIENCE</span>
+        {/* Platform Footer */}
+        <footer className="relative z-20 w-full select-none mt-12">
+          <div className="pixel-grass-strip h-3.5 w-full" />
+          <div className="pixel-brick-strip py-4 px-6">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-white font-bold gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">👾</span>
+                <span className="text-[#FFDE25] font-arcade text-[10px]">
+                  FUNTOPIA INDIE GAMING PLATFORM
+                </span>
+                <span className="text-purple-200 text-[10px] hidden md:inline">
+                  • REAL VERIFIED PARTICIPANTS
+                </span>
               </div>
-              <div className="text-xs font-arcade text-white/90">
-                16-BIT CHAMPIONSHIP ENGINE • HIGH FIDELITY AUDIO ACTIVE
+              <div className="text-[10px] font-arcade text-white/90">
+                ACTIVE PLAYERS: {data.participants.length} • TOTAL GAMES: {data.games.length}
               </div>
             </div>
           </div>
         </footer>
       </div>
 
-      {/* Audio Settings Modal */}
+      {/* Audio Modal */}
       <AudioSettingsModal
         isOpen={isAudioModalOpen}
         onClose={() => setIsAudioModalOpen(false)}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight, Sliders, Zap } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight, Sliders, Trophy, Flame, Play } from 'lucide-react';
 import AudioSettingsModal from '../components/AudioSettingsModal';
 import TetrisArcadeBackground from '../components/TetrisArcadeBackground';
 import { soundFx } from '../utilities/soundFx';
@@ -28,7 +28,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
   };
 
   return (
-    <div className="relative min-h-screen bg-[#35125E] text-white flex flex-col justify-between overflow-hidden select-none font-sans">
+    <div className="relative min-h-screen bg-[#300E54] text-white flex flex-col justify-between overflow-hidden select-none font-sans">
       {/* ========================================================================= */}
       {/* LAYER 1: CONTINUOUS ANIMATED TETRIS BLOCKS & ARCADE BACKGROUND CANVAS     */}
       {/* ========================================================================= */}
@@ -43,10 +43,10 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           backgroundPosition: '0 0, 12px 12px',
         }}
       />
-      <div className="absolute inset-0 bg-radial-at-t from-purple-600/30 via-transparent to-[#1F0738]/95 pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-radial-at-t from-purple-600/35 via-transparent to-[#150428]/95 pointer-events-none z-0" />
 
       {/* Floating Pixel Clouds */}
-      <div className="absolute top-16 left-6 sm:left-20 opacity-85 pointer-events-none animate-bounce-subtle">
+      <div className="absolute top-16 left-6 sm:left-24 opacity-85 pointer-events-none animate-bounce-subtle z-0">
         <svg width="120" height="50" viewBox="0 0 120 50" fill="none">
           <rect x="28" y="0" width="48" height="14" fill="#E9D5FF" />
           <rect x="14" y="14" width="82" height="14" fill="#E9D5FF" />
@@ -55,7 +55,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
         </svg>
       </div>
 
-      <div className="absolute top-24 right-8 sm:right-24 opacity-80 pointer-events-none">
+      <div className="absolute top-24 right-8 sm:right-28 opacity-80 pointer-events-none z-0">
         <svg width="140" height="56" viewBox="0 0 140 56" fill="none">
           <rect x="36" y="0" width="60" height="16" fill="#E9D5FF" />
           <rect x="16" y="16" width="100" height="16" fill="#E9D5FF" />
@@ -64,34 +64,50 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
         </svg>
       </div>
 
-      {/* Pixel Full Moon */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 sm:translate-x-64 opacity-90 pointer-events-none hidden md:block">
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-          <rect x="24" y="0" width="32" height="80" fill="#FFDE25" />
-          <rect x="8" y="8" width="64" height="64" fill="#FFDE25" />
-          <rect x="0" y="24" width="80" height="32" fill="#FFDE25" />
-          <rect x="20" y="28" width="12" height="12" fill="#E6C200" />
-          <rect x="48" y="44" width="16" height="16" fill="#E6C200" />
-          <rect x="40" y="16" width="8" height="8" fill="#E6C200" />
+      {/* Pixel Full Moon with Craters */}
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 sm:translate-x-72 opacity-90 pointer-events-none hidden md:block z-0">
+        <svg width="84" height="84" viewBox="0 0 84 84" fill="none">
+          <rect x="24" y="0" width="36" height="84" fill="#FFDE25" />
+          <rect x="8" y="8" width="68" height="68" fill="#FFDE25" />
+          <rect x="0" y="24" width="84" height="36" fill="#FFDE25" />
+          <rect x="20" y="28" width="14" height="14" fill="#E6C200" />
+          <rect x="52" y="46" width="16" height="16" fill="#E6C200" />
+          <rect x="42" y="16" width="10" height="10" fill="#E6C200" />
         </svg>
       </div>
 
-      {/* Layered Pixel City Skyline Silhouette across bottom background */}
-      <div className="absolute bottom-16 inset-x-0 h-40 opacity-25 pointer-events-none flex items-end justify-center overflow-hidden">
-        <svg viewBox="0 0 1200 160" className="w-full h-full preserve-3d" fill="none" preserveAspectRatio="none">
-          <rect x="40" y="60" width="50" height="100" fill="#200B3B" />
-          <rect x="110" y="20" width="70" height="140" fill="#200B3B" />
-          <rect x="200" y="70" width="45" height="90" fill="#200B3B" />
-          <rect x="260" y="40" width="80" height="120" fill="#200B3B" />
-          <rect x="360" y="10" width="65" height="150" fill="#200B3B" />
-          <rect x="445" y="80" width="55" height="80" fill="#200B3B" />
-          <rect x="520" y="30" width="90" height="130" fill="#200B3B" />
-          <rect x="630" y="50" width="70" height="110" fill="#200B3B" />
-          <rect x="720" y="15" width="80" height="145" fill="#200B3B" />
-          <rect x="820" y="65" width="60" height="95" fill="#200B3B" />
-          <rect x="900" y="35" width="85" height="125" fill="#200B3B" />
-          <rect x="1005" y="75" width="50" height="85" fill="#200B3B" />
-          <rect x="1075" y="25" width="85" height="135" fill="#200B3B" />
+      {/* Medieval Castle Tower on Left Horizon (Reference Image Screen 3) */}
+      <div className="absolute bottom-28 left-4 sm:left-12 opacity-35 pointer-events-none hidden lg:block z-0">
+        <svg width="100" height="140" viewBox="0 0 100 140" fill="none">
+          {/* Battlements */}
+          <rect x="15" y="10" width="14" height="16" fill="#3D186D" />
+          <rect x="43" y="10" width="14" height="16" fill="#3D186D" />
+          <rect x="71" y="10" width="14" height="16" fill="#3D186D" />
+          <rect x="10" y="26" width="80" height="16" fill="#2D1052" />
+          {/* Main Tower Body */}
+          <rect x="18" y="42" width="64" height="98" fill="#200B3B" />
+          {/* Tower Slit Windows */}
+          <rect x="45" y="55" width="10" height="18" rx="5" fill="#FFDE25" />
+          <rect x="45" y="90" width="10" height="18" rx="5" fill="#FFDE25" />
+        </svg>
+      </div>
+
+      {/* Retro Arcade Skyline across background */}
+      <div className="absolute bottom-20 inset-x-0 h-36 opacity-20 pointer-events-none flex items-end justify-center overflow-hidden z-0">
+        <svg viewBox="0 0 1200 140" className="w-full h-full" fill="none" preserveAspectRatio="none">
+          <rect x="40" y="40" width="50" height="100" fill="#1C0633" />
+          <rect x="110" y="15" width="70" height="125" fill="#1C0633" />
+          <rect x="200" y="50" width="45" height="90" fill="#1C0633" />
+          <rect x="260" y="25" width="80" height="115" fill="#1C0633" />
+          <rect x="360" y="5" width="65" height="135" fill="#1C0633" />
+          <rect x="445" y="60" width="55" height="80" fill="#1C0633" />
+          <rect x="520" y="20" width="90" height="120" fill="#1C0633" />
+          <rect x="630" y="35" width="70" height="105" fill="#1C0633" />
+          <rect x="720" y="10" width="80" height="130" fill="#1C0633" />
+          <rect x="820" y="45" width="60" height="95" fill="#1C0633" />
+          <rect x="900" y="20" width="85" height="120" fill="#1C0633" />
+          <rect x="1005" y="55" width="50" height="85" fill="#1C0633" />
+          <rect x="1075" y="15" width="85" height="125" fill="#1C0633" />
         </svg>
       </div>
 
@@ -105,10 +121,10 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </div>
           <div className="font-mono text-xs">
             <span className="text-[#FFDE25] font-black uppercase tracking-wider block">
-              FUNTOPIA ARCADE • ROM v2.6
+              FUNTOPIA ARCADE • ROM v3.0
             </span>
             <span className="text-purple-200 text-[10px] font-bold">
-              16-BIT INDIE GAMING SYSTEM
+              16-BIT CHAMPIONSHIP SYSTEM
             </span>
           </div>
         </div>
@@ -142,35 +158,35 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
       {/* ========================================================================= */}
       {/* CENTER STAGE: VIBRANT RETRO ARCADE TITLE & ILLUSTRATED CABINET            */}
       {/* ========================================================================= */}
-      <main className="relative z-20 flex flex-col items-center justify-center text-center px-4 my-auto py-6">
-        {/* Retro Header Tag */}
+      <main className="relative z-20 flex flex-col items-center justify-center text-center px-4 my-auto py-4">
+        {/* Retro Player Ready Tag */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FF5FA0] text-white font-arcade text-xs font-black uppercase tracking-widest border-3 border-[#0D0518] shadow-pixel-sm mb-3 animate-bounce">
           <Sparkles className="w-3.5 h-3.5 text-[#FFDE25]" />
-          <span>✦ PLAYER 1 READY ✦</span>
+          <span>✦ PLAYER 1 READY • INSERT 25¢ ✦</span>
         </div>
 
         {/* Grand Marquee Arcade Title "FUNTOPIA" */}
         <div className="relative mb-2">
           {/* Animated decorative glints around title */}
-          <div className="absolute -top-4 -left-6 sm:-left-10 text-[#FFDE25] text-2xl animate-spin-slow pointer-events-none">
+          <div className="absolute -top-6 -left-8 sm:-left-12 text-[#FFDE25] text-3xl animate-spin-slow pointer-events-none">
             ✦
           </div>
-          <div className="absolute -bottom-3 -right-6 sm:-right-10 text-[#FF5FA0] text-2xl animate-bounce pointer-events-none">
+          <div className="absolute -bottom-4 -right-8 sm:-right-12 text-[#FF5FA0] text-3xl animate-bounce pointer-events-none">
             ✦
           </div>
 
           <h1 className="font-bungee text-6xl sm:text-8xl md:text-9xl tracking-wider text-[#FFDE25] pixel-title-yellow select-none hover:scale-105 transition-transform duration-200">
             FUNTOPIA
           </h1>
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-48 sm:w-80 h-1.5 bg-[#FFDE25] shadow-[0_0_20px_#FFDE25] rounded-full" />
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-48 sm:w-80 h-1.5 bg-[#FFDE25] shadow-[0_0_24px_#FFDE25] rounded-full" />
         </div>
 
-        <p className="font-display font-black text-base sm:text-xl text-purple-200 tracking-wide max-w-xl mb-6">
-          THE INDIE ARCADE CHAMPIONSHIP PLATFORM
+        <p className="font-display font-black text-base sm:text-xl text-purple-200 tracking-wide max-w-xl mb-4">
+          THE INDIE ARCADE TOURNAMENT PLATFORM
         </p>
 
         {/* ORIGINAL ILLUSTRATED ARCADE CABINET CONTROL PANEL WITH JOYSTICK & COIN */}
-        <div className="w-72 sm:w-96 h-36 mb-6 relative flex items-center justify-center">
+        <div className="w-72 sm:w-96 h-32 mb-4 relative flex items-center justify-center">
           <svg
             viewBox="0 0 340 130"
             className="w-full h-full drop-shadow-[0_12px_30px_rgba(0,0,0,0.7)]"
@@ -216,17 +232,50 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
         </button>
 
         {/* Character Dialogue Bubble */}
-        <div className="mt-6 max-w-md bg-white text-[#0D0518] rounded-2xl border-4 border-[#0D0518] shadow-pixel p-3.5 relative text-xs font-mono font-bold flex items-center gap-3">
+        <div className="mt-5 max-w-md bg-white text-[#0D0518] rounded-2xl border-4 border-[#0D0518] shadow-pixel p-3 relative text-xs font-mono font-bold flex items-center gap-3">
           <span className="text-3xl shrink-0">👾</span>
           <p className="text-left text-xs leading-relaxed font-semibold">
-            Press <strong className="text-[#FF5FA0]">ENTER FUNTOPIA</strong> to proceed to portal selection!
+            Press <strong className="text-[#FF5FA0]">ENTER FUNTOPIA</strong> to choose between the <strong className="text-[#5C2D91]">Admin Portal</strong> or <strong className="text-[#28C76F]">Participant Arena</strong>!
           </p>
         </div>
       </main>
 
-      {/* FOOTER: PIXEL GRASS & BRICK PLATFORM WALKWAY BASELINE */}
+      {/* ========================================================================= */}
+      {/* FOOTER: PIXEL CHARACTER LINE-UP, GRASS STRIP & BRICK PLATFORM             */}
+      {/* ========================================================================= */}
       <footer className="relative z-20 w-full select-none">
+        {/* Pixel Characters Lineup (Reference Image Screen 5: "CHOOSE YOUR CHARACTER") */}
+        <div className="max-w-4xl mx-auto px-4 flex items-end justify-center gap-6 sm:gap-10 pb-1.5 opacity-90 pointer-events-none">
+          <div className="flex flex-col items-center animate-bounce-subtle">
+            <span className="text-2xl sm:text-3xl">🤠</span>
+            <span className="font-arcade text-[8px] text-[#FFDE25]">RANGER</span>
+          </div>
+          <div className="flex flex-col items-center animate-bounce-subtle" style={{ animationDelay: '0.2s' }}>
+            <span className="text-2xl sm:text-3xl">🧕</span>
+            <span className="font-arcade text-[8px] text-[#FF5FA0]">MYSTIC</span>
+          </div>
+          <div className="flex flex-col items-center animate-bounce-subtle" style={{ animationDelay: '0.4s' }}>
+            <span className="text-2xl sm:text-3xl">🦊</span>
+            <span className="font-arcade text-[8px] text-[#FF7A00]">PILOT</span>
+          </div>
+          <div className="flex flex-col items-center animate-bounce-subtle" style={{ animationDelay: '0.1s' }}>
+            <span className="text-2xl sm:text-3xl">🧑‍🎤</span>
+            <span className="font-arcade text-[8px] text-[#28C76F]">PUNK</span>
+          </div>
+          <div className="flex flex-col items-center animate-bounce-subtle" style={{ animationDelay: '0.5s' }}>
+            <span className="text-2xl sm:text-3xl">🚀</span>
+            <span className="font-arcade text-[8px] text-[#00F0FF]">COSMO</span>
+          </div>
+          <div className="flex flex-col items-center animate-bounce-subtle" style={{ animationDelay: '0.3s' }}>
+            <span className="text-2xl sm:text-3xl">⚔️</span>
+            <span className="font-arcade text-[8px] text-[#FFDE25]">KNIGHT</span>
+          </div>
+        </div>
+
+        {/* Emerald Pixel Grass Baseline */}
         <div className="pixel-grass-strip h-3.5 w-full" />
+
+        {/* Terracotta Pixel Brick Platform */}
         <div className="pixel-brick-strip py-3.5 px-6">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-white font-bold gap-2">
             <div className="flex items-center gap-2">

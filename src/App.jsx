@@ -23,8 +23,8 @@ export default function App() {
 
   // Dynamic individual leaderboard computed in real-time
   const leaderboard = useMemo(() => {
-    return calculateLeaderboard(data.participants || [], data.transactions || [], data.activeEventId, data.games || []);
-  }, [data.participants, data.transactions, data.activeEventId, data.games]);
+    return calculateLeaderboard(data.participants || [], data.transactions || [], null, data.games || []);
+  }, [data.participants, data.transactions, data.games]);
 
   // Confetti Blast Celebration
   const triggerCelebration = () => {
@@ -38,21 +38,6 @@ export default function App() {
     } catch (e) {
       console.warn('Confetti trigger error', e);
     }
-  };
-
-  // Event Handlers
-  const handleSaveEvent = (updatedEvent) => {
-    setData((prev) => {
-      const exists = prev.events.some((e) => e.id === updatedEvent.id);
-      const newEvents = exists
-        ? prev.events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e))
-        : [...prev.events, updatedEvent];
-      return { ...prev, events: newEvents };
-    });
-  };
-
-  const handleSetActiveEvent = (eventId) => {
-    setData((prev) => ({ ...prev, activeEventId: eventId }));
   };
 
   // Game Handlers
@@ -70,6 +55,7 @@ export default function App() {
     setData((prev) => ({
       ...prev,
       games: prev.games.filter((g) => g.id !== gameId),
+      transactions: prev.transactions.filter((tx) => tx.gameId !== gameId),
     }));
   };
 
@@ -153,8 +139,6 @@ export default function App() {
             <AdminPortal
               data={data}
               leaderboard={leaderboard}
-              onSaveEvent={handleSaveEvent}
-              setActiveEventId={handleSetActiveEvent}
               onSaveGame={handleSaveGame}
               onDeleteGame={handleDeleteGame}
               onToggleGameActive={handleToggleGameActive}

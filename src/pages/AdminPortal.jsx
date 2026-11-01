@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Calendar,
   Users,
   Gamepad2,
   Coins,
@@ -13,7 +12,6 @@ import {
 } from 'lucide-react';
 import AudioSettingsModal from '../components/AudioSettingsModal';
 import AdminDashboard from './AdminDashboard';
-import EventManagement from './EventManagement';
 import GameManagement from './GameManagement';
 import ScoringManagement from './ScoringManagement';
 import ParticipantRosterManager from '../components/admin/ParticipantRosterManager';
@@ -25,8 +23,6 @@ import { getAdminSession, validateAdminSession, revokeAdminSession } from '../se
 export default function AdminPortal({
   data,
   leaderboard,
-  onSaveEvent,
-  setActiveEventId,
   onSaveGame,
   onDeleteGame,
   onToggleGameActive,
@@ -40,7 +36,7 @@ export default function AdminPortal({
   const [adminSession, setAdminSession] = useState(() => getAdminSession());
   const [isVerifyingSession, setIsVerifyingSession] = useState(true);
 
-  const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'events' | 'participants' | 'games' | 'scoring'
+  const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'participants' | 'games' | 'scoring'
   const [quickScoreParticipantId, setQuickScoreParticipantId] = useState(null);
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
@@ -73,7 +69,7 @@ export default function AdminPortal({
     };
   }, []);
 
-  const activeEvent = data.events.find((e) => e.id === data.activeEventId) || data.events[0];
+  const competition = data.activeCompetition || { name: 'FUNTOPIA Tournament' };
 
   const handleLoginSuccess = (session) => {
     setAdminSession(session);
@@ -119,9 +115,8 @@ export default function AdminPortal({
 
   const navItems = [
     { id: 'overview', label: 'OVERVIEW', icon: LayoutDashboard },
-    { id: 'events', label: 'EVENTS', icon: Calendar },
-    { id: 'participants', label: 'PARTICIPANTS', icon: Users },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
+    { id: 'participants', label: 'PARTICIPANTS', icon: Users },
     { id: 'scoring', label: 'SCORING', icon: Coins },
   ];
 
@@ -237,7 +232,7 @@ export default function AdminPortal({
 
         {/* Live Score Ticker Tape */}
         <LiveTicker
-          activeEvent={activeEvent}
+          activeEvent={competition}
           transactions={data.transactions}
           participants={data.participants}
           games={data.games}
@@ -255,19 +250,9 @@ export default function AdminPortal({
             />
           )}
 
-          {currentTab === 'events' && (
-            <EventManagement
-              events={data.events}
-              activeEventId={data.activeEventId}
-              setActiveEventId={setActiveEventId}
-              onSaveEvent={onSaveEvent}
-            />
-          )}
-
           {currentTab === 'participants' && (
             <ParticipantRosterManager
               participants={data.participants || []}
-              activeEventId={data.activeEventId}
               onAddParticipant={onAddParticipant}
               onRemoveParticipant={onRemoveParticipant}
             />
