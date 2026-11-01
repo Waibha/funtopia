@@ -9,7 +9,9 @@ import {
   LogOut,
   ArrowLeft,
   Sparkles,
+  Sliders,
 } from 'lucide-react';
+import AudioSettingsModal from '../components/AudioSettingsModal';
 import AdminDashboard from './AdminDashboard';
 import EventManagement from './EventManagement';
 import GameManagement from './GameManagement';
@@ -45,6 +47,7 @@ export default function AdminPortal({
 
   const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'events' | 'participants' | 'games' | 'scoring'
   const [quickScoreParticipantId, setQuickScoreParticipantId] = useState(null);
+  const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
   const activeEvent = data.events.find((e) => e.id === data.activeEventId) || data.events[0];
 
@@ -147,6 +150,14 @@ export default function AdminPortal({
 
               {/* Action Controls */}
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsAudioModalOpen(true)}
+                  className="btn-pixel-yellow p-2.5 rounded-xl flex items-center gap-1.5 text-xs"
+                  title="Audio Settings"
+                >
+                  <Sliders className="w-4 h-4" />
+                </button>
+
                 <button
                   onClick={() => {
                     soundFx.play('fanfare');
@@ -266,6 +277,11 @@ export default function AdminPortal({
             </div>
           </div>
         </footer>
+        {/* Audio Settings Modal */}
+        <AudioSettingsModal
+          isOpen={isAudioModalOpen}
+          onClose={() => setIsAudioModalOpen(false)}
+        />
       </div>
     </div>
   );

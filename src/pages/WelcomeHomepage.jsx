@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight, Sliders } from 'lucide-react';
+import AudioSettingsModal from '../components/AudioSettingsModal';
 import { soundFx } from '../utilities/soundFx';
 
 export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, triggerCelebration }) {
   const navigate = useNavigate();
   const [insertCoinActive, setInsertCoinActive] = useState(false);
+  const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
   const handleStart = () => {
     soundFx.play('coin');
@@ -108,18 +110,29 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
         </div>
 
         {/* Audio Synthesizer Toggle */}
-        <button
-          onClick={handleSoundToggle}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-3 border-[#0D0518] text-xs font-mono font-black shadow-pixel-sm transition-all ${
-            soundEnabled
-              ? 'bg-[#FFDE25] text-[#0D0518]'
-              : 'bg-[#2E1052] text-purple-200'
-          }`}
-          title={soundEnabled ? '8-Bit Audio On' : 'Audio Muted'}
-        >
-          {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-gray-400" />}
-          <span className="font-arcade text-[10px]">{soundEnabled ? 'SFX ON' : 'MUTED'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsAudioModalOpen(true)}
+            className="btn-pixel-yellow py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-mono font-black"
+            title="Audio & Atmosphere Settings"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">AUDIO</span>
+          </button>
+
+          <button
+            onClick={handleSoundToggle}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-3 border-[#0D0518] text-xs font-mono font-black shadow-pixel-sm transition-all ${
+              soundEnabled
+                ? 'bg-[#FFDE25] text-[#0D0518]'
+                : 'bg-[#2E1052] text-purple-200'
+            }`}
+            title={soundEnabled ? '8-Bit Audio On' : 'Audio Muted'}
+          >
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-gray-400" />}
+            <span className="font-arcade text-[10px]">{soundEnabled ? 'SFX ON' : 'MUTED'}</span>
+          </button>
+        </div>
       </header>
 
       {/* ========================================================================= */}
@@ -215,6 +228,12 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </div>
         </div>
       </footer>
+
+      {/* Audio Settings Modal */}
+      <AudioSettingsModal
+        isOpen={isAudioModalOpen}
+        onClose={() => setIsAudioModalOpen(false)}
+      />
     </div>
   );
 }
