@@ -223,17 +223,31 @@ export default function ParticipantPortal({
                   <span>GAMES ({data.games.length})</span>
                 </button>
 
-                <button
-                  onClick={() => handleTabChange('register')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
-                    activeTab === 'register'
-                      ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
-                      : 'text-purple-200 hover:text-white'
-                  }`}
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>{loggedInParticipant ? 'SWITCH USER' : 'REGISTER / LOGIN'}</span>
-                </button>
+                {loggedInParticipant ? (
+                  <button
+                    onClick={() => handleTabChange('profile')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                      activeTab === 'profile'
+                        ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                        : 'text-purple-200 hover:text-white'
+                    }`}
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span>MY PROFILE</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleTabChange('register')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                      activeTab === 'register'
+                        ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                        : 'text-purple-200 hover:text-white'
+                    }`}
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>SIGN IN / REGISTER</span>
+                  </button>
+                )}
               </nav>
 
               {/* Right Side: Logged-in Participant Badge, Coins Wallet, & Audio */}
@@ -324,12 +338,12 @@ export default function ParticipantPortal({
                 GAMES
               </button>
               <button
-                onClick={() => handleTabChange('register')}
+                onClick={() => handleTabChange(loggedInParticipant ? 'profile' : 'register')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
-                  activeTab === 'register' ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518]' : 'text-purple-200'
+                  activeTab === 'profile' || activeTab === 'register' ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518]' : 'text-purple-200'
                 }`}
               >
-                {loggedInParticipant ? 'PROFILE' : 'REGISTER'}
+                {loggedInParticipant ? 'MY PROFILE' : 'SIGN IN'}
               </button>
             </div>
           </div>
@@ -391,13 +405,94 @@ export default function ParticipantPortal({
             />
           )}
 
-          {activeTab === 'register' && (
+          {activeTab === 'register' && !loggedInParticipant && (
             <ParticipantRegistration
               onRegisterParticipant={onRegisterParticipant}
               onParticipantLogin={handleParticipantLogin}
               startingCoins={data.settings?.startingCoins ?? 0}
               registeredList={data.participants || []}
             />
+          )}
+
+          {(activeTab === 'profile' || (activeTab === 'register' && loggedInParticipant)) && loggedInParticipant && (
+            <div className="max-w-2xl mx-auto space-y-6">
+              <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-xl text-white">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b-3 border-[#0D0518] pb-6">
+                  <div className="w-20 h-20 rounded-2xl bg-white border-3 border-[#0D0518] shadow-pixel flex items-center justify-center text-4xl shrink-0">
+                    {loggedInParticipant.avatar || '👾'}
+                  </div>
+                  <div className="text-center sm:text-left flex-grow">
+                    <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                      <h2 className="font-bungee text-2xl sm:text-3xl text-[#FFDE25]">
+                        {loggedInParticipant.name}
+                      </h2>
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border border-[#0D0518]">
+                        <ShieldCheck className="w-2.5 h-2.5 inline mr-0.5" /> VERIFIED GMAIL
+                      </span>
+                    </div>
+                    <p className="font-mono text-xs text-purple-200 mt-1">
+                      {loggedInParticipant.email}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 my-6">
+                  <div className="bg-[#200B3B] p-4 rounded-2xl border-2 border-[#FFDE25] text-center">
+                    <span className="text-[10px] font-arcade text-[#FFDE25] block font-black">YOUR ARCADE COINS</span>
+                    <span className="font-mono text-2xl font-black text-white mt-1 block">
+                      🪙 {currentCoins}
+                    </span>
+                    <span className="text-[10px] font-mono text-purple-200">Usable for Game Entries</span>
+                  </div>
+
+                  <div className="bg-[#200B3B] p-4 rounded-2xl border-2 border-[#28C76F] text-center">
+                    <span className="text-[10px] font-arcade text-[#28C76F] block font-black">TOURNAMENT POINTS</span>
+                    <span className="font-mono text-2xl font-black text-[#28C76F] mt-1 block">
+                      🏆 {myTotalPoints} PTS
+                    </span>
+                    <span className="text-[10px] font-mono text-purple-200">Championship Standing</span>
+                  </div>
+                </div>
+
+                {/* Score breakdown across games */}
+                <div className="bg-[#2B0E4C] rounded-2xl p-4 border-2 border-[#0D0518] space-y-3">
+                  <span className="text-xs font-arcade text-[#FFDE25] font-black block uppercase tracking-wider">
+                    YOUR GAME BREAKDOWN ({myGamesBreakdown.length} PLAYED)
+                  </span>
+                  <div className="space-y-2">
+                    {myGamesBreakdown.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7EE] text-[#0D0518] font-mono text-xs font-bold border-2 border-[#0D0518]"
+                      >
+                        <span>{item.name}</span>
+                        <span className="font-black text-[#5C2D91] bg-[#FFDE25] px-2 py-0.5 rounded border border-[#0D0518]">
+                          +{item.points} PTS
+                        </span>
+                      </div>
+                    ))}
+                    {myGamesBreakdown.length === 0 && (
+                      <p className="text-xs font-mono text-purple-200 text-center py-4">
+                        You have not recorded points in any games yet. Enter games to compete!
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t-2 border-[#0D0518] flex justify-between items-center">
+                  <span className="text-xs font-mono text-purple-200 font-bold">
+                    Authenticated Account Session
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="btn-pixel-white text-xs py-2.5 px-4 flex items-center gap-1.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>LOG OUT</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
 
           {activeTab === 'games' && (

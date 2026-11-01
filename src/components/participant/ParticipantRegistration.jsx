@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
-import { Mail, Lock, KeyRound, CheckCircle2, AlertTriangle, ArrowRight, ShieldCheck, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Mail,
+  Lock,
+  KeyRound,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  ShieldCheck,
+  RotateCw,
+  Info,
+} from 'lucide-react';
 import { soundFx } from '../../utilities/soundFx';
 import {
   initiateParticipantRegistration,
   completeParticipantVerification,
+  resendParticipantVerification,
   loginParticipant,
 } from '../../services/api/authService';
+import { supabase, supabaseConfig } from '../../services/supabaseClient';
 
 export default function ParticipantRegistration({
   onRegisterParticipant,
@@ -26,7 +38,7 @@ export default function ParticipantRegistration({
   // Verification step state
   const [verificationEmail, setVerificationEmail] = useState('');
   const [verificationCodeInput, setVerificationCodeInput] = useState('');
-  const [sentCodeHint, setSentCodeHint] = useState('');
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -36,9 +48,46 @@ export default function ParticipantRegistration({
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [verifiedProfile, setVerifiedProfile] = useState(null);
 
-  // Diverse pixel adventure character sprites referencing Screen 5: "CHOOSE YOUR CHARACTER"
+  // Cooldown timer for resend
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  // Listen to Supabase Auth State Change for email confirmation link clicks
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user?.email_confirmed_at) {
+        const user = session.user;
+        const participant = {
+          id: user.id,
+          name: user.user_metadata?.name || 'Verified Player',
+          email: user.email,
+          avatar: user.user_metadata?.avatar || '👾',
+          coins: typeof user.user_metadata?.startingCoins === 'number'
+            ? user.user_metadata.startingCoins
+            : Number(startingCoins ?? 0),
+          isEmailVerified: true,
+          registeredAt: new Date().toISOString(),
+        };
+        soundFx.play('fanfare');
+        setVerifiedProfile(participant);
+        if (onRegisterParticipant) onRegisterParticipant(participant);
+        if (onParticipantLogin) onParticipantLogin(participant);
+      }
+    });
+
+    return () => subscription?.unsubscribe();
+  }, [onRegisterParticipant, onParticipantLogin, startingCoins]);
+
+  // Diverse pixel adventure character sprites
   const avatars = [
     { icon: '👾', name: 'Alien Pixel' },
     { icon: '🤠', name: 'Ranger' },
@@ -52,7 +101,7 @@ export default function ParticipantRegistration({
     { icon: '🔥', name: 'Blaze' },
   ];
 
-  // Handle Step 1: Initiate Registration
+  // Handle Step 1: Initiate Real Registration via Supabase
   const handleInitiateRegistration = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -80,7 +129,8 @@ export default function ParticipantRegistration({
       soundFx.play('coin');
       setIsSubmitting(false);
       setVerificationEmail(res.cleanEmail);
-      setSentCodeHint(res.verificationCode);
+      setSuccessMsg(res.message || `An actual verification email has been dispatched to ${res.cleanEmail}.`);
+      setResendCooldown(60);
       setMode('verify');
     } catch (err) {
       soundFx.play('scoreDown');
@@ -89,10 +139,11 @@ export default function ParticipantRegistration({
     }
   };
 
-  // Handle Step 2: Complete Email Verification
+  // Handle Step 2: Complete Email Verification with Real OTP / Confirmation
   const handleVerifyCode = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
     setIsSubmitting(true);
     soundFx.play('click');
 
@@ -100,19 +151,22 @@ export default function ParticipantRegistration({
       const res = await completeParticipantVerification({
         email: verificationEmail,
         code: verificationCodeInput,
+        startingCoins: Number(startingCoins ?? 0),
       });
 
       if (!res.success) {
         soundFx.play('scoreDown');
         setIsSubmitting(false);
-        setErrorMsg(res.error || 'Invalid code.');
+        setErrorMsg(res.error || 'Verification failed. Code may be invalid or expired.');
         return;
       }
 
       soundFx.play('fanfare');
       setIsSubmitting(false);
       setVerifiedProfile(res.participant);
-      onRegisterParticipant(res.participant);
+      if (onRegisterParticipant) {
+        onRegisterParticipant(res.participant);
+      }
       if (onParticipantLogin) {
         onParticipantLogin(res.participant);
       }
@@ -123,10 +177,36 @@ export default function ParticipantRegistration({
     }
   };
 
+  // Handle Resend Verification Email
+  const handleResend = async () => {
+    if (resendCooldown > 0 || isResending) return;
+    setIsResending(true);
+    setErrorMsg('');
+    soundFx.play('click');
+
+    try {
+      const res = await resendParticipantVerification({ email: verificationEmail });
+      if (!res.success) {
+        soundFx.play('scoreDown');
+        setErrorMsg(res.error || 'Failed to resend verification email.');
+      } else {
+        soundFx.play('coin');
+        setSuccessMsg(res.message || 'Verification email resent! Please check your inbox.');
+        setResendCooldown(60);
+      }
+    } catch (err) {
+      soundFx.play('scoreDown');
+      setErrorMsg('Error resending email. Please try again later.');
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   // Handle Login for Existing Registered Participant
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    setSuccessMsg('');
     setIsSubmitting(true);
     soundFx.play('click');
 
@@ -141,6 +221,10 @@ export default function ParticipantRegistration({
         soundFx.play('scoreDown');
         setIsSubmitting(false);
         setErrorMsg(res.error || 'Login failed.');
+        if (res.unconfirmed) {
+          setVerificationEmail(res.email || loginEmail);
+          setMode('verify');
+        }
         return;
       }
 
@@ -168,7 +252,7 @@ export default function ParticipantRegistration({
 
           <div>
             <span className="px-3 py-1 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
-              EMAIL VERIFIED • ACCOUNT ACTIVE
+              REAL EMAIL CONFIRMED • ACCOUNT ACTIVE
             </span>
             <h2 className="font-bungee text-3xl text-[#0D0518]">
               WELCOME, {verifiedProfile.name.toUpperCase()}!
@@ -180,11 +264,11 @@ export default function ParticipantRegistration({
 
           <div className="bg-[#FAF7EE] border-3 border-[#0D0518] rounded-2xl p-5 shadow-pixel text-left space-y-3">
             <div className="flex items-center justify-between border-b-2 border-[#0D0518] pb-3">
-              <span className="font-arcade text-xs text-[#FF5FA0] font-black">PLAYER PASSPORT</span>
+              <span className="font-arcade text-xs text-[#FF5FA0] font-black">PLAYER IDENTITY PASSPORT</span>
               <span className="text-3xl">{verifiedProfile.avatar}</span>
             </div>
 
-            <div className="space-y-1 font-mono text-xs">
+            <div className="space-y-1.5 font-mono text-xs">
               <div className="flex justify-between">
                 <span className="text-gray-500 font-bold">NAME:</span>
                 <span className="font-black text-[#0D0518]">{verifiedProfile.name}</span>
@@ -194,13 +278,13 @@ export default function ParticipantRegistration({
                 <span className="font-bold text-[#0D0518]">{verifiedProfile.email}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 font-bold">STARTING COINS:</span>
-                <span className="font-black text-[#FF7A00]">🪙 {verifiedProfile.coins || 500} COINS</span>
+                <span className="text-gray-500 font-bold">STARTING BALANCE:</span>
+                <span className="font-black text-[#FF7A00]">🪙 {Number(verifiedProfile.coins ?? 0)} COINS</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 font-bold">EMAIL STATUS:</span>
+                <span className="text-gray-500 font-bold">EMAIL VERIFICATION:</span>
                 <span className="font-black text-[#28C76F] flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Verified
+                  <ShieldCheck className="w-3.5 h-3.5" /> Confirmed via Supabase Auth
                 </span>
               </div>
             </div>
@@ -210,7 +294,7 @@ export default function ParticipantRegistration({
             onClick={() => setVerifiedProfile(null)}
             className="btn-pixel-yellow w-full py-3 text-xs"
           >
-            VIEW LOBBY & LEADERBOARD
+            ENTER CHAMPIONSHIP LOBBY
           </button>
         </div>
       </div>
@@ -227,6 +311,7 @@ export default function ParticipantRegistration({
             soundFx.play('click');
             setMode('register');
             setErrorMsg('');
+            setSuccessMsg('');
           }}
           className={`flex-1 py-2 rounded-xl transition-all ${
             mode === 'register' || mode === 'verify'
@@ -242,6 +327,7 @@ export default function ParticipantRegistration({
             soundFx.play('click');
             setMode('login');
             setErrorMsg('');
+            setSuccessMsg('');
           }}
           className={`flex-1 py-2 rounded-xl transition-all ${
             mode === 'login'
@@ -253,11 +339,32 @@ export default function ParticipantRegistration({
         </button>
       </div>
 
+      {/* Supabase Connection Status Indicator */}
+      {!supabaseConfig.isConfigured && (
+        <div className="p-3.5 rounded-2xl bg-amber-50 border-3 border-amber-500 text-amber-950 text-xs font-mono flex items-start gap-2.5 shadow-pixel-sm">
+          <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-black block">LIVE EMAIL DISPATCH NOT CONFIGURED:</span>
+            <span>
+              Real Gmail delivery requires Supabase credentials (<code className="bg-amber-200/60 px-1 rounded">VITE_SUPABASE_URL</code> and <code className="bg-amber-200/60 px-1 rounded">VITE_SUPABASE_ANON_KEY</code>) configured in <code className="bg-amber-200/60 px-1 rounded">.env</code> with an enabled SMTP provider.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Error Alert */}
       {errorMsg && (
         <div className="p-3.5 rounded-2xl bg-red-100 border-3 border-red-600 text-red-900 text-xs font-mono flex items-start gap-2.5 shadow-pixel-sm animate-shake">
           <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
           <span className="font-bold">{errorMsg}</span>
+        </div>
+      )}
+
+      {/* Success Alert */}
+      {successMsg && (
+        <div className="p-3.5 rounded-2xl bg-green-100 border-3 border-green-600 text-green-900 text-xs font-mono flex items-start gap-2.5 shadow-pixel-sm">
+          <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+          <span className="font-bold">{successMsg}</span>
         </div>
       )}
 
@@ -268,13 +375,13 @@ export default function ParticipantRegistration({
         <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 sm:p-8 shadow-pixel-lg space-y-6">
           <div className="border-b-3 border-[#0D0518] pb-4">
             <span className="px-3 py-1 rounded-full bg-[#FF5FA0] text-white font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
-              STEP 1 OF 2 • REAL EMAIL ONBOARDING
+              STEP 1 OF 2 • REAL GMAIL / EMAIL REGISTRATION
             </span>
             <h2 className="font-bungee text-2xl sm:text-3xl text-[#0D0518]">
               REGISTER PARTICIPANT
             </h2>
             <p className="text-gray-600 font-mono text-xs mt-1">
-              Enter your real name and email address. An email verification code will be required before account activation.
+              Enter your real name and verified email address. An actual verification email will be dispatched to your inbox.
             </p>
           </div>
 
@@ -305,12 +412,12 @@ export default function ParticipantRegistration({
                 />
               </div>
               <p className="text-[10px] text-gray-500 mt-1 font-bold">
-                Duplicate email registrations are rejected. Verification is required.
+                You will need to open your email inbox to verify ownership before accessing the platform.
               </p>
             </div>
 
             <div>
-              <label className="block text-[#0D0518] mb-1 font-black">CREATE PASSWORD (MIN 6 CHARS) *</label>
+              <label className="block text-[#0D0518] mb-1 font-black">CREATE PASSWORD (MIN 6 CHARACTERS) *</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
@@ -355,7 +462,7 @@ export default function ParticipantRegistration({
               disabled={isSubmitting}
               className="btn-pixel-yellow w-full py-3.5 text-xs font-bold flex items-center justify-center gap-2 mt-2"
             >
-              <span>{isSubmitting ? 'PROCESSING...' : 'CONTINUE TO EMAIL VERIFICATION'}</span>
+              <span>{isSubmitting ? 'DISPATCHING EMAIL...' : 'DISPATCH VERIFICATION EMAIL'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -363,44 +470,42 @@ export default function ParticipantRegistration({
       )}
 
       {/* ========================================================================= */}
-      {/* STAGE 2: EMAIL VERIFICATION CODE STEP                                     */}
+      {/* STAGE 2: REAL EMAIL VERIFICATION CODE / CONFIRMATION STEP                 */}
       {/* ========================================================================= */}
       {mode === 'verify' && (
         <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 sm:p-8 shadow-pixel-lg space-y-6">
           <div className="border-b-3 border-[#0D0518] pb-4">
             <span className="px-3 py-1 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
-              STEP 2 OF 2 • VERIFY EMAIL OWNERSHIP
+              STEP 2 OF 2 • CHECK YOUR EMAIL INBOX
             </span>
             <h2 className="font-bungee text-2xl sm:text-3xl text-[#0D0518]">
-              ENTER VERIFICATION CODE
+              VERIFY YOUR EMAIL
             </h2>
             <p className="text-gray-600 font-mono text-xs mt-1">
-              A 6-digit verification code has been dispatched to{' '}
+              A real verification email has been dispatched to{' '}
               <strong className="text-[#0D0518] underline">{verificationEmail}</strong>.
             </p>
           </div>
 
-          {/* Verification Code Box for Evaluator / Testing */}
-          <div className="bg-[#FAF7EE] border-2 border-dashed border-[#5C2D91] rounded-2xl p-3.5 flex items-center justify-between text-xs font-mono">
-            <div>
-              <span className="text-[10px] text-gray-500 font-bold block uppercase">VERIFICATION DISPATCH</span>
-              <span className="font-black text-[#5C2D91]">
-                CODE SENT: <code className="text-base text-[#0D0518] bg-white px-2 py-0.5 rounded border border-gray-400">{sentCodeHint}</code>
-              </span>
+          {/* Genuine Inbox Instructions Card */}
+          <div className="bg-[#FAF7EE] border-3 border-[#0D0518] rounded-2xl p-4 space-y-2 text-xs font-mono">
+            <div className="flex items-center gap-2 text-[#5C2D91] font-black">
+              <Mail className="w-4 h-4" />
+              <span>CHECK INBOX & SPAM FOLDER</span>
             </div>
-            <button
-              type="button"
-              onClick={() => setVerificationCodeInput(sentCodeHint)}
-              className="px-2.5 py-1 bg-[#FFDE25] border-2 border-[#0D0518] rounded-lg font-bold text-[10px]"
-            >
-              FILL CODE
-            </button>
+            <p className="text-gray-700 leading-relaxed">
+              Open the verification email sent from Supabase Auth. You can either:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-1 pl-1 font-bold">
+              <li>Click the confirmation link directly inside the email.</li>
+              <li>Or copy the 6-digit verification code and paste it below.</li>
+            </ul>
           </div>
 
           <form onSubmit={handleVerifyCode} className="space-y-4 text-xs font-mono">
             <div>
               <label className="block text-[#0D0518] mb-1 font-black">
-                6-DIGIT VERIFICATION CODE *
+                ENTER 6-DIGIT VERIFICATION CODE *
               </label>
               <div className="relative">
                 <KeyRound className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -409,11 +514,30 @@ export default function ParticipantRegistration({
                   required
                   maxLength={6}
                   value={verificationCodeInput}
-                  onChange={(e) => setVerificationCodeInput(e.target.value)}
-                  placeholder="123456"
+                  onChange={(e) => setVerificationCodeInput(e.target.value.trim())}
+                  placeholder="••••••"
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-mono font-black text-xl tracking-widest text-center focus:outline-none focus:border-[#FF5FA0]"
                 />
               </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] pt-1">
+              <span className="text-gray-500 font-bold">Did not receive the email?</span>
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resendCooldown > 0 || isResending}
+                className="text-[#5C2D91] font-black hover:underline disabled:text-gray-400 flex items-center gap-1"
+              >
+                <RotateCw className={`w-3 h-3 ${isResending ? 'animate-spin' : ''}`} />
+                <span>
+                  {resendCooldown > 0
+                    ? `Resend in ${resendCooldown}s`
+                    : isResending
+                    ? 'Resending...'
+                    : 'Resend Verification Email'}
+                </span>
+              </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-2">
@@ -443,13 +567,13 @@ export default function ParticipantRegistration({
         <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 sm:p-8 shadow-pixel-lg space-y-6">
           <div className="border-b-3 border-[#0D0518] pb-4">
             <span className="px-3 py-1 rounded-full bg-[#5C2D91] text-white font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm inline-block mb-2">
-              PLAYER ACCESS
+              VERIFIED PLAYER LOGIN
             </span>
             <h2 className="font-bungee text-2xl sm:text-3xl text-[#0D0518]">
               PARTICIPANT SIGN IN
             </h2>
             <p className="text-gray-600 font-mono text-xs mt-1">
-              Sign in with your verified email and password to access your coins, games, and scores.
+              Sign in with your verified email and password. Unverified accounts cannot sign in.
             </p>
           </div>
 

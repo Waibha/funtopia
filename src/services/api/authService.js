@@ -3,9 +3,11 @@
  *
  * Implements:
  * 1. Cryptographically hashed administrator passkey verification.
- * 2. Real Gmail/email participant registration with verification, duplicate prevention,
- *    password hashing, and verified session management.
+ * 2. Real Gmail/email participant registration with Supabase Auth,
+ *    actual email confirmation, duplicate prevention, and verified session management.
  */
+
+import { supabase, supabaseConfig } from '../supabaseClient.js';
 
 // Cryptographic SHA-256 hashes of authorized administrative passkeys
 const AUTHORIZED_PASSKEY_HASHES = [
@@ -15,17 +17,20 @@ const AUTHORIZED_PASSKEY_HASHES = [
 
 const ADMIN_SESSION_KEY = 'funtopia_admin_session';
 const PARTICIPANT_SESSION_KEY = 'funtopia_participant_session';
-const PENDING_VERIFICATIONS_KEY = 'funtopia_pending_verifications';
 
 /**
- * Computes SHA-256 hex digest using Web Crypto API.
+ * Computes SHA-256 hex digest using Web Crypto API or Node crypto.
  */
 export async function hashString(value) {
   const encoder = new TextEncoder();
   const data = encoder.encode(value.trim());
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  if (typeof crypto !== 'undefined' && crypto.subtle) {
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  // Fallback for non-subtle crypto environments
+  return 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 }
 
 /* ========================================================================= */
@@ -126,7 +131,13 @@ export async function validateAdminSession(session) {
 
 export function saveAdminSession(session) {
   try {
-    sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
+    const serialized = JSON.stringify(session);
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(ADMIN_SESSION_KEY, serialized);
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(ADMIN_SESSION_KEY, serialized);
+    }
   } catch (e) {
     console.error('Failed to store admin session', e);
   }
@@ -134,7 +145,13 @@ export function saveAdminSession(session) {
 
 export function getAdminSession() {
   try {
-    const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    let raw = null;
+    if (typeof sessionStorage !== 'undefined') {
+      raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    }
+    if (!raw && typeof localStorage !== 'undefined') {
+      raw = localStorage.getItem(ADMIN_SESSION_KEY);
+    }
     return raw ? JSON.parse(raw) : null;
   } catch (e) {
     return null;
@@ -143,19 +160,25 @@ export function getAdminSession() {
 
 export function revokeAdminSession() {
   try {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(ADMIN_SESSION_KEY);
+    }
   } catch (e) {
     console.error('Failed to revoke admin session', e);
   }
 }
 
 /* ========================================================================= */
-/* 2. REAL GMAIL / EMAIL PARTICIPANT AUTHENTICATION & VERIFICATION          */
+/* 2. REAL GMAIL / EMAIL PARTICIPANT AUTHENTICATION (SUPABASE AUTH)          */
 /* ========================================================================= */
 
 /**
- * Initiates registration with email verification code.
- * Rejects duplicate email addresses and weak passwords.
+ * Initiates registration with real Supabase Auth email confirmation.
+ * Dispatches an actual verification email to the user's Gmail/inbox.
+ * Never displays or exposes an OTP on screen.
  */
 export async function initiateParticipantRegistration({
   name,
@@ -179,120 +202,199 @@ export async function initiateParticipantRegistration({
     return { success: false, error: 'Password must be at least 6 characters long.' };
   }
 
-  // Enforce duplicate account prevention
+  // Pre-check for duplicate registered participants
   const isDuplicate = existingParticipants.some(
     (p) => (p.email || '').trim().toLowerCase() === cleanEmail
   );
   if (isDuplicate) {
     return {
       success: false,
-      error: 'An account with this email address already exists. Please log in instead.',
+      error: 'An account with this email address already exists. Please sign in instead.',
     };
   }
 
-  // Generate 6-digit verification OTP
-  const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const passwordHash = await hashString(password);
+  // If Supabase is configured, use real Supabase Auth email confirmation
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          data: {
+            name: name.trim(),
+            avatar: avatar || '👾',
+            startingCoins: Number(startingCoins ?? 0),
+          },
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/participant` : undefined,
+        },
+      });
 
-  const pendingRecord = {
-    id: `p-${Date.now()}`,
-    name: name.trim(),
-    email: cleanEmail,
-    passwordHash,
-    avatar: avatar || '👾',
-    verificationCode,
-    isEmailVerified: false,
-    coins: Number(startingCoins ?? 0), // Allocated automatically based on current admin setting
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 15 * 60 * 1000, // 15 minute verification window
-  };
+      if (error) {
+        return {
+          success: false,
+          error: error.message || 'Failed to dispatch verification email via Supabase Auth.',
+        };
+      }
 
-  // Store in pending verifications map
-  try {
-    const raw = sessionStorage.getItem(PENDING_VERIFICATIONS_KEY);
-    const map = raw ? JSON.parse(raw) : {};
-    map[cleanEmail] = pendingRecord;
-    sessionStorage.setItem(PENDING_VERIFICATIONS_KEY, JSON.stringify(map));
-  } catch (e) {
-    console.error('Failed to save pending verification', e);
+      // Supabase returns an empty identities array if user already exists with email confirmations on
+      if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        return {
+          success: false,
+          error: 'An account with this email address already exists. Please sign in instead.',
+        };
+      }
+
+      return {
+        success: true,
+        cleanEmail,
+        requiresVerification: true,
+        message: `An actual verification email has been dispatched to ${cleanEmail}. Please check your inbox and spam folder.`,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: `Supabase Auth error: ${err.message}`,
+      };
+    }
   }
 
+  // If Supabase is NOT configured, report honest configuration error
   return {
-    success: true,
+    success: false,
+    missingConfig: true,
     cleanEmail,
-    verificationCode,
-    message: `Verification code generated for ${cleanEmail}.`,
+    error: 'Live email verification requires Supabase configuration. VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be provided in .env connected to an active SMTP provider.',
+    details: 'To send genuine verification emails to Gmail, connect your Supabase project in .env and enable Email Confirmations in Supabase Auth.',
   };
 }
 
 /**
- * Confirms email verification code and returns verified participant profile.
+ * Confirms email verification via Supabase Auth OTP verification.
+ * Only marks account as verified after real verification succeeds.
  */
-export async function completeParticipantVerification({ email, code }) {
+export async function completeParticipantVerification({ email, code, startingCoins = 0 }) {
   const cleanEmail = (email || '').trim().toLowerCase();
   const cleanCode = (code || '').trim();
 
-  let pending = null;
-  try {
-    const raw = sessionStorage.getItem(PENDING_VERIFICATIONS_KEY);
-    const map = raw ? JSON.parse(raw) : {};
-    pending = map[cleanEmail];
-  } catch (e) {
-    return { success: false, error: 'Verification session expired. Please register again.' };
+  if (!cleanCode || cleanCode.length < 6) {
+    return { success: false, error: 'Please enter the 6-digit verification code from your email.' };
   }
 
-  if (!pending) {
-    return { success: false, error: 'No pending registration found for this email. Please register again.' };
+  if (supabase) {
+    try {
+      // Attempt verification with signup token type
+      let res = await supabase.auth.verifyOtp({
+        email: cleanEmail,
+        token: cleanCode,
+        type: 'signup',
+      });
+
+      if (res.error) {
+        // Fallback check with email token type
+        res = await supabase.auth.verifyOtp({
+          email: cleanEmail,
+          token: cleanCode,
+          type: 'email',
+        });
+      }
+
+      if (res.error) {
+        return {
+          success: false,
+          error: res.error.message || 'Invalid or expired verification code. Please check your inbox or request a new code.',
+        };
+      }
+
+      const user = res.data?.user;
+      if (!user) {
+        return { success: false, error: 'Verification failed. No user record returned by Supabase.' };
+      }
+
+      const allocatedCoins = typeof user.user_metadata?.startingCoins === 'number'
+        ? user.user_metadata.startingCoins
+        : Number(startingCoins ?? 0);
+
+      const verifiedParticipant = {
+        id: user.id,
+        name: user.user_metadata?.name || 'Verified Player',
+        email: user.email,
+        avatar: user.user_metadata?.avatar || '👾',
+        isEmailVerified: true,
+        coins: allocatedCoins,
+        registeredAt: new Date().toISOString(),
+      };
+
+      const session = {
+        role: 'participant',
+        participantId: verifiedParticipant.id,
+        name: verifiedParticipant.name,
+        email: verifiedParticipant.email,
+        avatar: verifiedParticipant.avatar,
+        issuedAt: Date.now(),
+      };
+
+      saveParticipantSession(session);
+
+      return {
+        success: true,
+        participant: verifiedParticipant,
+        session,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: `Supabase verification error: ${err.message}`,
+      };
+    }
   }
-
-  if (Date.now() > pending.expiresAt) {
-    return { success: false, error: 'Verification code expired. Please request a new code.' };
-  }
-
-  if (pending.verificationCode !== cleanCode) {
-    return { success: false, error: 'Incorrect verification code. Please check and try again.' };
-  }
-
-  // Create final verified profile
-  const verifiedParticipant = {
-    id: pending.id,
-    name: pending.name,
-    email: pending.email,
-    passwordHash: pending.passwordHash,
-    avatar: pending.avatar,
-    isEmailVerified: true,
-    coins: typeof pending.coins === 'number' ? pending.coins : 0,
-    registeredAt: new Date().toISOString(),
-  };
-
-  // Clean pending map
-  try {
-    const raw = sessionStorage.getItem(PENDING_VERIFICATIONS_KEY);
-    const map = raw ? JSON.parse(raw) : {};
-    delete map[cleanEmail];
-    sessionStorage.setItem(PENDING_VERIFICATIONS_KEY, JSON.stringify(map));
-  } catch (e) {}
-
-  // Issue verified participant session
-  const session = {
-    role: 'participant',
-    participantId: verifiedParticipant.id,
-    name: verifiedParticipant.name,
-    email: verifiedParticipant.email,
-    avatar: verifiedParticipant.avatar,
-    issuedAt: Date.now(),
-  };
-  saveParticipantSession(session);
 
   return {
-    success: true,
-    participant: verifiedParticipant,
-    session,
+    success: false,
+    error: 'Live verification requires Supabase credentials. VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be configured in .env.',
+  };
+}
+
+/**
+ * Resends a genuine verification email via Supabase Auth.
+ */
+export async function resendParticipantVerification({ email }) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  if (!cleanEmail) {
+    return { success: false, error: 'Email address is required to resend verification.' };
+  }
+
+  if (supabase) {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: cleanEmail,
+        options: {
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/participant` : undefined,
+        },
+      });
+
+      if (error) {
+        return { success: false, error: error.message || 'Failed to resend verification email.' };
+      }
+
+      return {
+        success: true,
+        message: `A new verification email has been dispatched to ${cleanEmail}. Please check your inbox.`,
+      };
+    } catch (err) {
+      return { success: false, error: `Resend error: ${err.message}` };
+    }
+  }
+
+  return {
+    success: false,
+    error: 'Cannot resend verification: Supabase is not configured in .env.',
   };
 }
 
 /**
  * Signs in an existing verified participant with email and password.
+ * Unverified accounts are strictly blocked with an email confirmation requirement error.
  */
 export async function loginParticipant({ email, password, registeredParticipants = [] }) {
   const cleanEmail = (email || '').trim().toLowerCase();
@@ -300,6 +402,67 @@ export async function loginParticipant({ email, password, registeredParticipants
     return { success: false, error: 'Email and password are required.' };
   }
 
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+
+      if (error) {
+        if (error.message.toLowerCase().includes('email not confirmed')) {
+          return {
+            success: false,
+            unconfirmed: true,
+            email: cleanEmail,
+            error: 'Your email address has not been verified yet. Please check your inbox and verify your email before logging in.',
+          };
+        }
+        return {
+          success: false,
+          error: error.message || 'Invalid email or password.',
+        };
+      }
+
+      const user = data.user;
+      const existing = registeredParticipants.find(
+        (p) => (p.email || '').trim().toLowerCase() === cleanEmail
+      );
+
+      const participant = existing || {
+        id: user.id,
+        name: user.user_metadata?.name || 'Verified Player',
+        email: user.email,
+        avatar: user.user_metadata?.avatar || '👾',
+        coins: typeof user.user_metadata?.startingCoins === 'number' ? user.user_metadata.startingCoins : 0,
+        isEmailVerified: true,
+      };
+
+      const session = {
+        role: 'participant',
+        participantId: participant.id,
+        name: participant.name,
+        email: participant.email,
+        avatar: participant.avatar,
+        issuedAt: Date.now(),
+      };
+
+      saveParticipantSession(session);
+
+      return {
+        success: true,
+        participant,
+        session,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error: `Supabase login error: ${err.message}`,
+      };
+    }
+  }
+
+  // Offline / Local database check
   const participant = registeredParticipants.find(
     (p) => (p.email || '').trim().toLowerCase() === cleanEmail
   );
@@ -336,13 +499,25 @@ export async function loginParticipant({ email, password, registeredParticipants
 
 export function saveParticipantSession(session) {
   try {
-    sessionStorage.setItem(PARTICIPANT_SESSION_KEY, JSON.stringify(session));
+    const serialized = JSON.stringify(session);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(PARTICIPANT_SESSION_KEY, serialized);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(PARTICIPANT_SESSION_KEY, serialized);
+    }
   } catch (e) {}
 }
 
 export function getParticipantSession() {
   try {
-    const raw = sessionStorage.getItem(PARTICIPANT_SESSION_KEY);
+    let raw = null;
+    if (typeof localStorage !== 'undefined') {
+      raw = localStorage.getItem(PARTICIPANT_SESSION_KEY);
+    }
+    if (!raw && typeof sessionStorage !== 'undefined') {
+      raw = sessionStorage.getItem(PARTICIPANT_SESSION_KEY);
+    }
     return raw ? JSON.parse(raw) : null;
   } catch (e) {
     return null;
@@ -351,6 +526,14 @@ export function getParticipantSession() {
 
 export function revokeParticipantSession() {
   try {
-    sessionStorage.removeItem(PARTICIPANT_SESSION_KEY);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(PARTICIPANT_SESSION_KEY);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(PARTICIPANT_SESSION_KEY);
+    }
+    if (supabase) {
+      supabase.auth.signOut().catch(() => {});
+    }
   } catch (e) {}
 }

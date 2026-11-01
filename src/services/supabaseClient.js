@@ -1,31 +1,46 @@
 /**
  * FUNTOPIA - Supabase Integration Client
- * Prepares the application for live Supabase database and real-time event streaming.
+ * Manages Supabase Auth, database, and real email verification.
  */
+import { createClient } from '@supabase/supabase-js';
 
-// Placeholder for future supabase-js client
+const metaEnv = (typeof import.meta !== 'undefined' && import.meta.env)
+  ? import.meta.env
+  : (typeof process !== 'undefined' && process.env ? process.env : {});
+
 export const supabaseConfig = {
-  url: import.meta.env.VITE_SUPABASE_URL || '',
-  anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+  url: metaEnv.VITE_SUPABASE_URL || '',
+  anonKey: metaEnv.VITE_SUPABASE_ANON_KEY || '',
   isConfigured: Boolean(
-    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY
+    metaEnv.VITE_SUPABASE_URL && metaEnv.VITE_SUPABASE_ANON_KEY
   ),
 };
 
+export const supabase = supabaseConfig.isConfigured
+  ? createClient(supabaseConfig.url, supabaseConfig.anonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+      },
+    })
+  : null;
+
 export const SUPABASE_TABLES = {
+  PROFILES: 'profiles',
   EVENTS: 'events',
-  TEAMS: 'teams',
   GAMES: 'games',
   SCORE_TRANSACTIONS: 'score_transactions',
-  EVENT_GAMES: 'event_games',
+  COIN_TRANSACTIONS: 'coin_transactions',
 };
 
-// Hook or service helper ready for database integration
 export const getSupabaseStatus = () => {
   return {
-    ready: supabaseConfig.isConfigured,
+    configured: supabaseConfig.isConfigured,
+    ready: Boolean(supabase),
+    url: supabaseConfig.url || null,
     message: supabaseConfig.isConfigured
       ? 'Connected to Supabase endpoint.'
-      : 'Running in Local Indie Studio Mode (Mock Data Store active).',
+      : 'Supabase credentials missing: VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be provided in .env for live email delivery and verification.',
   };
 };
