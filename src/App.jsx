@@ -1,33 +1,51 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-import CosmicBackground from './components/CosmicBackground';
-import Navbar from './components/Navbar';
-import LiveTicker from './components/LiveTicker';
-import PublicLeaderboard from './pages/PublicLeaderboard';
-import AdminDashboard from './pages/AdminDashboard';
-import EventManagement from './pages/EventManagement';
-import TeamManagement from './pages/TeamManagement';
-import GameManagement from './pages/GameManagement';
-import ScoringManagement from './pages/ScoringManagement';
+import WelcomeHomepage from './pages/WelcomeHomepage';
+import PortalSelectPage from './pages/PortalSelectPage';
+import ParticipantPortal from './pages/ParticipantPortal';
+import AdminPortal from './pages/AdminPortal';
 import { loadStoredData, saveStoredData, INITIAL_DATA } from './services/mockData';
 import { calculateLeaderboard } from './utilities/leaderboardEngine';
 import { soundFx } from './utilities/soundFx';
 
 export default function App() {
-  const [data, setData] = useState(() => loadStoredData());
-  const [currentView, setCurrentView] = useState('leaderboard');
+  const [data, setData] = useState(() => {
+    const stored = loadStoredData();
+    // Ensure participants array exists
+    if (!stored.participants) {
+      stored.participants = [
+        {
+          id: 'p-1',
+          eventId: 'evt-cosmic-2026',
+          teamId: 'team-vpr',
+          name: 'Nova Chen',
+          gamertag: 'NOVA_SPEED',
+          email: 'nova@funtopia.arcade',
+          avatar: '🦅',
+          registeredAt: '2026-11-01T20:00:00Z',
+        },
+        {
+          id: 'p-2',
+          eventId: 'evt-cosmic-2026',
+          teamId: 'team-pls',
+          name: 'Zara Matrix',
+          gamertag: 'ZARA_PULSE',
+          email: 'zara@funtopia.arcade',
+          avatar: '⚡',
+          registeredAt: '2026-11-01T20:15:00Z',
+        },
+      ];
+    }
+    return stored;
+  });
+
   const [soundEnabled, setSoundEnabled] = useState(soundFx.enabled);
-  const [quickScoreTeamId, setQuickScoreTeamId] = useState(null);
 
   // Sync state changes to localStorage
   useEffect(() => {
     saveStoredData(data);
   }, [data]);
-
-  // Active event object
-  const activeEvent = useMemo(() => {
-    return data.events.find((e) => e.id === data.activeEventId) || data.events[0];
-  }, [data.events, data.activeEventId]);
 
   // Dynamic leaderboard computed in real-time
   const leaderboard = useMemo(() => {
@@ -121,119 +139,88 @@ export default function App() {
     }));
   };
 
-  const handleResetData = () => {
-    setData(INITIAL_DATA);
-    triggerCelebration();
+  const handleRegisterParticipant = (newParticipant) => {
+    setData((prev) => ({
+      ...prev,
+      participants: [...(prev.participants || []), newParticipant],
+    }));
   };
 
-  const handleOpenQuickScore = (teamId = null) => {
-    setQuickScoreTeamId(teamId);
-    setCurrentView('scoring');
+  const handleAssignParticipantTeam = (participantId, teamId) => {
+    setData((prev) => ({
+      ...prev,
+      participants: (prev.participants || []).map((p) =>
+        p.id === participantId ? { ...p, teamId } : p
+      ),
+    }));
+  };
+
+  const handleRemoveParticipant = (participantId) => {
+    setData((prev) => ({
+      ...prev,
+      participants: (prev.participants || []).filter((p) => p.id !== participantId),
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF7EE] text-[#180A28] flex flex-col relative selection:bg-pop-yellow selection:text-pop-ink font-sans">
-      {/* Warm Ivory Graphic Texture */}
-      <CosmicBackground />
-
-      {/* Main App Content Container */}
-      <div className="relative z-10 flex flex-col flex-grow">
-        {/* Top Navbar */}
-        <Navbar
-          currentView={currentView}
-          setCurrentView={setCurrentView}
-          soundEnabled={soundEnabled}
-          setSoundEnabled={setSoundEnabled}
-          triggerCelebration={triggerCelebration}
-          resetData={handleResetData}
-          activeEvent={activeEvent}
-        />
-
-        {/* Live Scrolling Marquee Ticker */}
-        <LiveTicker
-          activeEvent={activeEvent}
-          transactions={data.transactions}
-          teams={data.teams}
-          games={data.games}
-        />
-
-        {/* Main View Router */}
-        <main className="flex-grow px-4 sm:px-6 lg:px-8">
-          {currentView === 'leaderboard' && (
-            <PublicLeaderboard
-              leaderboard={leaderboard}
-              activeEvent={activeEvent}
-              games={data.games}
-              transactions={data.transactions}
-              teams={data.teams}
+    <BrowserRouter>
+      <Routes>
+        {/* Experience 1: Animated Public Welcome Homepage */}
+        <Route
+          path="/"
+          element={
+            <WelcomeHomepage
+              soundEnabled={soundEnabled}
+              setSoundEnabled={setSoundEnabled}
               triggerCelebration={triggerCelebration}
             />
-          )}
+          }
+        />
 
-          {currentView === 'admin' && (
-            <AdminDashboard
+        {/* Portal Selection Screen */}
+        <Route path="/select-portal" element={<PortalSelectPage />} />
+
+        {/* Experience 2: Participant Portal */}
+        <Route
+          path="/participant/*"
+          element={
+            <ParticipantPortal
               data={data}
               leaderboard={leaderboard}
-              setCurrentView={setCurrentView}
-              onOpenQuickScore={handleOpenQuickScore}
+              onRegisterParticipant={handleRegisterParticipant}
               triggerCelebration={triggerCelebration}
+              soundEnabled={soundEnabled}
+              setSoundEnabled={setSoundEnabled}
             />
-          )}
+          }
+        />
 
-          {currentView === 'events' && (
-            <EventManagement
-              events={data.events}
-              activeEventId={data.activeEventId}
-              setActiveEventId={handleSetActiveEvent}
+        {/* Experience 3: Restricted Admin Portal */}
+        <Route
+          path="/admin/*"
+          element={
+            <AdminPortal
+              data={data}
+              leaderboard={leaderboard}
               onSaveEvent={handleSaveEvent}
-              teams={data.teams}
-              games={data.games}
-            />
-          )}
-
-          {currentView === 'teams' && (
-            <TeamManagement
-              teams={data.teams}
+              setActiveEventId={handleSetActiveEvent}
               onSaveTeam={handleSaveTeam}
               onDeleteTeam={handleDeleteTeam}
-            />
-          )}
-
-          {currentView === 'games' && (
-            <GameManagement
-              games={data.games}
               onSaveGame={handleSaveGame}
               onDeleteGame={handleDeleteGame}
               onToggleGameActive={handleToggleGameActive}
-            />
-          )}
-
-          {currentView === 'scoring' && (
-            <ScoringManagement
-              data={data}
               onAwardScore={handleAwardScore}
               onRollbackTransaction={handleRollbackTransaction}
-              quickTeamId={quickScoreTeamId}
+              onAssignParticipantTeam={handleAssignParticipantTeam}
+              onRemoveParticipant={handleRemoveParticipant}
+              triggerCelebration={triggerCelebration}
             />
-          )}
-        </main>
+          }
+        />
 
-        {/* Studio Footer */}
-        <footer className="border-t-3 border-pop-ink py-6 bg-pop-butter mt-16 text-center text-xs font-mono text-pop-muted select-none">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="font-bungee text-pop-ink text-sm">FUNTOPIA</span>
-              <span>•</span>
-              <span className="font-bold text-pop-ink">PREMIUM RETRO POP ARCADE</span>
-            </div>
-            <div className="flex items-center gap-3 text-xs font-bold text-pop-ink">
-              <span>BRANCH: person-1/ui-foundation</span>
-              <span>•</span>
-              <span className="text-pop-purple font-black">READY PLAYER 1</span>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </div>
+        {/* Fallback to Welcome Homepage */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
