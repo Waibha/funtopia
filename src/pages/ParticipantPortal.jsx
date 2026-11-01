@@ -208,7 +208,7 @@ export default function ParticipantPortal({
                   }`}
                 >
                   <Trophy className="w-3.5 h-3.5" />
-                  <span>STANDINGS</span>
+                  <span>LEADERBOARD</span>
                 </button>
 
                 <button
@@ -313,7 +313,7 @@ export default function ParticipantPortal({
                   activeTab === 'leaderboard' ? 'bg-[#FFDE25] text-[#0D0518] border-2 border-[#0D0518]' : 'text-purple-200'
                 }`}
               >
-                STANDINGS
+                LEADERBOARD
               </button>
               <button
                 onClick={() => handleTabChange('games')}

@@ -99,7 +99,7 @@ export default function PortalSelectPage() {
                   </div>
                   <div className="text-center -translate-y-2 group-hover:-translate-y-3 transition-transform">
                     <span className="text-4xl block">🏆</span>
-                    <span className="text-[8px] font-arcade text-[#28C76F]">STANDINGS</span>
+                    <span className="text-[8px] font-arcade text-[#28C76F]">LEADERBOARD</span>
                   </div>
                   <div className="text-center group-hover:-translate-y-1 transition-transform">
                     <span className="text-3xl block">🚀</span>

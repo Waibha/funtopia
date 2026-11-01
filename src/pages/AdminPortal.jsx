@@ -40,7 +40,7 @@ export default function AdminPortal({
   const [adminSession, setAdminSession] = useState(() => getAdminSession());
   const [isVerifyingSession, setIsVerifyingSession] = useState(true);
 
-  const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'games' | 'participants' | 'coins' | 'scoring'
+  const [currentTab, setCurrentTab] = useState('leaderboard'); // 'leaderboard' | 'games' | 'participants' | 'coins' | 'scoring'
   const [quickScoreParticipantId, setQuickScoreParticipantId] = useState(null);
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
@@ -118,7 +118,7 @@ export default function AdminPortal({
   }
 
   const navItems = [
-    { id: 'overview', label: 'OVERVIEW', icon: LayoutDashboard },
+    { id: 'leaderboard', label: 'LEADERBOARD', icon: Trophy },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
     { id: 'participants', label: 'PARTICIPANTS', icon: Users },
     { id: 'coins', label: 'COINS', icon: Coins },
@@ -245,7 +245,7 @@ export default function AdminPortal({
 
         {/* Admin Modules Body */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-grow py-6">
-          {currentTab === 'overview' && (
+          {currentTab === 'leaderboard' && (
             <AdminDashboard
               data={data}
               leaderboard={leaderboard}

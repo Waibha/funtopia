@@ -8,7 +8,9 @@ import {
   ArrowUpRight,
   Plus,
   Sparkles,
+  Activity,
 } from 'lucide-react';
+import LeaderboardTableView from '../components/leaderboard/LeaderboardTableView';
 import { soundFx } from '../utilities/soundFx';
 
 export default function AdminDashboard({
@@ -64,14 +66,14 @@ export default function AdminDashboard({
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#FF5FA0] animate-ping" />
             <span className="font-arcade text-[10px] text-[#FFDE25] tracking-wider font-black">
-              ARCADE OPERATOR STATION • LIVE
+              ARCADE OPERATOR STATION • LIVE STANDINGS
             </span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-bungee tracking-wide text-[#FFDE25] pixel-title-yellow">
-            MASTER CONTROL
+            LEADERBOARD
           </h1>
           <p className="text-purple-200 font-mono text-xs sm:text-sm mt-1 max-w-xl font-medium">
-            Dispatch points, configure game costs/budgets, register players, and audit the live ledger.
+            Live participant rankings, game-by-game score breakdown, and quick operator scoring controls.
           </p>
         </div>
 
@@ -158,103 +160,40 @@ export default function AdminDashboard({
         })}
       </div>
 
-      {/* Standings Snapshot & Recent Transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Standings Snapshot (2 cols) */}
-        <div className="lg:col-span-2 bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 shadow-pixel-lg">
-          <div className="flex items-center justify-between mb-5 border-b-3 border-[#0D0518] pb-3">
-            <div className="flex items-center gap-2 font-arcade text-xs text-[#0D0518] font-black">
-              <Trophy className="w-4 h-4 text-[#FF7A00]" />
-              <span>CURRENT STANDINGS</span>
-            </div>
-            <button
-              onClick={() => {
-                soundFx.play('switch');
-                setCurrentView('leaderboard');
-              }}
-              className="text-xs font-mono text-[#5C2D91] hover:underline flex items-center gap-1 font-black"
-            >
-              <span>Public Arena View</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+      {/* Full-Width Championship Leaderboard with All Games */}
+      <section aria-label="Admin Championship Leaderboard">
+        <LeaderboardTableView
+          leaderboard={leaderboard}
+          games={data.games || []}
+          onOpenQuickScore={onOpenQuickScore}
+          isAdmin={true}
+        />
+      </section>
 
-          <div className="space-y-2.5">
-            {leaderboard.map((participant) => (
-              <div
-                key={participant.id}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FFFDF5] border-3 border-[#0D0518] hover:bg-[#FAF7EE] transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-arcade text-xs font-black border-2 border-[#0D0518] shadow-pixel-sm ${
-                      participant.rank === 1
-                        ? 'bg-[#FFDE25] text-[#0D0518]'
-                        : participant.rank === 2
-                        ? 'bg-[#5C2D91] text-white'
-                        : participant.rank === 3
-                        ? 'bg-[#FF7A00] text-white'
-                        : 'bg-white text-[#0D0518]'
-                    }`}
-                  >
-                    #{participant.rank}
-                  </span>
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-2xl">{participant.avatar}</span>
-                    <span className="font-display font-black text-[#0D0518] text-base">
-                      {participant.name}
-                    </span>
-                    <span className="text-xs font-mono text-gray-500">
-                      ({participant.email})
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-base font-black text-[#0D0518]">
-                    🪙 {participant.totalPoints.toLocaleString()} PTS
-                  </span>
-                  <button
-                    onClick={() => {
-                      soundFx.play('coin');
-                      if (onOpenQuickScore) onOpenQuickScore(participant.id);
-                    }}
-                    title="Score Participant"
-                    className="btn-pixel-yellow text-[10px] py-1 px-2.5"
-                  >
-                    +Score
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {leaderboard.length === 0 && (
-              <div className="text-center py-8 text-gray-500 font-mono text-xs font-bold">
-                No participants registered yet.
-              </div>
-            )}
-          </div>
-        </div>
-
+      {/* Operator Activity Feed & Scoring Terminal Shortcuts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
         {/* Transaction Log */}
         <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 shadow-pixel-lg flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4 border-b-3 border-[#0D0518] pb-3">
-              <span className="font-arcade text-xs text-[#0D0518] font-black">ACTIVITY FEED</span>
+              <div className="flex items-center gap-2 font-arcade text-xs text-[#0D0518] font-black">
+                <Activity className="w-4 h-4 text-[#FF5FA0]" />
+                <span>RECENT DISPATCHED SCORES</span>
+              </div>
               <button
                 onClick={() => {
                   soundFx.play('switch');
                   setCurrentView('scoring');
                 }}
-                className="text-xs font-mono text-[#FF5FA0] hover:underline font-black"
+                className="text-xs font-mono text-[#5C2D91] hover:underline font-black"
               >
-                Terminal
+                Scoring Terminal →
               </button>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
               {(data.transactions || [])
-                .slice(-5)
+                .slice(-6)
                 .reverse()
                 .map((tx) => {
                   const participant = (data.participants || []).find((p) => p.id === tx.participantId);
@@ -268,11 +207,11 @@ export default function AdminDashboard({
                       className="p-3 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-black text-[#0D0518] truncate max-w-[140px]">
-                          {participant?.avatar} {participant?.name || 'Participant'}
+                        <span className="font-black text-[#0D0518] truncate max-w-[150px]">
+                          {participant?.avatar || '👾'} {participant?.name || 'Participant'}
                         </span>
                         <span
-                          className={`font-black font-mono px-1.5 py-0.5 rounded border border-[#0D0518] ${
+                          className={`font-black font-mono px-2 py-0.5 rounded border border-[#0D0518] ${
                             isPositive
                               ? 'bg-[#28C76F] text-[#0D0518]'
                               : 'bg-[#FF5FA0] text-white'
@@ -292,8 +231,8 @@ export default function AdminDashboard({
                 })}
 
               {(data.transactions || []).length === 0 && (
-                <div className="text-center py-6 text-gray-500 font-mono text-xs font-bold">
-                  No recent activity.
+                <div className="text-center py-8 text-gray-500 font-mono text-xs font-bold">
+                  No scores recorded yet.
                 </div>
               )}
             </div>
@@ -304,9 +243,70 @@ export default function AdminDashboard({
               soundFx.play('switch');
               setCurrentView('scoring');
             }}
-            className="btn-pixel-pink w-full mt-5 text-center justify-center text-xs py-3"
+            className="btn-pixel-yellow w-full mt-4 text-center justify-center text-xs py-3 font-bold"
           >
-            Open Scoring Console
+            Launch Scoring Console
+          </button>
+        </div>
+
+        {/* Quick Rotation Directory & System Status */}
+        <div className="bg-[#40186D] text-white border-4 border-[#0D0518] rounded-3xl p-6 shadow-pixel-lg flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4 border-b-3 border-[#0D0518] pb-3">
+              <div className="flex items-center gap-2 font-arcade text-xs text-[#FFDE25] font-black uppercase">
+                <Gamepad2 className="w-4 h-4 text-[#00F0FF]" />
+                <span>ROTATING GAMES DIRECTORY</span>
+              </div>
+              <button
+                onClick={() => {
+                  soundFx.play('switch');
+                  setCurrentView('games');
+                }}
+                className="text-xs font-mono text-purple-200 hover:text-white hover:underline font-bold"
+              >
+                Manage Games →
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+              {(data.games || []).map((g, idx) => (
+                <div
+                  key={g.id}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7EE] text-[#0D0518] border-2 border-[#0D0518] text-xs font-mono font-bold"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-arcade text-gray-500">#{idx + 1}</span>
+                    <div>
+                      <span className="font-black text-[#0D0518] block">{g.name}</span>
+                      <span className="text-[10px] text-gray-500 font-normal">Entry: {Number(g.cost || 0)} virtual coins</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded border border-[#0D0518] font-black font-arcade text-[9px] ${
+                      g.isActive ? 'bg-[#28C76F] text-[#0D0518]' : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {g.isActive ? 'ACTIVE' : 'OFFLINE'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+
+              {(data.games || []).length === 0 && (
+                <div className="text-center py-8 text-purple-200 font-mono text-xs">
+                  No games configured. Click "Manage Games" to add games.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              soundFx.play('switch');
+              setCurrentView('games');
+            }}
+            className="btn-pixel-pink w-full mt-4 text-center justify-center text-xs py-3 font-bold"
+          >
+            Add / Edit Games
           </button>
         </div>
       </div>

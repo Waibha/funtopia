@@ -10,6 +10,7 @@ import {
   Coins,
 } from 'lucide-react';
 import Podium from '../components/Podium';
+import LeaderboardTableView from '../components/leaderboard/LeaderboardTableView';
 import { soundFx } from '../utilities/soundFx';
 
 export default function PublicLeaderboard({
@@ -68,10 +69,10 @@ export default function PublicLeaderboard({
             </div>
 
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-bungee tracking-wide text-[#FFDE25] pixel-title-yellow">
-              {activeEvent?.name || 'FUNTOPIA CHAMPIONSHIP'}
+              CHAMPIONSHIP LEADERBOARD
             </h1>
             <p className="text-purple-200 font-mono text-xs sm:text-base mt-2 max-w-2xl font-medium">
-              {activeEvent?.description || 'Individual participant scores, live rankings, and verified game breakdown.'}
+              {activeEvent?.name ? `${activeEvent.name} • ` : ''}Individual participant scores, live rankings, and verified game breakdown.
             </p>
           </div>
 
@@ -161,203 +162,117 @@ export default function PublicLeaderboard({
         </div>
 
         {/* ========================================================= */}
-        {/* INDIVIDUAL STANDINGS TABLE & ACTIVITY FEED (2-COL LAYOUT)  */}
+        {/* RESPONSIVE FULL-WIDTH CHAMPIONSHIP LEADERBOARD TABLE     */}
         {/* ========================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Standings (2 cols) */}
-          <div className="lg:col-span-2 space-y-3">
-            <div className="flex items-center justify-between px-3 text-xs font-mono text-purple-200 uppercase font-black">
-              <span>RANK & PARTICIPANT</span>
-              <span>GAME BREAKDOWN / TOTAL</span>
+        <section aria-label="Championship Leaderboard Table">
+          <LeaderboardTableView
+            leaderboard={leaderboard}
+            games={games}
+            filterGameId={filterGameId}
+            onSelectParticipant={handleParticipantClick}
+            isAdmin={false}
+          />
+        </section>
+
+        {/* ========================================================= */}
+        {/* ANCILLARY INFORMATION: ACTIVITY FEED & ACTIVE GAMES       */}
+        {/* ========================================================= */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          {/* Live Feed Card */}
+          <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-5 shadow-pixel-lg">
+            <div className="flex items-center justify-between mb-4 border-b-3 border-[#0D0518] pb-3">
+              <div className="flex items-center gap-2 font-arcade text-xs text-[#0D0518] font-black">
+                <Activity className="w-4 h-4 text-[#FF5FA0]" />
+                <span>RECENT DISPATCHED SCORES</span>
+              </div>
+              <span className="w-2.5 h-2.5 rounded-full bg-[#28C76F] animate-ping" />
             </div>
 
-            {leaderboard.map((participant) => {
-              const pointsDisplay =
-                filterGameId === 'all'
-                  ? participant.totalPoints
-                  : participant.gameBreakdown[filterGameId] || 0;
+            <div className="space-y-2.5 max-h-[320px] overflow-y-auto pr-1">
+              {transactions
+                .slice()
+                .reverse()
+                .map((tx) => {
+                  const participant = leaderboard.find((p) => p.id === tx.participantId);
+                  const game = games.find((g) => g.id === tx.gameId);
+                  const isPositive = Number(tx.pointsDelta) >= 0;
 
-              return (
-                <div
-                  key={participant.id}
-                  onClick={() => handleParticipantClick(participant)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && handleParticipantClick(participant)}
-                  className={`p-4 rounded-2xl border-4 border-[#0D0518] shadow-pixel transition-all duration-150 cursor-pointer flex items-center justify-between gap-4 text-[#0D0518] ${
-                    participant.rank === 1
-                      ? 'bg-[#FFFDF5] hover:bg-[#FFDE25]/20'
-                      : participant.rank === 2
-                      ? 'bg-[#FFFDF5] hover:bg-purple-100'
-                      : participant.rank === 3
-                      ? 'bg-[#FFFDF5] hover:bg-orange-100'
-                      : 'bg-white hover:bg-[#FAF7EE]'
-                  }`}
-                >
-                  {/* Rank & Participant Identity */}
-                  <div className="flex items-center gap-3.5">
+                  return (
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-arcade text-xs font-black shrink-0 border-2 border-[#0D0518] shadow-pixel-sm ${
-                        participant.rank === 1
-                          ? 'bg-[#FFDE25] text-[#0D0518]'
-                          : participant.rank === 2
-                          ? 'bg-[#D1D5DB] text-[#0D0518]'
-                          : participant.rank === 3
-                          ? 'bg-[#E08552] text-white'
-                          : 'bg-[#FAF7EE] text-[#0D0518]'
-                      }`}
+                      key={tx.id}
+                      className="p-3 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono"
                     >
-                      #{participant.rank}
-                    </div>
-
-                    <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-2xl shrink-0">
-                      <span>{participant.avatar || '👤'}</span>
-                    </div>
-
-                    <div>
-                      <h4 className="font-display font-black text-base sm:text-lg text-[#0D0518]">
-                        {participant.name}
-                      </h4>
-                      <p className="text-xs text-gray-500 font-mono font-medium">
-                        {participant.email}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Game Breakdown & Total Points */}
-                  <div className="flex items-center gap-4">
-                    {/* Game-wise breakdown tags */}
-                    <div className="hidden md:flex items-center gap-1.5">
-                      {games.map((g) => (
-                        <div
-                          key={g.id}
-                          title={`${g.name}: ${participant.gameBreakdown[g.id] || 0} PTS`}
-                          className="px-2.5 py-1 rounded-lg bg-[#FAF7EE] border-2 border-[#0D0518] text-center text-xs font-mono shadow-pixel-sm"
+                      <div className="flex items-center justify-between">
+                        <span className="font-black text-[#0D0518] flex items-center gap-1.5">
+                          <span>{participant?.avatar || '👾'}</span>
+                          <span className="truncate max-w-[140px]">{participant?.name || 'Participant'}</span>
+                        </span>
+                        <span
+                          className={`font-black font-mono px-2 py-0.5 rounded border border-[#0D0518] ${
+                            isPositive
+                              ? 'bg-[#28C76F] text-[#0D0518]'
+                              : 'bg-[#FF5FA0] text-white'
+                          }`}
                         >
-                          <span className="block text-[9px] text-gray-500 truncate max-w-[60px] font-bold">{g.name}</span>
-                          <span className="font-black text-[#5C2D91]">
-                            {participant.gameBreakdown[g.id] || 0}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Total Points */}
-                    <div className="text-right shrink-0">
-                      <div className="font-mono text-xl sm:text-2xl font-black text-[#0D0518]">
-                        {pointsDisplay.toLocaleString()}
-                        <span className="text-xs text-gray-500 font-mono ml-1 font-bold">PTS</span>
+                          {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
+                        </span>
                       </div>
-                      {participant.diffFromFirst > 0 ? (
-                        <span className="text-[11px] font-mono text-[#FF5FA0] font-black">
-                          -{participant.diffFromFirst} to #1
+                      <div className="text-gray-500 text-[11px] flex justify-between mt-1 font-bold">
+                        <span>{game?.name || 'General Score'}</span>
+                        <span>
+                          {new Date(tx.timestamp).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </span>
-                      ) : (
-                        <span className="text-[11px] font-mono text-[#28C76F] font-black">
-                          ★ 1ST PLACE
-                        </span>
+                      </div>
+                      {tx.note && (
+                        <p className="text-[11px] text-[#0D0518] mt-1 italic font-medium truncate">
+                          "{tx.note}"
+                        </p>
                       )}
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
 
-            {leaderboard.length === 0 && (
-              <div className="p-12 text-center text-gray-400 font-mono text-sm bg-white rounded-3xl border-4 border-[#0D0518]">
-                No participants registered yet.
-              </div>
-            )}
+              {transactions.length === 0 && (
+                <div className="text-center py-8 text-gray-500 font-mono text-xs font-bold">
+                  No scores recorded yet.
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Right Column: Live Activity Feed & Active Games Box */}
-          <div className="space-y-6">
-            {/* Live Feed Card */}
-            <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-5 shadow-pixel-lg">
-              <div className="flex items-center justify-between mb-4 border-b-3 border-[#0D0518] pb-3">
-                <div className="flex items-center gap-2 font-arcade text-xs text-[#0D0518] font-black">
-                  <Activity className="w-4 h-4 text-[#FF5FA0]" />
-                  <span>RECENT SCORES</span>
-                </div>
-                <span className="w-2.5 h-2.5 rounded-full bg-[#28C76F] animate-ping" />
-              </div>
-
-              <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-                {transactions
-                  .slice()
-                  .reverse()
-                  .map((tx) => {
-                    const participant = leaderboard.find((p) => p.id === tx.participantId);
-                    const game = games.find((g) => g.id === tx.gameId);
-                    const isPositive = Number(tx.pointsDelta) >= 0;
-
-                    return (
-                      <div
-                        key={tx.id}
-                        className="p-3 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-black text-[#0D0518] flex items-center gap-1.5">
-                            <span>{participant?.avatar || '👾'}</span>
-                            <span className="truncate max-w-[120px]">{participant?.name || 'Participant'}</span>
-                          </span>
-                          <span
-                            className={`font-black font-mono px-2 py-0.5 rounded border border-[#0D0518] ${
-                              isPositive
-                                ? 'bg-[#28C76F] text-[#0D0518]'
-                                : 'bg-[#FF5FA0] text-white'
-                            }`}
-                          >
-                            {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
-                          </span>
-                        </div>
-                        <div className="text-gray-500 text-[11px] flex justify-between mt-1 font-bold">
-                          <span>{game?.name || 'General Score'}</span>
-                          <span>
-                            {new Date(tx.timestamp).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                        </div>
-                        {tx.note && (
-                          <p className="text-[11px] text-[#0D0518] mt-1 italic font-medium truncate">
-                            "{tx.note}"
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-
-                {transactions.length === 0 && (
-                  <div className="text-center py-8 text-gray-500 font-mono text-xs">
-                    No scores recorded yet.
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Active Tournament Games & Costs Card */}
-            <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-5 shadow-pixel-lg text-white">
-              <span className="font-arcade text-xs text-[#FFDE25] font-black block mb-3">
-                TOURNAMENT GAMES
-              </span>
-              <div className="space-y-2">
-                {games.map((g) => (
-                  <div
-                    key={g.id}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7EE] text-[#0D0518] border-2 border-[#0D0518] text-xs font-mono font-bold"
-                  >
+          {/* Active Tournament Games & Costs Card */}
+          <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-5 shadow-pixel-lg text-white">
+            <span className="font-arcade text-xs text-[#FFDE25] font-black block mb-3 uppercase tracking-wider">
+              ROTATING TOURNAMENT GAMES ({games.length})
+            </span>
+            <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+              {games.map((g, idx) => (
+                <div
+                  key={g.id}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7EE] text-[#0D0518] border-2 border-[#0D0518] text-xs font-mono font-bold"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-arcade text-gray-500 font-black">#{idx + 1}</span>
                     <div>
                       <span className="font-black text-[#0D0518] block">{g.name}</span>
-                      <span className="text-[10px] text-gray-500 font-normal">Cost: ${g.cost || 0}</span>
+                      <span className="text-[10px] text-gray-500 font-normal">Entry: {Number(g.cost || 0)} virtual coins</span>
                     </div>
-                    <span className="bg-[#FFDE25] px-2 py-0.5 rounded border border-[#0D0518] text-[#0D0518] font-black font-mono">
-                      {g.points || 0} PTS
-                    </span>
                   </div>
-                ))}
-              </div>
+                  <span className={`px-2 py-0.5 rounded border border-[#0D0518] font-black font-arcade text-[9px] ${
+                    g.isActive ? 'bg-[#28C76F] text-[#0D0518]' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    {g.isActive ? 'ACTIVE' : 'OFFLINE'}
+                  </span>
+                </div>
+              ))}
+              {games.length === 0 && (
+                <div className="text-center py-8 text-purple-200 font-mono text-xs">
+                  No games configured yet.
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -395,7 +310,7 @@ export default function PublicLeaderboard({
                 <span className="text-xs font-arcade text-[#0D0518] font-black block">
                   SCORES BY GAME:
                 </span>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 max-h-[48vh] overflow-y-auto pr-1">
                   {games.map((g) => (
                     <div
                       key={g.id}
