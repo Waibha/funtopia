@@ -215,15 +215,23 @@ export default function ParticipantPortal({
                     className="p-6 rounded-3xl bg-white text-[#0D0518] border-4 border-[#0D0518] shadow-pixel-lg space-y-4"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="font-display font-black text-2xl text-[#0D0518]">
-                          {g.name}
-                        </h3>
-                        {g.description && (
-                          <p className="text-xs font-mono text-gray-600 font-medium mt-1">
-                            {g.description}
-                          </p>
-                        )}
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-14 h-14 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-3xl shrink-0">
+                          {g.name.toLowerCase().includes('race') || g.name.toLowerCase().includes('racer') ? '🏎️' :
+                           g.name.toLowerCase().includes('pixel') || g.name.toLowerCase().includes('blast') ? '👾' :
+                           g.name.toLowerCase().includes('puzzle') ? '🧩' :
+                           g.name.toLowerCase().includes('pinball') ? '⚡' : '🕹️'}
+                        </div>
+                        <div>
+                          <h3 className="font-display font-black text-2xl text-[#0D0518]">
+                            {g.name}
+                          </h3>
+                          {g.description && (
+                            <p className="text-xs font-mono text-gray-600 font-medium mt-0.5">
+                              {g.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                       <span className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black border-2 border-[#0D0518] ${

@@ -102,19 +102,27 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
           >
             <div>
               <div className="flex items-start justify-between gap-3 mb-4">
-                <div>
-                  <h3 className="font-display font-black text-xl text-[#0D0518]">
-                    {game.name}
-                  </h3>
-                  <span
-                    className={`inline-block mt-1 text-[10px] font-mono font-black px-2 py-0.5 rounded border-2 border-[#0D0518] ${
-                      game.isActive
-                        ? 'bg-[#28C76F] text-[#0D0518]'
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    {game.isActive ? 'ACTIVE' : 'INACTIVE'}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-2xl shrink-0">
+                    {game.name.toLowerCase().includes('race') || game.name.toLowerCase().includes('racer') ? '🏎️' :
+                     game.name.toLowerCase().includes('pixel') || game.name.toLowerCase().includes('blast') ? '👾' :
+                     game.name.toLowerCase().includes('puzzle') ? '🧩' :
+                     game.name.toLowerCase().includes('pinball') ? '⚡' : '🕹️'}
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-xl text-[#0D0518]">
+                      {game.name}
+                    </h3>
+                    <span
+                      className={`inline-block mt-0.5 text-[9px] font-arcade font-black px-2 py-0.5 rounded border-2 border-[#0D0518] ${
+                        game.isActive
+                          ? 'bg-[#28C76F] text-[#0D0518]'
+                          : 'bg-gray-200 text-gray-600'
+                      }`}
+                    >
+                      {game.isActive ? 'ACTIVE' : 'INACTIVE'}
+                    </span>
+                  </div>
                 </div>
 
                 <button

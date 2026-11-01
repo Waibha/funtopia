@@ -7,6 +7,7 @@ import {
   Activity,
   Gamepad2,
   User,
+  Coins,
 } from 'lucide-react';
 import Podium from '../components/Podium';
 import { soundFx } from '../utilities/soundFx';
@@ -41,29 +42,36 @@ export default function PublicLeaderboard({
 
   return (
     <div
-      className={`transition-all duration-300 ${
+      className={`transition-all duration-300 font-sans ${
         broadcastMode
-          ? 'fixed inset-0 z-50 bg-[#FAF7EE] overflow-y-auto p-4 sm:p-8'
-          : 'py-8'
+          ? 'fixed inset-0 z-50 bg-[#451B75] overflow-y-auto p-4 sm:p-8 text-white'
+          : 'py-4 text-white'
       }`}
     >
       <div className="max-w-7xl mx-auto space-y-8">
         {/* ========================================================= */}
-        {/* EVENT BANNER                                              */}
+        {/* RETRO POP CHAMPIONSHIP HERO BANNER (LAYERED & GRAPHIC)   */}
         {/* ========================================================= */}
-        <div className="bg-pop-purple rounded-3xl border-3 border-pop-ink p-6 sm:p-8 shadow-pop-lg text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-xl text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+          {/* Subtle Graphic Accents */}
+          <div className="absolute -right-8 -bottom-8 w-44 h-44 bg-[#FF5FA0] rounded-full border-4 border-[#0D0518] opacity-25 pointer-events-none" />
+          <div className="absolute top-2 right-40 w-16 h-16 bg-[#FFDE25] rounded-full border-3 border-[#0D0518] opacity-20 pointer-events-none" />
+
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-pop-yellow text-pop-ink font-arcade text-[10px] font-black uppercase border-2 border-pop-ink shadow-pop-sm">
+              <span className="px-3 py-1 rounded-full bg-[#FFDE25] text-[#0D0518] font-arcade text-[10px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm">
                 ● LIVE LEADERBOARD
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-[#FFDE25] font-mono text-xs font-bold border border-white/30">
+                VERIFIED SCORES
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-bungee tracking-wide text-pop-yellow drop-shadow-[2px_2px_0px_#180A28]">
-              {activeEvent?.name || 'FUNTOPIA LEADERBOARD'}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bungee tracking-wide text-[#FFDE25] pixel-title-yellow">
+              {activeEvent?.name || 'FUNTOPIA CHAMPIONSHIP'}
             </h1>
-            <p className="text-purple-100 font-sans text-sm sm:text-base mt-1.5 max-w-2xl font-medium">
-              {activeEvent?.description || 'Individual participant scores and standings.'}
+            <p className="text-purple-200 font-mono text-xs sm:text-base mt-2 max-w-2xl font-medium">
+              {activeEvent?.description || 'Individual participant scores, live rankings, and verified game breakdown.'}
             </p>
           </div>
 
@@ -74,15 +82,15 @@ export default function PublicLeaderboard({
                 soundFx.play('fanfare');
                 triggerCelebration();
               }}
-              className="btn-pop-yellow flex items-center gap-2"
+              className="btn-pixel-yellow flex items-center gap-2 text-xs"
             >
-              <Sparkles className="w-4 h-4 text-pop-coral fill-pop-coral" />
+              <Sparkles className="w-4 h-4 text-[#FF5FA0] fill-[#FF5FA0]" />
               <span>CELEBRATE</span>
             </button>
 
             <button
               onClick={toggleBroadcast}
-              className="btn-pop-white flex items-center gap-1.5 font-mono text-xs"
+              className="btn-pixel-white flex items-center gap-1.5 font-mono text-xs"
             >
               {broadcastMode ? (
                 <>
@@ -100,16 +108,16 @@ export default function PublicLeaderboard({
         </div>
 
         {/* ========================================================= */}
-        {/* PODIUM SECTION                                            */}
+        {/* RETRO ARCADE PODIUM                                       */}
         {/* ========================================================= */}
         <section aria-label="Individual Podium">
           <div className="flex items-center justify-between px-2 mb-2">
-            <div className="flex items-center gap-2 font-arcade text-xs text-pop-ink font-black">
-              <Trophy className="w-4 h-4 text-pop-orange" />
-              <span>TOP PARTICIPANTS</span>
+            <div className="flex items-center gap-2 font-arcade text-xs text-[#FFDE25] font-black">
+              <Trophy className="w-4 h-4 text-[#FF7A00]" />
+              <span>TOP PARTICIPANTS PODIUM</span>
             </div>
-            <span className="text-xs font-mono text-pop-muted hidden sm:inline font-bold">
-              ✦ Click any participant to inspect their scores
+            <span className="text-xs font-mono text-purple-200 hidden sm:inline font-bold">
+              ✦ Click any podium step to inspect participant breakdown
             </span>
           </div>
 
@@ -119,9 +127,9 @@ export default function PublicLeaderboard({
         {/* ========================================================= */}
         {/* GAME FILTER TABS                                          */}
         {/* ========================================================= */}
-        <div className="flex items-center justify-between gap-3 flex-wrap bg-white p-3 rounded-2xl border-3 border-pop-ink shadow-pop">
-          <div className="flex items-center gap-2 font-display text-xs font-black text-pop-ink tracking-wider">
-            <Gamepad2 className="w-4 h-4 text-pop-purple" />
+        <div className="flex items-center justify-between gap-3 flex-wrap bg-[#40186D] p-4 rounded-3xl border-4 border-[#0D0518] shadow-pixel-lg">
+          <div className="flex items-center gap-2 font-arcade text-xs font-black text-[#FFDE25] tracking-wider">
+            <Gamepad2 className="w-4 h-4 text-[#00F0FF]" />
             <span>FILTER BY GAME:</span>
           </div>
 
@@ -130,8 +138,8 @@ export default function PublicLeaderboard({
               onClick={() => handleFilterClick('all')}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-black transition-all ${
                 filterGameId === 'all'
-                  ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
-                  : 'bg-pop-butter text-pop-ink hover:bg-pop-yellow-light border border-pop-ink/30'
+                  ? 'bg-[#FFDE25] text-[#0D0518] border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                  : 'bg-[#200B3B] text-purple-200 hover:text-white border border-[#0D0518]'
               }`}
             >
               All Scores
@@ -142,8 +150,8 @@ export default function PublicLeaderboard({
                 onClick={() => handleFilterClick(g.id)}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-black whitespace-nowrap transition-all flex items-center gap-1.5 ${
                   filterGameId === g.id
-                    ? 'bg-pop-coral text-white border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
-                    : 'bg-pop-butter text-pop-ink hover:bg-pop-coral-light border border-pop-ink/30'
+                    ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                    : 'bg-[#200B3B] text-purple-200 hover:text-white border border-[#0D0518]'
                 }`}
               >
                 <span>{g.name}</span>
@@ -153,12 +161,12 @@ export default function PublicLeaderboard({
         </div>
 
         {/* ========================================================= */}
-        {/* INDIVIDUAL STANDINGS TABLE & ACTIVITY FEED                */}
+        {/* INDIVIDUAL STANDINGS TABLE & ACTIVITY FEED (2-COL LAYOUT)  */}
         {/* ========================================================= */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Standings (2 cols) */}
           <div className="lg:col-span-2 space-y-3">
-            <div className="flex items-center justify-between px-3 text-xs font-mono text-pop-muted uppercase font-black">
+            <div className="flex items-center justify-between px-3 text-xs font-mono text-purple-200 uppercase font-black">
               <span>RANK & PARTICIPANT</span>
               <span>GAME BREAKDOWN / TOTAL</span>
             </div>
@@ -176,41 +184,41 @@ export default function PublicLeaderboard({
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && handleParticipantClick(participant)}
-                  className={`p-4 rounded-2xl border-3 border-pop-ink shadow-pop transition-all duration-150 cursor-pointer flex items-center justify-between gap-4 ${
+                  className={`p-4 rounded-2xl border-4 border-[#0D0518] shadow-pixel transition-all duration-150 cursor-pointer flex items-center justify-between gap-4 text-[#0D0518] ${
                     participant.rank === 1
-                      ? 'bg-pop-yellow-light hover:bg-pop-yellow/30'
+                      ? 'bg-[#FFFDF5] hover:bg-[#FFDE25]/20'
                       : participant.rank === 2
-                      ? 'bg-pop-purple-light hover:bg-purple-100'
+                      ? 'bg-[#FFFDF5] hover:bg-purple-100'
                       : participant.rank === 3
-                      ? 'bg-pop-orange-light hover:bg-orange-100'
-                      : 'bg-white hover:bg-pop-butter'
+                      ? 'bg-[#FFFDF5] hover:bg-orange-100'
+                      : 'bg-white hover:bg-[#FAF7EE]'
                   }`}
                 >
                   {/* Rank & Participant Identity */}
                   <div className="flex items-center gap-3.5">
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-arcade text-xs font-black shrink-0 border-2 border-pop-ink shadow-pop-sm ${
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-arcade text-xs font-black shrink-0 border-2 border-[#0D0518] shadow-pixel-sm ${
                         participant.rank === 1
-                          ? 'bg-pop-yellow text-pop-ink'
+                          ? 'bg-[#FFDE25] text-[#0D0518]'
                           : participant.rank === 2
-                          ? 'bg-pop-purple text-white'
+                          ? 'bg-[#D1D5DB] text-[#0D0518]'
                           : participant.rank === 3
-                          ? 'bg-pop-orange text-white'
-                          : 'bg-pop-butter text-pop-ink'
+                          ? 'bg-[#E08552] text-white'
+                          : 'bg-[#FAF7EE] text-[#0D0518]'
                       }`}
                     >
                       #{participant.rank}
                     </div>
 
-                    <div className="w-12 h-12 rounded-2xl bg-white border-2 border-pop-ink shadow-pop-sm flex items-center justify-center text-2xl shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-white border-2 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-2xl shrink-0">
                       <span>{participant.avatar || '👤'}</span>
                     </div>
 
                     <div>
-                      <h4 className="font-display font-black text-base sm:text-lg text-pop-ink">
+                      <h4 className="font-display font-black text-base sm:text-lg text-[#0D0518]">
                         {participant.name}
                       </h4>
-                      <p className="text-xs text-pop-muted font-mono font-medium">
+                      <p className="text-xs text-gray-500 font-mono font-medium">
                         {participant.email}
                       </p>
                     </div>
@@ -224,10 +232,10 @@ export default function PublicLeaderboard({
                         <div
                           key={g.id}
                           title={`${g.name}: ${participant.gameBreakdown[g.id] || 0} PTS`}
-                          className="px-2.5 py-1 rounded-lg bg-white border-2 border-pop-ink text-center text-xs font-mono shadow-pop-sm"
+                          className="px-2.5 py-1 rounded-lg bg-[#FAF7EE] border-2 border-[#0D0518] text-center text-xs font-mono shadow-pixel-sm"
                         >
-                          <span className="block text-[10px] text-pop-muted truncate max-w-[60px]">{g.name}</span>
-                          <span className="font-black text-pop-ink">
+                          <span className="block text-[9px] text-gray-500 truncate max-w-[60px] font-bold">{g.name}</span>
+                          <span className="font-black text-[#5C2D91]">
                             {participant.gameBreakdown[g.id] || 0}
                           </span>
                         </div>
@@ -236,16 +244,16 @@ export default function PublicLeaderboard({
 
                     {/* Total Points */}
                     <div className="text-right shrink-0">
-                      <div className="font-mono text-xl sm:text-2xl font-black text-pop-ink">
+                      <div className="font-mono text-xl sm:text-2xl font-black text-[#0D0518]">
                         {pointsDisplay.toLocaleString()}
-                        <span className="text-xs text-pop-muted font-mono ml-1 font-bold">PTS</span>
+                        <span className="text-xs text-gray-500 font-mono ml-1 font-bold">PTS</span>
                       </div>
                       {participant.diffFromFirst > 0 ? (
-                        <span className="text-[11px] font-mono text-pop-coral font-black">
+                        <span className="text-[11px] font-mono text-[#FF5FA0] font-black">
                           -{participant.diffFromFirst} to #1
                         </span>
                       ) : (
-                        <span className="text-[11px] font-mono text-pop-green font-black">
+                        <span className="text-[11px] font-mono text-[#28C76F] font-black">
                           ★ 1ST PLACE
                         </span>
                       )}
@@ -256,24 +264,25 @@ export default function PublicLeaderboard({
             })}
 
             {leaderboard.length === 0 && (
-              <div className="p-12 text-center text-pop-muted font-mono text-sm bg-white rounded-3xl border-3 border-pop-ink">
+              <div className="p-12 text-center text-gray-400 font-mono text-sm bg-white rounded-3xl border-4 border-[#0D0518]">
                 No participants registered yet.
               </div>
             )}
           </div>
 
-          {/* Right Column: Recent Scores */}
+          {/* Right Column: Live Activity Feed & Active Games Box */}
           <div className="space-y-6">
-            <div className="bg-white border-3 border-pop-ink rounded-3xl p-5 shadow-pop">
-              <div className="flex items-center justify-between mb-4 border-b-2 border-pop-ink pb-3">
-                <div className="flex items-center gap-2 font-arcade text-xs text-pop-ink font-black">
-                  <Activity className="w-4 h-4 text-pop-coral" />
+            {/* Live Feed Card */}
+            <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-5 shadow-pixel-lg">
+              <div className="flex items-center justify-between mb-4 border-b-3 border-[#0D0518] pb-3">
+                <div className="flex items-center gap-2 font-arcade text-xs text-[#0D0518] font-black">
+                  <Activity className="w-4 h-4 text-[#FF5FA0]" />
                   <span>RECENT SCORES</span>
                 </div>
-                <span className="w-2.5 h-2.5 rounded-full bg-pop-green animate-ping" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#28C76F] animate-ping" />
               </div>
 
-              <div className="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
+              <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
                 {transactions
                   .slice()
                   .reverse()
@@ -285,23 +294,24 @@ export default function PublicLeaderboard({
                     return (
                       <div
                         key={tx.id}
-                        className="p-3 rounded-xl bg-pop-butter border-2 border-pop-ink text-xs font-mono"
+                        className="p-3 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-black text-pop-ink">
-                            {participant?.name || 'Participant'}
+                          <span className="font-black text-[#0D0518] flex items-center gap-1.5">
+                            <span>{participant?.avatar || '👾'}</span>
+                            <span className="truncate max-w-[120px]">{participant?.name || 'Participant'}</span>
                           </span>
                           <span
-                            className={`font-black font-mono px-2 py-0.5 rounded border border-pop-ink ${
+                            className={`font-black font-mono px-2 py-0.5 rounded border border-[#0D0518] ${
                               isPositive
-                                ? 'bg-pop-green text-pop-ink'
-                                : 'bg-pop-coral text-white'
+                                ? 'bg-[#28C76F] text-[#0D0518]'
+                                : 'bg-[#FF5FA0] text-white'
                             }`}
                           >
                             {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
                           </span>
                         </div>
-                        <div className="text-pop-muted text-[11px] flex justify-between mt-1 font-bold">
+                        <div className="text-gray-500 text-[11px] flex justify-between mt-1 font-bold">
                           <span>{game?.name || 'General Score'}</span>
                           <span>
                             {new Date(tx.timestamp).toLocaleTimeString([], {
@@ -311,7 +321,7 @@ export default function PublicLeaderboard({
                           </span>
                         </div>
                         {tx.note && (
-                          <p className="text-[11px] text-pop-ink mt-1 italic font-medium truncate">
+                          <p className="text-[11px] text-[#0D0518] mt-1 italic font-medium truncate">
                             "{tx.note}"
                           </p>
                         )}
@@ -320,10 +330,33 @@ export default function PublicLeaderboard({
                   })}
 
                 {transactions.length === 0 && (
-                  <div className="text-center py-8 text-pop-muted font-mono text-xs">
+                  <div className="text-center py-8 text-gray-500 font-mono text-xs">
                     No scores recorded yet.
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Active Tournament Games & Costs Card */}
+            <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-5 shadow-pixel-lg text-white">
+              <span className="font-arcade text-xs text-[#FFDE25] font-black block mb-3">
+                TOURNAMENT GAMES
+              </span>
+              <div className="space-y-2">
+                {games.map((g) => (
+                  <div
+                    key={g.id}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7EE] text-[#0D0518] border-2 border-[#0D0518] text-xs font-mono font-bold"
+                  >
+                    <div>
+                      <span className="font-black text-[#0D0518] block">{g.name}</span>
+                      <span className="text-[10px] text-gray-500 font-normal">Cost: ${g.cost || 0}</span>
+                    </div>
+                    <span className="bg-[#FFDE25] px-2 py-0.5 rounded border border-[#0D0518] text-[#0D0518] font-black font-mono">
+                      {g.points || 0} PTS
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -331,27 +364,27 @@ export default function PublicLeaderboard({
 
         {/* Participant Inspection Modal */}
         {selectedParticipant && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pop-ink/70 backdrop-blur-xs">
-            <div className="relative w-full max-w-md bg-white border-4 border-pop-ink rounded-3xl p-6 sm:p-8 shadow-pop-xl">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0D0518]/80 backdrop-blur-xs">
+            <div className="relative w-full max-w-md bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 sm:p-8 shadow-pixel-xl">
               <button
                 onClick={() => setSelectedParticipant(null)}
-                className="absolute top-4 right-4 text-pop-muted hover:text-pop-ink font-mono text-lg font-black"
+                className="absolute top-4 right-4 text-gray-500 hover:text-[#0D0518] font-mono text-lg font-black"
               >
                 ✕
               </button>
 
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-2xl bg-pop-yellow border-3 border-pop-ink shadow-pop flex items-center justify-center text-4xl">
+                <div className="w-16 h-16 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel flex items-center justify-center text-4xl">
                   {selectedParticipant.avatar || '👤'}
                 </div>
                 <div>
-                  <span className="font-arcade text-xs text-pop-coral font-black">
+                  <span className="font-arcade text-xs text-[#FF5FA0] font-black">
                     Rank #{selectedParticipant.rank}
                   </span>
-                  <h3 className="font-bungee text-2xl text-pop-ink mt-0.5">
+                  <h3 className="font-bungee text-2xl text-[#0D0518] mt-0.5">
                     {selectedParticipant.name}
                   </h3>
-                  <p className="text-xs text-pop-muted font-mono font-bold">
+                  <p className="text-xs text-gray-500 font-mono font-bold">
                     {selectedParticipant.email}
                   </p>
                 </div>
@@ -359,17 +392,17 @@ export default function PublicLeaderboard({
 
               {/* Game Breakdown */}
               <div className="space-y-2 mb-6">
-                <span className="text-xs font-arcade text-pop-ink font-black block">
+                <span className="text-xs font-arcade text-[#0D0518] font-black block">
                   SCORES BY GAME:
                 </span>
                 <div className="grid grid-cols-2 gap-2">
                   {games.map((g) => (
                     <div
                       key={g.id}
-                      className="p-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink flex items-center justify-between text-xs font-mono font-bold"
+                      className="p-2.5 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] flex items-center justify-between text-xs font-mono font-bold"
                     >
                       <span className="truncate">{g.name}</span>
-                      <span className="font-black text-pop-purple">
+                      <span className="font-black text-[#5C2D91]">
                         {selectedParticipant.gameBreakdown[g.id] || 0}
                       </span>
                     </div>
@@ -377,10 +410,10 @@ export default function PublicLeaderboard({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t-2 border-pop-ink">
-                <span className="font-mono text-xs text-pop-muted font-bold">Total Score:</span>
-                <span className="font-mono text-2xl font-black text-pop-ink">
-                  {selectedParticipant.totalPoints.toLocaleString()} PTS
+              <div className="flex items-center justify-between pt-4 border-t-2 border-[#0D0518]">
+                <span className="font-mono text-xs text-gray-500 font-bold">Total Score:</span>
+                <span className="font-mono text-2xl font-black text-[#0D0518] flex items-center gap-1">
+                  🪙 {selectedParticipant.totalPoints.toLocaleString()} PTS
                 </span>
               </div>
             </div>
