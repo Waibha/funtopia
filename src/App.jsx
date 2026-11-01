@@ -133,9 +133,9 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#05060f] text-gray-100 flex flex-col relative selection:bg-arcade-pink selection:text-white ${crtEnabled ? 'crt-active' : ''}`}>
-      {/* Interactive Cosmic Starfield Canvas */}
-      <CosmicBackground warpActive={false} />
+    <div className={`min-h-screen bg-[#0c0b10] text-arcade-white flex flex-col relative selection:bg-arcade-yellow selection:text-black ${crtEnabled ? 'crt-active' : ''}`}>
+      {/* Clean Dark Arcade Chassis Texture */}
+      <CosmicBackground />
 
       {/* Main App Content Container */}
       <div className="relative z-10 flex flex-col flex-grow">
@@ -221,18 +221,18 @@ export default function App() {
           )}
         </main>
 
-        {/* Studio Footer */}
-        <footer className="border-t border-purple-500/15 py-6 bg-[#060714]/80 backdrop-blur-md mt-16 text-center text-xs font-mono text-gray-500">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        {/* Arcade Studio Footer */}
+        <footer className="border-t border-arcade-border py-5 bg-[#121118] mt-12 text-center text-xs font-mono text-arcade-muted select-none">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="font-arcade text-arcade-pink text-[11px]">FUNTOPIA</span>
-              <span>•</span>
-              <span>Cosmic Retro Indie Gaming Studio Edition</span>
+              <span className="font-arcade text-arcade-yellow text-[10px]">FUNTOPIA</span>
+              <span>/</span>
+              <span>RETRO ARCADE CHAMPIONSHIP</span>
             </div>
-            <div className="flex items-center gap-4 text-[11px]">
-              <span className="text-gray-400">Branch: person-1/ui-foundation</span>
+            <div className="flex items-center gap-3 text-[11px]">
+              <span className="text-zinc-500">BRANCH: person-1/ui-foundation</span>
               <span>•</span>
-              <span className="text-emerald-400">Local State Active</span>
+              <span className="text-emerald-400 font-bold">READY PLAYER 1</span>
             </div>
           </div>
         </footer>

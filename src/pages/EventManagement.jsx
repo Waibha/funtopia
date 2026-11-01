@@ -4,14 +4,10 @@ import {
   Plus,
   Edit2,
   CheckCircle2,
-  Archive,
   Clock,
   MapPin,
   Trophy,
-  Users,
-  Gamepad2,
   Play,
-  Layers,
 } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
@@ -26,7 +22,6 @@ export default function EventManagement({
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
 
-  // Form state
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -50,8 +45,8 @@ export default function EventManagement({
       description: '',
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0],
-      location: 'Grand Orbital Arena',
-      prizePool: '5,000 Cosmic Tokens',
+      location: 'Main Arcade Arena',
+      prizePool: '5,000 Arcade Tokens',
       assignedGameIds: games.map((g) => g.id),
       assignedTeamIds: teams.map((t) => t.id),
     });
@@ -99,91 +94,73 @@ export default function EventManagement({
     });
   };
 
-  const toggleTeamAssignment = (teamId) => {
-    setFormData((prev) => {
-      const exists = prev.assignedTeamIds.includes(teamId);
-      return {
-        ...prev,
-        assignedTeamIds: exists
-          ? prev.assignedTeamIds.filter((id) => id !== teamId)
-          : [...prev.assignedTeamIds, teamId],
-      };
-    });
-  };
-
   return (
-    <div className="py-8 space-y-8 max-w-7xl mx-auto">
+    <div className="py-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Calendar className="w-5 h-5 text-arcade-pink" />
             <h1 className="font-bungee text-2xl sm:text-3xl text-white">
-              EVENT MANAGEMENT
+              EVENT TOURNAMENTS
             </h1>
           </div>
-          <p className="text-gray-400 font-sans text-sm">
-            Configure championship schedules, activate live arenas, and coordinate tournament formats.
+          <p className="text-arcade-muted font-sans text-xs sm:text-sm">
+            Schedule tournament brackets, activate arenas, and configure prize pools.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-arcade-pink to-purple-600 text-white font-display font-bold text-xs tracking-wider shadow-arcade-button-pink hover:scale-105 active:scale-95 transition-all"
+          className="arcade-btn-pink flex items-center gap-1.5"
         >
           <Plus className="w-4 h-4" />
           <span>CREATE EVENT</span>
         </button>
       </div>
 
-      {/* Events List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Events Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {events.map((evt) => {
           const isActive = evt.id === activeEventId;
 
           return (
             <div
               key={evt.id}
-              className={`rounded-2xl p-6 border transition-all flex flex-col justify-between relative overflow-hidden ${
+              className={`rounded-xl p-5 border-2 border-black flex flex-col justify-between transition-all duration-150 ${
                 isActive
-                  ? 'bg-gradient-to-br from-[#131138] via-[#101235] to-[#0b0c24] border-arcade-pink shadow-neon-pink'
-                  : 'bg-[#0c0e28] border-purple-500/20 hover:border-purple-500/40'
+                  ? 'bg-[#181622] shadow-arcade-pink'
+                  : 'bg-[#15141c] shadow-arcade-sm'
               }`}
             >
-              {isActive && (
-                <div className="absolute top-0 right-0 bg-gradient-to-l from-arcade-pink to-purple-600 text-white font-arcade text-[9px] px-3 py-1 rounded-bl-lg font-bold">
-                  ★ CURRENT CHAMPIONSHIP
-                </div>
-              )}
-
               <div>
-                {/* Status & Code */}
-                <div className="flex items-center gap-2 mb-3">
+                {/* Status Bar */}
+                <div className="flex items-center justify-between mb-3">
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-arcade uppercase tracking-wider ${
+                    className={`px-2 py-0.5 rounded font-arcade text-[9px] font-bold uppercase border border-black ${
                       evt.status === 'active'
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        ? 'bg-emerald-400 text-black'
                         : evt.status === 'draft'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-purple-900/40 text-purple-300 border border-purple-500/20'
+                        ? 'bg-arcade-yellow text-black'
+                        : 'bg-zinc-700 text-zinc-300'
                     }`}
                   >
                     {evt.status}
                   </span>
-                  <span className="text-xs font-mono text-gray-400">
+                  <span className="text-xs font-mono font-bold text-arcade-muted">
                     {evt.code}
                   </span>
                 </div>
 
-                <h3 className="font-display font-bold text-lg text-white mb-2">
+                <h3 className="font-display font-black text-lg text-white mb-1.5">
                   {evt.name}
                 </h3>
-                <p className="text-gray-400 font-sans text-xs line-clamp-2 mb-4">
+                <p className="text-arcade-muted font-sans text-xs line-clamp-2 mb-4">
                   {evt.description}
                 </p>
 
-                {/* Event Details */}
-                <div className="space-y-1.5 text-xs font-mono text-gray-300 mb-6 bg-[#070817] p-3 rounded-xl border border-purple-500/10">
+                {/* Specs Box */}
+                <div className="space-y-1.5 text-xs font-mono text-zinc-300 mb-5 bg-[#0e0d14] p-3 rounded-lg border border-arcade-border">
                   <div className="flex items-center gap-2">
                     <Clock className="w-3.5 h-3.5 text-arcade-cyan" />
                     <span>
@@ -196,33 +173,35 @@ export default function EventManagement({
                   </div>
                   <div className="flex items-center gap-2">
                     <Trophy className="w-3.5 h-3.5 text-arcade-yellow" />
-                    <span className="truncate text-arcade-yellow">{evt.prizePool}</span>
+                    <span className="truncate text-arcade-yellow font-bold">
+                      {evt.prizePool}
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between pt-4 border-t border-purple-500/20 gap-2">
+              <div className="flex items-center justify-between pt-3 border-t border-arcade-border gap-2">
                 <button
                   onClick={() => handleOpenEdit(evt)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-mono transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#201d2a] hover:bg-[#2c283a] text-white text-xs font-mono font-bold transition-colors"
                 >
-                  <Edit2 className="w-3.5 h-3.5" />
+                  <Edit2 className="w-3 h-3" />
                   <span>Edit</span>
                 </button>
 
                 {!isActive ? (
                   <button
                     onClick={() => handleActivateEvent(evt.id)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 text-xs font-display font-semibold transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-black font-display font-black text-xs uppercase transition-colors"
                   >
-                    <Play className="w-3.5 h-3.5" />
+                    <Play className="w-3 h-3 fill-black" />
                     <span>Set Active</span>
                   </button>
                 ) : (
-                  <span className="text-xs font-mono text-arcade-pink font-bold flex items-center gap-1">
+                  <span className="text-xs font-arcade text-arcade-yellow font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Broadcasting</span>
+                    <span>ACTIVE NOW</span>
                   </span>
                 )}
               </div>
@@ -231,68 +210,65 @@ export default function EventManagement({
         })}
       </div>
 
-      {/* CREATE / EDIT MODAL */}
+      {/* CREATE / EDIT EVENT MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-2xl rounded-2xl bg-[#0d0f28] border-2 border-purple-500/40 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85">
+          <div className="relative w-full max-w-xl bg-[#15141c] border-3 border-black rounded-xl p-6 shadow-arcade-lg max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white font-mono text-lg"
+              className="absolute top-4 right-4 text-arcade-muted hover:text-white font-mono text-base"
             >
               ✕
             </button>
 
             <h2 className="font-bungee text-xl text-white mb-1">
-              {editingEvent ? 'EDIT CHAMPIONSHIP EVENT' : 'CREATE NEW CHAMPIONSHIP'}
+              {editingEvent ? 'EDIT TOURNAMENT' : 'NEW TOURNAMENT'}
             </h2>
-            <p className="text-xs text-gray-400 font-sans mb-6">
+            <p className="text-xs text-arcade-muted font-sans mb-4">
               All settings are dynamically configurable.
             </p>
 
-            <form onSubmit={handleFormSubmit} className="space-y-4 text-xs font-mono">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleFormSubmit} className="space-y-3.5 text-xs font-mono">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-300 mb-1">EVENT NAME</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">NAME</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Cosmic Retro Masters 2026"
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-300 mb-1">EVENT CODE</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">CODE</label>
                   <input
                     type="text"
                     required
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    placeholder="e.g. CRC-26"
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-1">DESCRIPTION</label>
+                <label className="block text-arcade-muted mb-1 font-bold">DESCRIPTION</label>
                 <textarea
                   rows="2"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Championship background and match format..."
-                  className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-gray-300 mb-1">STATUS</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">STATUS</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   >
                     <option value="draft">Draft</option>
                     <option value="active">Active</option>
@@ -301,49 +277,49 @@ export default function EventManagement({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-300 mb-1">START DATE</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">START DATE</label>
                   <input
                     type="date"
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-300 mb-1">END DATE</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">END DATE</label>
                   <input
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-300 mb-1">LOCATION / STREAM</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">LOCATION / VENUE</label>
                   <input
                     type="text"
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-300 mb-1">PRIZE POOL</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">PRIZE POOL</label>
                   <input
                     type="text"
                     value={formData.prizePool}
                     onChange={(e) => setFormData({ ...formData, prizePool: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-pink"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   />
                 </div>
               </div>
 
               {/* Assign Games */}
               <div>
-                <label className="block text-gray-300 mb-2">ASSIGN DISCIPLINES / GAMES</label>
+                <label className="block text-arcade-muted mb-1.5 font-bold">ASSIGN DISCIPLINES</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {games.map((g) => {
                     const selected = formData.assignedGameIds.includes(g.id);
@@ -352,10 +328,10 @@ export default function EventManagement({
                         type="button"
                         key={g.id}
                         onClick={() => toggleGameAssignment(g.id)}
-                        className={`p-2 rounded-lg border text-left transition-all flex items-center gap-2 ${
+                        className={`p-2 rounded border text-left flex items-center gap-2 text-xs ${
                           selected
-                            ? 'bg-purple-600/30 border-purple-400 text-white'
-                            : 'bg-[#070817] border-purple-500/20 text-gray-400'
+                            ? 'bg-arcade-yellow text-black border-black font-bold'
+                            : 'bg-[#0e0d14] border-arcade-border text-arcade-muted'
                         }`}
                       >
                         <span>{g.icon}</span>
@@ -366,20 +342,20 @@ export default function EventManagement({
                 </div>
               </div>
 
-              {/* Submit / Cancel Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-purple-500/20">
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-arcade-border">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-mono"
+                  className="px-4 py-2 rounded bg-[#201d2a] text-white font-mono"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-arcade-pink to-purple-600 text-white font-display font-bold tracking-wider shadow-neon-pink hover:scale-105 active:scale-95 transition-all"
+                  className="arcade-btn-yellow"
                 >
-                  {editingEvent ? 'SAVE CHANGES' : 'CREATE EVENT'}
+                  {editingEvent ? 'SAVE EVENT' : 'CREATE EVENT'}
                 </button>
               </div>
             </form>

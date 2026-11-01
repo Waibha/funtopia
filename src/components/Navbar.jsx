@@ -23,11 +23,10 @@ export default function Navbar({
   setCrtEnabled,
   triggerCelebration,
   resetData,
-  activeEvent,
 }) {
   const navItems = [
-    { id: 'leaderboard', label: 'LEADERBOARD', icon: Trophy, publicBadge: 'LIVE' },
-    { id: 'admin', label: 'OVERVIEW', icon: LayoutDashboard },
+    { id: 'leaderboard', label: 'LEADERBOARD', icon: Trophy, isLive: true },
+    { id: 'admin', label: 'OPERATOR', icon: LayoutDashboard },
     { id: 'events', label: 'EVENTS', icon: Calendar },
     { id: 'teams', label: 'TEAMS', icon: Users },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
@@ -50,36 +49,35 @@ export default function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#060714]/90 backdrop-blur-md border-b border-purple-500/20 shadow-2xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo & Universe Branding */}
+    <header className="sticky top-0 z-40 bg-[#121118] border-b-2 border-arcade-border select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between h-18 py-3">
+          {/* Logo & Arcade Brand */}
           <div
             onClick={() => handleNavClick('leaderboard')}
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <div className="relative w-11 h-11 rounded-lg bg-gradient-to-br from-arcade-pink via-arcade-purple to-arcade-cyan p-[2px] shadow-neon-pink group-hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full bg-[#070817] rounded-md flex items-center justify-center">
-                <span className="text-xl">👾</span>
-              </div>
+            {/* Bold Retro Arcade Token Box */}
+            <div className="w-10 h-10 rounded-lg bg-arcade-yellow border-2 border-black shadow-arcade flex items-center justify-center font-arcade text-black font-black text-lg group-hover:-translate-y-0.5 transition-transform">
+              👾
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-arcade text-lg sm:text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-arcade-pink via-arcade-yellow to-arcade-cyan drop-shadow">
+                <span className="font-arcade text-base sm:text-lg tracking-wider text-arcade-white group-hover:text-arcade-yellow transition-colors">
                   FUNTOPIA
                 </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-pixel tracking-widest bg-arcade-pink/20 text-arcade-pink border border-arcade-pink/40">
-                  v2.0
+                <span className="px-1.5 py-0.5 rounded bg-arcade-pink text-white font-pixel text-[9px] font-bold tracking-widest uppercase">
+                  ARCADE
                 </span>
               </div>
-              <p className="text-[11px] font-mono tracking-widest text-purple-300/70 hidden sm:block">
-                COSMIC RETRO CHAMPIONSHIP
+              <p className="text-[10px] font-mono text-arcade-muted tracking-wider hidden sm:block">
+                CHAMPIONSHIP LEADERBOARD
               </p>
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1.5 bg-[#0a0c24]/80 p-1.5 rounded-xl border border-purple-500/20">
+          {/* Navigation Links (Tactile Solid Tabs) */}
+          <nav className="hidden md:flex items-center gap-1 bg-[#1a1923] p-1.5 rounded-lg border border-arcade-border">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentView === item.id;
@@ -87,60 +85,57 @@ export default function Navbar({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-display font-semibold tracking-wider transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-display font-bold tracking-wider transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-purple-700/80 to-pink-600/80 text-white shadow-neon-purple border border-pink-400/40'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-arcade-yellow text-black border border-black shadow-arcade-sm'
+                      : 'text-arcade-muted hover:text-arcade-white hover:bg-[#252332]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-arcade-cyan' : 'text-purple-400'}`} />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
-                  {item.publicBadge && (
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
+                  {item.isLive && (
+                    <span className="w-2 h-2 rounded-full bg-arcade-pink animate-pulse" />
                   )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Quick Arcade Controls */}
+          {/* Arcade Utility Deck */}
           <div className="flex items-center gap-2">
-            {/* Celebration Confetti */}
+            {/* Celebration Confetti Blast */}
             <button
               onClick={() => {
                 soundFx.play('fanfare');
                 triggerCelebration();
               }}
-              title="Trigger Winner Fanfare & Confetti"
-              className="p-2.5 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-arcade-yellow hover:bg-yellow-500/20 hover:scale-105 active:scale-95 transition-all"
+              title="Trigger Winner Celebration"
+              className="p-2 rounded-lg bg-[#1e1c27] border border-arcade-border text-arcade-yellow hover:bg-[#2b2838] transition-all"
             >
               <Sparkles className="w-4 h-4" />
             </button>
 
-            {/* CRT Toggle */}
+            {/* CRT Scanline Toggle */}
             <button
               onClick={handleCrtToggle}
-              title={crtEnabled ? 'Disable CRT Scanlines' : 'Enable CRT Scanlines'}
-              className={`p-2.5 rounded-lg border transition-all ${
+              title={crtEnabled ? 'CRT Scanlines On' : 'CRT Scanlines Off'}
+              className={`p-2 rounded-lg border transition-all ${
                 crtEnabled
-                  ? 'bg-cyan-500/20 border-cyan-400 text-arcade-cyan shadow-neon-cyan'
-                  : 'bg-white/5 border-purple-500/20 text-gray-400 hover:text-white'
+                  ? 'bg-arcade-cyan text-black border-black font-bold'
+                  : 'bg-[#1e1c27] border-arcade-border text-arcade-muted hover:text-white'
               }`}
             >
               <Tv className="w-4 h-4" />
             </button>
 
-            {/* Sound FX Toggle */}
+            {/* Sound Toggle */}
             <button
               onClick={handleSoundToggle}
-              title={soundEnabled ? 'Mute 8-bit Audio' : 'Unmute 8-bit Audio'}
-              className={`p-2.5 rounded-lg border transition-all ${
+              title={soundEnabled ? '8-Bit Audio On' : '8-Bit Audio Off'}
+              className={`p-2 rounded-lg border transition-all ${
                 soundEnabled
-                  ? 'bg-purple-600/20 border-purple-500/40 text-arcade-pink'
-                  : 'bg-white/5 border-purple-500/20 text-gray-500 hover:text-gray-300'
+                  ? 'bg-arcade-pink text-white border-black font-bold'
+                  : 'bg-[#1e1c27] border-arcade-border text-arcade-muted hover:text-white'
               }`}
             >
               {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -149,21 +144,21 @@ export default function Navbar({
             {/* Reset Seed State */}
             <button
               onClick={() => {
-                if (window.confirm('Reset all sample data to default Indie Studio state?')) {
+                if (window.confirm('Reset championship data to original seed?')) {
                   soundFx.play('coin');
                   resetData();
                 }
               }}
-              title="Reset sample data"
-              className="p-2.5 rounded-lg bg-white/5 border border-purple-500/20 text-gray-400 hover:text-red-400 hover:border-red-500/40 transition-all"
+              title="Reset Sample Data"
+              className="p-2 rounded-lg bg-[#1e1c27] border border-arcade-border text-arcade-muted hover:text-red-400 transition-all"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Row */}
-        <div className="flex md:hidden items-center justify-between py-2 border-t border-purple-500/10 overflow-x-auto gap-2">
+        {/* Mobile Nav Row */}
+        <div className="flex md:hidden items-center gap-1 py-2 border-t border-arcade-border overflow-x-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -171,13 +166,13 @@ export default function Navbar({
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-display whitespace-nowrap ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded text-[11px] font-display font-bold whitespace-nowrap ${
                   isActive
-                    ? 'bg-purple-600 text-white font-bold'
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-arcade-yellow text-black'
+                    : 'text-arcade-muted hover:text-white'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3 h-3" />
                 <span>{item.label}</span>
               </button>
             );

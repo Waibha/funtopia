@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
 import {
   Coins,
-  PlusCircle,
-  MinusCircle,
   RotateCcw,
   Search,
-  Filter,
-  CheckCircle,
-  AlertTriangle,
-  Flame,
-  Zap,
 } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
@@ -52,7 +45,7 @@ export default function ScoringManagement({
       teamId: selectedTeamId,
       gameId: selectedGameId,
       pointsDelta: finalDelta,
-      reason: reason.trim() || (isDeduction ? 'Manual penalty deduction' : 'Manual score adjustment award'),
+      reason: reason.trim() || (isDeduction ? 'Manual penalty deduction' : 'Score award'),
       timestamp: new Date().toISOString(),
       admin: adminName.trim() || 'Admin',
     };
@@ -63,12 +56,11 @@ export default function ScoringManagement({
 
   const handleRollback = (txId) => {
     soundFx.play('coin');
-    if (window.confirm('Roll back and revert this scoring transaction?')) {
+    if (window.confirm('Revert and roll back this scoring transaction?')) {
       onRollbackTransaction(txId);
     }
   };
 
-  // Filtered transactions
   const filteredTransactions = data.transactions
     .filter((tx) => {
       const team = data.teams.find((t) => t.id === tx.teamId);
@@ -83,196 +75,191 @@ export default function ScoringManagement({
     .reverse();
 
   return (
-    <div className="py-8 space-y-8 max-w-7xl mx-auto">
+    <div className="py-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Coins className="w-5 h-5 text-arcade-yellow" />
           <h1 className="font-bungee text-2xl sm:text-3xl text-white">
-            SCORING MANAGEMENT DECK
+            SCORING TERMINAL
           </h1>
         </div>
-        <p className="text-gray-400 font-sans text-sm">
-          Dispatch point rewards, issue rule deductions, and audit the live championship transaction ledger.
+        <p className="text-arcade-muted font-sans text-xs sm:text-sm">
+          Dispatch point rewards, issue rule penalties, and audit the live verified ledger.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* DISPATCH CONTROLS (1 col) */}
-        <div className="rounded-2xl bg-[#0c0e28] border border-purple-500/30 p-6 shadow-2xl relative overflow-hidden">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-arcade text-xs sm:text-sm text-arcade-yellow tracking-wider">
-              DISPATCH POINTS
-            </h2>
-            <div className="flex items-center gap-1 bg-[#070817] p-1 rounded-lg border border-purple-500/20 text-xs font-mono">
-              <button
-                type="button"
-                onClick={() => {
-                  soundFx.play('click');
-                  setIsDeduction(false);
-                }}
-                className={`px-2.5 py-1 rounded transition-all font-bold ${
-                  !isDeduction
-                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                AWARD
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  soundFx.play('click');
-                  setIsDeduction(true);
-                }}
-                className={`px-2.5 py-1 rounded transition-all font-bold ${
-                  isDeduction
-                    ? 'bg-red-500 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                DEDUCT
-              </button>
-            </div>
-          </div>
-
-          <form onSubmit={handleScoreSubmit} className="space-y-4 text-xs font-mono">
-            {/* Target Team */}
-            <div>
-              <label className="block text-gray-300 mb-1">RECIPIENT CREW</label>
-              <select
-                value={selectedTeamId}
-                onChange={(e) => setSelectedTeamId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-yellow font-display font-semibold"
-              >
-                {data.teams.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.avatar} {t.name} [{t.tag}]
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Target Game */}
-            <div>
-              <label className="block text-gray-300 mb-1">DISCIPLINE / MATCH</label>
-              <select
-                value={selectedGameId}
-                onChange={(e) => setSelectedGameId(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-yellow font-display font-semibold"
-              >
-                {data.games.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.icon} {g.name} ({g.basePoints} Base PTS)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Points Value & Quick Chips */}
-            <div>
-              <label className="block text-gray-300 mb-1">
-                POINT MAGNITUDE ({isDeduction ? 'PENALTY -' : 'AWARD +'})
-              </label>
-              <input
-                type="number"
-                min={1}
-                required
-                value={pointsDelta}
-                onChange={(e) => setPointsDelta(Number(e.target.value))}
-                className={`w-full px-3 py-2.5 rounded-xl bg-[#070817] border text-lg font-mono font-extrabold focus:outline-none ${
-                  isDeduction
-                    ? 'border-red-500/50 text-red-400 focus:border-red-400'
-                    : 'border-emerald-500/50 text-emerald-400 focus:border-emerald-400'
-                }`}
-              />
-
-              {/* Quick Increment Chips */}
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {quickPills.map((val) => (
-                  <button
-                    type="button"
-                    key={val}
-                    onClick={() => {
-                      soundFx.play('click');
-                      setPointsDelta(val);
-                    }}
-                    className="px-2 py-1 rounded bg-[#070817] border border-purple-500/20 text-gray-300 hover:text-white hover:border-arcade-yellow text-[11px] font-mono"
-                  >
-                    {isDeduction ? `-${val}` : `+${val}`}
-                  </button>
-                ))}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* DISPATCH TERMINAL (1 col) */}
+        <div className="bg-[#15141c] border-2 border-black rounded-xl p-5 shadow-arcade flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4 border-b border-arcade-border pb-2.5">
+              <span className="font-arcade text-xs text-white">SCORE DISPATCH</span>
+              <div className="flex items-center gap-1 bg-[#0e0d14] p-1 rounded border border-arcade-border text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundFx.play('click');
+                    setIsDeduction(false);
+                  }}
+                  className={`px-2.5 py-1 rounded font-bold transition-colors ${
+                    !isDeduction
+                      ? 'bg-arcade-yellow text-black'
+                      : 'text-arcade-muted hover:text-white'
+                  }`}
+                >
+                  AWARD
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundFx.play('click');
+                    setIsDeduction(true);
+                  }}
+                  className={`px-2.5 py-1 rounded font-bold transition-colors ${
+                    isDeduction
+                      ? 'bg-red-600 text-white'
+                      : 'text-arcade-muted hover:text-white'
+                  }`}
+                >
+                  DEDUCT
+                </button>
               </div>
             </div>
 
-            {/* Reason */}
-            <div>
-              <label className="block text-gray-300 mb-1">JUDGE REASON / ACHIEVEMENT</label>
-              <input
-                type="text"
-                required
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="e.g. 1st Place Podium Finish or Time Penalty"
-                className="w-full px-3 py-2 rounded-xl bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-yellow"
-              />
-            </div>
+            <form onSubmit={handleScoreSubmit} className="space-y-3.5 text-xs font-mono">
+              <div>
+                <label className="block text-arcade-muted mb-1 font-bold">RECIPIENT CREW</label>
+                <select
+                  value={selectedTeamId}
+                  onChange={(e) => setSelectedTeamId(e.target.value)}
+                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow font-display font-bold"
+                >
+                  {data.teams.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.avatar} {t.name} [{t.tag}]
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Admin Signature */}
-            <div>
-              <label className="block text-gray-300 mb-1">MARSHAL / JUDGE NAME</label>
-              <input
-                type="text"
-                value={adminName}
-                onChange={(e) => setAdminName(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-yellow"
-              />
-            </div>
+              <div>
+                <label className="block text-arcade-muted mb-1 font-bold">DISCIPLINE</label>
+                <select
+                  value={selectedGameId}
+                  onChange={(e) => setSelectedGameId(e.target.value)}
+                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow font-display font-bold"
+                >
+                  {data.games.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.icon} {g.name} ({g.basePoints} Base PTS)
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Submit Dispatch Button */}
-            <button
-              type="submit"
-              className={`w-full py-3 rounded-xl font-display font-bold text-xs tracking-wider uppercase transition-all shadow-lg hover:scale-[1.02] active:scale-95 ${
-                isDeduction
-                  ? 'bg-gradient-to-r from-red-600 to-rose-700 text-white shadow-red-900/40'
-                  : 'bg-gradient-to-r from-arcade-yellow to-amber-500 text-slate-950 shadow-arcade-button-yellow'
-              }`}
-            >
-              {isDeduction ? `DEDUCT -${pointsDelta} POINTS` : `DISPATCH +${pointsDelta} POINTS`}
-            </button>
-          </form>
+              {/* Point Value & Quick Chips */}
+              <div>
+                <label className="block text-arcade-muted mb-1 font-bold">
+                  POINTS ({isDeduction ? 'PENALTY -' : 'AWARD +'})
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🪙</span>
+                  <input
+                    type="number"
+                    min={1}
+                    required
+                    value={pointsDelta}
+                    onChange={(e) => setPointsDelta(Number(e.target.value))}
+                    className={`w-full px-3 py-2 rounded bg-[#0e0d14] border text-base font-mono font-black focus:outline-none ${
+                      isDeduction
+                        ? 'border-red-500 text-red-400'
+                        : 'border-arcade-yellow text-arcade-yellow'
+                    }`}
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {quickPills.map((val) => (
+                    <button
+                      type="button"
+                      key={val}
+                      onClick={() => {
+                        soundFx.play('click');
+                        setPointsDelta(val);
+                      }}
+                      className="px-2 py-1 rounded bg-[#0e0d14] hover:bg-white/10 border border-arcade-border text-white text-[11px] font-mono font-bold"
+                    >
+                      {isDeduction ? `-${val}` : `+${val}`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-arcade-muted mb-1 font-bold">REASON</label>
+                <input
+                  type="text"
+                  required
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="e.g. 1st Place Podium Finish"
+                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
+                />
+              </div>
+
+              <div>
+                <label className="block text-arcade-muted mb-1 font-bold">OPERATOR</label>
+                <input
+                  type="text"
+                  value={adminName}
+                  onChange={(e) => setAdminName(e.target.value)}
+                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className={`w-full py-2.5 rounded font-display font-black text-xs tracking-wider uppercase border-2 border-black shadow-arcade transition-all ${
+                  isDeduction
+                    ? 'bg-red-600 text-white hover:bg-red-500'
+                    : 'bg-arcade-yellow text-black hover:bg-yellow-300'
+                }`}
+              >
+                {isDeduction ? `DEDUCT -${pointsDelta} PTS` : `AWARD +${pointsDelta} PTS`}
+              </button>
+            </form>
+          </div>
         </div>
 
-        {/* TRANSACTION AUDIT LEDGER (2 cols) */}
-        <div className="lg:col-span-2 rounded-2xl bg-[#0c0e28] border border-purple-500/30 p-6 shadow-2xl flex flex-col justify-between">
+        {/* VERIFIED LEDGER TABLE (2 cols) */}
+        <div className="lg:col-span-2 bg-[#15141c] border-2 border-black rounded-xl p-5 shadow-arcade flex flex-col justify-between">
           <div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 border-b border-arcade-border pb-2.5">
               <div>
-                <h2 className="font-arcade text-xs sm:text-sm text-white tracking-wider">
-                  VERIFIED TRANSACTION LEDGER
-                </h2>
-                <p className="text-xs font-mono text-gray-400 mt-0.5">
+                <span className="font-arcade text-xs text-white">VERIFIED AUDIT LEDGER</span>
+                <p className="text-[11px] font-mono text-arcade-muted mt-0.5">
                   Showing {filteredTransactions.length} of {data.transactions.length} records
                 </p>
               </div>
 
-              {/* Search & Filter */}
+              {/* Search & Team Filter */}
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:w-48">
-                  <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <div className="relative flex-1 sm:w-44">
+                  <Search className="w-3.5 h-3.5 text-arcade-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search ledger..."
-                    className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-[#070817] border border-purple-500/30 text-xs font-mono text-white focus:outline-none focus:border-arcade-cyan"
+                    placeholder="Search..."
+                    className="w-full pl-8 pr-2.5 py-1.5 rounded bg-[#0e0d14] border border-arcade-border text-xs font-mono text-white focus:outline-none"
                   />
                 </div>
 
                 <select
                   value={filterTeam}
                   onChange={(e) => setFilterTeam(e.target.value)}
-                  className="px-2.5 py-1.5 rounded-lg bg-[#070817] border border-purple-500/30 text-xs font-mono text-white focus:outline-none"
+                  className="px-2.5 py-1.5 rounded bg-[#0e0d14] border border-arcade-border text-xs font-mono text-white focus:outline-none"
                 >
                   <option value="all">All Teams</option>
                   {data.teams.map((t) => (
@@ -284,8 +271,8 @@ export default function ScoringManagement({
               </div>
             </div>
 
-            {/* Transactions Table */}
-            <div className="space-y-2.5 max-h-[520px] overflow-y-auto pr-1">
+            {/* Transaction Rows */}
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
               {filteredTransactions.map((tx) => {
                 const team = data.teams.find((t) => t.id === tx.teamId);
                 const game = data.games.find((g) => g.id === tx.gameId);
@@ -294,47 +281,42 @@ export default function ScoringManagement({
                 return (
                   <div
                     key={tx.id}
-                    className="p-3.5 rounded-xl bg-[#070817] border border-purple-500/10 hover:border-purple-500/30 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono"
+                    className="p-3 rounded-lg bg-[#100f16] border border-arcade-border flex items-center justify-between gap-3 text-xs font-mono"
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border"
-                        style={{
-                          backgroundColor: `${team?.color || '#FF007F'}15`,
-                          borderColor: `${team?.color || '#FF007F'}50`,
-                        }}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0 border border-black"
+                        style={{ backgroundColor: team?.color || '#FF007F' }}
                       >
                         {team?.avatar}
                       </div>
 
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white font-display text-sm">
-                            {team?.name || 'Unknown Team'}
+                          <span className="font-bold text-white font-display">
+                            {team?.name || 'Unknown'}
                           </span>
-                          <span className="text-[10px] text-gray-400 font-mono">
+                          <span className="text-[10px] text-arcade-muted">
                             in {game?.name || 'Discipline'}
                           </span>
                         </div>
-                        <p className="text-gray-300 text-xs italic mt-0.5">
+                        <p className="text-zinc-300 text-xs italic mt-0.5">
                           "{tx.reason}"
                         </p>
-                        <div className="text-[10px] text-gray-500 flex items-center gap-2 mt-1">
+                        <div className="text-[10px] text-zinc-500 flex items-center gap-2 mt-0.5">
                           <span>By: {tx.admin}</span>
                           <span>•</span>
-                          <span>{new Date(tx.timestamp).toLocaleString()}</span>
-                          <span>•</span>
-                          <span className="text-purple-400/80">{tx.id}</span>
+                          <span>{new Date(tx.timestamp).toLocaleTimeString()}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 self-end sm:self-center">
+                    <div className="flex items-center gap-3 shrink-0">
                       <span
-                        className={`text-base font-extrabold font-mono px-2.5 py-1 rounded-lg ${
+                        className={`text-sm font-black font-mono px-2 py-0.5 rounded ${
                           isPositive
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                            : 'bg-red-950 text-red-400 border border-red-800'
                         }`}
                       >
                         {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
@@ -342,8 +324,8 @@ export default function ScoringManagement({
 
                       <button
                         onClick={() => handleRollback(tx.id)}
-                        title="Revert / Rollback Transaction"
-                        className="p-2 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-gray-400 border border-purple-500/20 transition-all"
+                        title="Rollback Transaction"
+                        className="p-1.5 rounded bg-[#201d2a] hover:bg-red-950 hover:text-red-400 text-zinc-400 transition-colors"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
                       </button>
@@ -353,8 +335,8 @@ export default function ScoringManagement({
               })}
 
               {filteredTransactions.length === 0 && (
-                <div className="text-center py-12 text-gray-500 font-mono text-xs">
-                  No matching score transactions found.
+                <div className="text-center py-10 text-zinc-500 font-mono text-xs">
+                  No matching transactions in ledger.
                 </div>
               )}
             </div>

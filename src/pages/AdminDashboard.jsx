@@ -8,9 +8,6 @@ import {
   ArrowUpRight,
   Plus,
   Sparkles,
-  Zap,
-  Radio,
-  Flame,
 } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
@@ -26,21 +23,19 @@ export default function AdminDashboard({
 
   const stats = [
     {
-      label: 'ACTIVE TOURNAMENT',
+      label: 'ACTIVE EVENT',
       value: activeEvent ? activeEvent.name : 'None Selected',
       subtext: `${activeEvent?.code || 'CRC'} • ${activeEvent?.status?.toUpperCase() || 'ACTIVE'}`,
       icon: Calendar,
-      color: 'border-arcade-pink/40 text-arcade-pink',
-      bgGlow: 'bg-arcade-pink/5',
+      colorBar: 'bg-arcade-pink',
       action: () => setCurrentView('events'),
     },
     {
-      label: 'TEAMS COMPETING',
-      value: `${data.teams.length} CREWS`,
-      subtext: `${data.teams.reduce((acc, t) => acc + (t.membersCount || 4), 0)} Total Challengers`,
+      label: 'REGISTERED CREWS',
+      value: `${data.teams.length} TEAMS`,
+      subtext: `${data.teams.reduce((acc, t) => acc + (t.membersCount || 4), 0)} Players Competing`,
       icon: Users,
-      color: 'border-arcade-cyan/40 text-arcade-cyan',
-      bgGlow: 'bg-arcade-cyan/5',
+      colorBar: 'bg-arcade-cyan',
       action: () => setCurrentView('teams'),
     },
     {
@@ -48,83 +43,81 @@ export default function AdminDashboard({
       value: `${data.games.length} GAMES`,
       subtext: `${data.games.filter((g) => g.isActive).length} Currently Active`,
       icon: Gamepad2,
-      color: 'border-arcade-purple/40 text-arcade-violet',
-      bgGlow: 'bg-purple-600/5',
+      colorBar: 'bg-arcade-purple',
       action: () => setCurrentView('games'),
     },
     {
-      label: 'DISPATCHED POINTS',
+      label: 'POINTS DISPATCHED',
       value: `${totalPoints.toLocaleString()} PTS`,
-      subtext: `${data.transactions.length} Verified Transactions`,
+      subtext: `${data.transactions.length} Verified Entries`,
       icon: Coins,
-      color: 'border-arcade-yellow/40 text-arcade-yellow',
-      bgGlow: 'bg-yellow-500/5',
+      colorBar: 'bg-arcade-yellow',
       action: () => setCurrentView('scoring'),
     },
   ];
 
   return (
-    <div className="py-8 space-y-8 max-w-7xl mx-auto">
-      {/* MISSION CONTROL BANNER */}
-      <div className="relative rounded-2xl bg-gradient-to-r from-[#090b24] via-[#12133a] to-[#090b24] border border-purple-500/30 p-6 sm:p-8 shadow-2xl overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/10 blur-[100px] pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-              <span className="font-arcade text-[11px] text-emerald-400 tracking-wider">
-                ADMIN MISSION CONTROL • ONLINE
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-4xl font-bungee tracking-wide text-white">
-              EVENT MASTER CONSOLE
-            </h1>
-            <p className="text-gray-300 font-sans text-sm sm:text-base max-w-xl mt-1">
-              Configure tournaments, register competitive crews, manage game rules, and dispatch points with real-time leaderboard broadcast updates.
-            </p>
+    <div className="py-6 space-y-6 max-w-7xl mx-auto">
+      {/* ========================================================= */}
+      {/* ARCADE OPERATOR CONSOLE HEADER                            */}
+      {/* ========================================================= */}
+      <div className="bg-[#15141c] border-2 border-black rounded-xl p-5 sm:p-6 shadow-arcade flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-arcade-yellow" />
+            <span className="font-arcade text-[10px] text-arcade-yellow tracking-wider">
+              OPERATOR COMMAND CONSOLE
+            </span>
           </div>
+          <h1 className="text-2xl sm:text-3xl font-bungee tracking-wide text-white">
+            ARCADE MASTER CONTROL
+          </h1>
+          <p className="text-arcade-muted font-sans text-xs sm:text-sm mt-1 max-w-xl">
+            Dispatch points, adjust match rules, register competitive crews, and supervise live tournaments.
+          </p>
+        </div>
 
-          {/* Quick Actions Deck */}
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => {
-                soundFx.play('coin');
-                if (onOpenQuickScore) onOpenQuickScore();
-              }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-arcade-yellow to-amber-500 text-slate-950 font-display font-bold text-xs tracking-wider shadow-arcade-button-yellow hover:scale-105 active:scale-95 transition-all"
-            >
-              <Coins className="w-4 h-4" />
-              <span>AWARD POINTS</span>
-            </button>
+        {/* Master Control Buttons */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => {
+              soundFx.play('coin');
+              if (onOpenQuickScore) onOpenQuickScore();
+            }}
+            className="arcade-btn-yellow flex items-center gap-2"
+          >
+            <Coins className="w-4 h-4 fill-black" />
+            <span>DISPATCH POINTS</span>
+          </button>
 
-            <button
-              onClick={() => {
-                soundFx.play('click');
-                setCurrentView('teams');
-              }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-purple-500/30 text-white font-display text-xs font-semibold hover:bg-white/10 transition-all"
-            >
-              <Plus className="w-4 h-4 text-arcade-cyan" />
-              <span>ADD TEAM</span>
-            </button>
+          <button
+            onClick={() => {
+              soundFx.play('click');
+              setCurrentView('teams');
+            }}
+            className="arcade-btn-ghost flex items-center gap-1.5"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>ADD TEAM</span>
+          </button>
 
-            <button
-              onClick={() => {
-                soundFx.play('fanfare');
-                triggerCelebration();
-              }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-arcade-pink/15 border border-arcade-pink/40 text-arcade-pink font-display text-xs font-semibold hover:bg-arcade-pink/25 transition-all"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>TEST FANFARE</span>
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              soundFx.play('fanfare');
+              triggerCelebration();
+            }}
+            className="arcade-btn-ghost flex items-center gap-1.5 text-arcade-pink hover:text-arcade-pink"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>TEST FANFARE</span>
+          </button>
         </div>
       </div>
 
-      {/* STAT TILES */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ========================================================= */}
+      {/* STAT TILES (SOLID COLOR BARS)                             */}
+      {/* ========================================================= */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {stats.map((st, i) => {
           const Icon = st.icon;
           return (
@@ -134,94 +127,95 @@ export default function AdminDashboard({
                 soundFx.play('click');
                 st.action();
               }}
-              className={`p-5 rounded-xl bg-[#0c0e28] border ${st.color} ${st.bgGlow} hover:scale-[1.02] transition-all cursor-pointer shadow-lg group relative overflow-hidden`}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && st.action()}
+              className="bg-[#15141c] border-2 border-black rounded-xl p-4 shadow-arcade-sm hover:translate-x-0.5 hover:translate-y-0.5 transition-transform cursor-pointer relative overflow-hidden"
             >
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-arcade text-[10px] text-gray-400 tracking-wider">
+              <div className={`absolute top-0 left-0 right-0 h-1.5 ${st.colorBar}`} />
+              <div className="flex items-center justify-between mb-2 mt-1">
+                <span className="font-arcade text-[10px] text-arcade-muted">
                   {st.label}
                 </span>
-                <Icon className="w-4 h-4 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all" />
+                <Icon className="w-4 h-4 text-arcade-muted" />
               </div>
-              <h3 className="font-display font-bold text-xl sm:text-2xl text-white truncate mb-1">
+              <h3 className="font-display font-black text-xl text-white truncate mb-0.5">
                 {st.value}
               </h3>
-              <div className="flex items-center justify-between text-xs font-mono text-gray-400">
-                <span>{st.subtext}</span>
-                <ArrowUpRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="flex items-center justify-between text-[11px] font-mono text-arcade-muted">
+                <span className="truncate">{st.subtext}</span>
+                <ArrowUpRight className="w-3 h-3 shrink-0 ml-1" />
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* TWO COLUMN GRID: LIVE STANDINGS PREVIEW & RECENT AUDIT LOG */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Live Standings Preview (2 cols) */}
-        <div className="lg:col-span-2 rounded-2xl bg-[#0c0e28] border border-purple-500/20 p-6 shadow-xl">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2.5">
-              <Trophy className="w-5 h-5 text-arcade-yellow" />
-              <h2 className="font-arcade text-xs sm:text-sm text-white tracking-wider">
-                STANDINGS SNAPSHOT
-              </h2>
+      {/* ========================================================= */}
+      {/* SNAPSHOT & RECENT TRANSACTION LOG                         */}
+      {/* ========================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Standings Snapshot (2 cols) */}
+        <div className="lg:col-span-2 bg-[#15141c] border-2 border-black rounded-xl p-5 shadow-arcade-sm">
+          <div className="flex items-center justify-between mb-4 border-b border-arcade-border pb-2">
+            <div className="flex items-center gap-2 font-arcade text-xs text-white">
+              <Trophy className="w-4 h-4 text-arcade-yellow" />
+              <span>CURRENT RANKINGS</span>
             </div>
             <button
               onClick={() => {
                 soundFx.play('switch');
                 setCurrentView('leaderboard');
               }}
-              className="text-xs font-mono text-arcade-cyan hover:underline flex items-center gap-1"
+              className="text-xs font-mono text-arcade-cyan hover:underline flex items-center gap-1 font-bold"
             >
-              <span>View Public Display</span>
+              <span>Public Stage View</span>
               <ArrowUpRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {leaderboard.map((team) => (
               <div
                 key={team.id}
-                className="flex items-center justify-between p-3 rounded-xl bg-[#070817] border border-purple-500/10 hover:border-purple-500/30 transition-all"
+                className="flex items-center justify-between p-3 rounded-lg bg-[#100f16] border border-arcade-border hover:border-arcade-muted transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={`w-7 h-7 rounded flex items-center justify-center font-arcade text-xs font-bold ${
+                    className={`w-7 h-7 rounded flex items-center justify-center font-arcade text-xs font-bold border border-black ${
                       team.rank === 1
-                        ? 'bg-arcade-yellow text-slate-950'
+                        ? 'bg-arcade-yellow text-black'
                         : team.rank === 2
-                        ? 'bg-slate-300 text-slate-950'
+                        ? 'bg-zinc-300 text-black'
                         : team.rank === 3
-                        ? 'bg-amber-700 text-white'
-                        : 'bg-purple-950 text-purple-300'
+                        ? 'bg-amber-600 text-white'
+                        : 'bg-[#1e1c27] text-arcade-muted'
                     }`}
                   >
-                    #{team.rank}
+                    {team.rank}
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{team.avatar}</span>
                     <span className="font-display font-bold text-white text-sm">
                       {team.name}
                     </span>
-                    <span
-                      className="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold"
-                      style={{ color: team.color, backgroundColor: `${team.color}15` }}
-                    >
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-black/50 text-arcade-muted font-bold">
                       [{team.tag}]
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-base font-bold text-white">
-                    {team.totalPoints.toLocaleString()} PTS
+                  <span className="font-mono text-sm font-black text-white">
+                    🪙 {team.totalPoints.toLocaleString()} PTS
                   </span>
                   <button
                     onClick={() => {
                       soundFx.play('coin');
                       if (onOpenQuickScore) onOpenQuickScore(team.id);
                     }}
-                    title="Quick Score Award"
-                    className="p-1.5 rounded-lg bg-arcade-yellow/10 border border-arcade-yellow/30 text-arcade-yellow hover:bg-arcade-yellow/20 text-xs font-mono"
+                    title="Quick Score"
+                    className="px-2.5 py-1 rounded bg-[#201d2a] hover:bg-arcade-yellow hover:text-black text-arcade-yellow border border-arcade-border text-xs font-mono font-bold transition-colors"
                   >
                     +Score
                   </button>
@@ -231,28 +225,23 @@ export default function AdminDashboard({
           </div>
         </div>
 
-        {/* Recent Score Transactions Audit Stream */}
-        <div className="rounded-2xl bg-[#0c0e28] border border-purple-500/20 p-6 shadow-xl flex flex-col justify-between">
+        {/* Recent Ledger Log */}
+        <div className="bg-[#15141c] border-2 border-black rounded-xl p-5 shadow-arcade-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Radio className="w-4 h-4 text-arcade-pink" />
-                <h3 className="font-arcade text-xs text-white tracking-wider">
-                  SCORE AUDIT LOG
-                </h3>
-              </div>
+            <div className="flex items-center justify-between mb-4 border-b border-arcade-border pb-2">
+              <span className="font-arcade text-xs text-white">OPERATOR LOG</span>
               <button
                 onClick={() => {
                   soundFx.play('switch');
                   setCurrentView('scoring');
                 }}
-                className="text-[11px] font-mono text-arcade-pink hover:underline"
+                className="text-xs font-mono text-arcade-yellow hover:underline font-bold"
               >
-                Manage
+                Full Console
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {data.transactions
                 .slice(-5)
                 .reverse()
@@ -263,26 +252,31 @@ export default function AdminDashboard({
                   return (
                     <div
                       key={tx.id}
-                      className="p-2.5 rounded-lg bg-[#070817] border border-purple-500/10 text-xs font-mono"
+                      className="p-2.5 rounded bg-[#100f16] border border-arcade-border text-xs font-mono"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-white">
+                        <span className="font-bold text-white truncate max-w-[140px]">
                           {team?.avatar} {team?.name}
                         </span>
                         <span
-                          className={`font-bold ${
+                          className={`font-black ${
                             isPositive ? 'text-emerald-400' : 'text-red-400'
                           }`}
                         >
                           {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
                         </span>
                       </div>
-                      <p className="text-[11px] text-gray-400 truncate mt-0.5">
+                      <p className="text-[11px] text-arcade-muted truncate mt-0.5">
                         {tx.reason}
                       </p>
-                      <div className="text-[10px] text-gray-500 flex justify-between mt-1">
-                        <span>By {tx.admin}</span>
-                        <span>{new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <div className="text-[10px] text-zinc-500 flex justify-between mt-1">
+                        <span>By: {tx.admin}</span>
+                        <span>
+                          {new Date(tx.timestamp).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
                       </div>
                     </div>
                   );
@@ -290,17 +284,15 @@ export default function AdminDashboard({
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-purple-500/20 text-center">
-            <button
-              onClick={() => {
-                soundFx.play('switch');
-                setCurrentView('scoring');
-              }}
-              className="w-full py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-200 text-xs font-display font-semibold transition-all"
-            >
-              Open Full Scoring Deck
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              soundFx.play('switch');
+              setCurrentView('scoring');
+            }}
+            className="w-full mt-4 py-2.5 rounded bg-[#201d2a] hover:bg-white/10 border border-arcade-border text-white text-xs font-display font-bold transition-colors"
+          >
+            Open Scoring Terminal
+          </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Gamepad2, Plus, Edit2, Trash2, Power, Zap, Award, Target, HelpCircle } from 'lucide-react';
+import { Gamepad2, Plus, Edit2, Trash2, Power } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
 export default function GameManagement({ games, onSaveGame, onDeleteGame, onToggleGameActive }) {
@@ -40,7 +40,7 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
       multiplier: 1.5,
       maxRounds: 3,
       isActive: true,
-      rules: 'Standard scoring applies.',
+      rules: 'Standard tournament rules apply.',
     });
     setModalOpen(true);
   };
@@ -54,7 +54,7 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
 
   const handleDelete = (gameId, name) => {
     soundFx.play('scoreDown');
-    if (window.confirm(`Delete discipline "${name}"? Existing scores will still be retained.`)) {
+    if (window.confirm(`Delete discipline "${name}"?`)) {
       onDeleteGame(gameId);
     }
   };
@@ -76,132 +76,128 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
   };
 
   return (
-    <div className="py-8 space-y-8 max-w-7xl mx-auto">
+    <div className="py-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Gamepad2 className="w-5 h-5 text-arcade-violet" />
+            <Gamepad2 className="w-5 h-5 text-arcade-purple" />
             <h1 className="font-bungee text-2xl sm:text-3xl text-white">
-              GAME MANAGEMENT
+              DISCIPLINE CATALOG
             </h1>
           </div>
-          <p className="text-gray-400 font-sans text-sm">
-            Configure arcade disciplines, multipliers, scoring rules, and active status.
+          <p className="text-arcade-muted font-sans text-xs sm:text-sm">
+            Configure arcade game cartridges, point weights, and rotation status.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-arcade-purple to-purple-600 text-white font-display font-bold text-xs tracking-wider shadow-arcade-button hover:scale-105 active:scale-95 transition-all"
+          className="arcade-btn-yellow flex items-center gap-1.5"
         >
           <Plus className="w-4 h-4" />
           <span>NEW DISCIPLINE</span>
         </button>
       </div>
 
-      {/* Games Grid (Arcade Cartridges) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Cartridge Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {games.map((game) => (
           <div
             key={game.id}
-            className={`rounded-2xl p-6 border transition-all duration-300 relative flex flex-col justify-between ${
+            className={`rounded-xl p-5 border-2 border-black flex flex-col justify-between transition-all duration-150 ${
               game.isActive
-                ? 'bg-[#0c0e28] border-purple-500/30 hover:border-arcade-cyan/60 shadow-lg'
-                : 'bg-[#08091a]/80 border-gray-800 opacity-60'
+                ? 'bg-[#15141c] shadow-arcade-sm'
+                : 'bg-[#111016] opacity-60 border-zinc-800'
             }`}
           >
             <div>
-              {/* Cartridge Header */}
-              <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-3xl shadow-inner">
+                  <div className="w-12 h-12 rounded-lg bg-[#201d2a] border border-black flex items-center justify-center text-2xl">
                     <span>{game.icon}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-900/40 text-purple-300 border border-purple-500/20">
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black text-arcade-muted font-bold">
                       {game.category}
                     </span>
-                    <h3 className="font-display font-bold text-lg text-white mt-1">
+                    <h3 className="font-display font-black text-base text-white mt-1">
                       {game.name}
                     </h3>
                   </div>
                 </div>
 
-                {/* Status Toggle */}
+                {/* Active / Inactive switch */}
                 <button
                   onClick={() => {
                     soundFx.play('click');
                     onToggleGameActive(game.id);
                   }}
-                  title={game.isActive ? 'Deactivate Discipline' : 'Activate Discipline'}
-                  className={`p-1.5 rounded-lg border transition-all ${
+                  className={`p-1.5 rounded border border-black font-mono text-xs font-bold ${
                     game.isActive
-                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                      : 'bg-red-500/10 text-red-400 border-red-500/30'
+                      ? 'bg-emerald-500 text-black'
+                      : 'bg-zinc-800 text-zinc-400'
                   }`}
+                  title={game.isActive ? 'Deactivate' : 'Activate'}
                 >
-                  <Power className="w-4 h-4" />
+                  <Power className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <p className="text-xs text-gray-400 font-sans mb-4 line-clamp-2">
+              <p className="text-xs text-arcade-muted font-sans mb-3 line-clamp-2">
                 {game.description}
               </p>
 
-              {/* Scoring Specs Box */}
-              <div className="grid grid-cols-3 gap-2 bg-[#070817] p-3 rounded-xl border border-purple-500/15 mb-4 text-center font-mono">
+              {/* Point Specs */}
+              <div className="grid grid-cols-3 gap-2 bg-[#0e0d14] p-2.5 rounded border border-arcade-border mb-3 text-center font-mono">
                 <div>
-                  <span className="text-[9px] text-gray-500 block">BASE PTS</span>
-                  <span className="text-xs font-bold text-arcade-yellow">
+                  <span className="text-[9px] text-zinc-500 block">BASE PTS</span>
+                  <span className="text-xs font-black text-arcade-yellow">
                     {game.basePoints}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-gray-500 block">MULTIPLIER</span>
-                  <span className="text-xs font-bold text-arcade-cyan">
+                  <span className="text-[9px] text-zinc-500 block">MULTIPLIER</span>
+                  <span className="text-xs font-black text-white">
                     {game.multiplier}x
                   </span>
                 </div>
                 <div>
-                  <span className="text-[9px] text-gray-500 block">MAX ROUNDS</span>
-                  <span className="text-xs font-bold text-purple-300">
+                  <span className="text-[9px] text-zinc-500 block">ROUNDS</span>
+                  <span className="text-xs font-black text-arcade-muted">
                     {game.maxRounds}
                   </span>
                 </div>
               </div>
 
-              {/* Rules Note */}
-              <div className="text-[11px] font-mono text-gray-400 mb-4 bg-purple-950/20 p-2.5 rounded-lg border border-purple-500/10 flex items-start gap-1.5">
-                <Target className="w-3.5 h-3.5 text-arcade-pink shrink-0 mt-0.5" />
-                <span className="line-clamp-2 italic">{game.rules}</span>
-              </div>
+              <p className="text-[11px] font-mono text-zinc-400 italic mb-4 truncate">
+                Rule: {game.rules}
+              </p>
             </div>
 
-            {/* Actions Footer */}
-            <div className="flex items-center justify-between pt-4 border-t border-purple-500/15">
+            <div className="flex items-center justify-between pt-3 border-t border-arcade-border">
               <span
-                className={`text-[10px] font-mono uppercase font-bold ${
-                  game.isActive ? 'text-emerald-400' : 'text-gray-500'
+                className={`text-[10px] font-mono font-bold ${
+                  game.isActive ? 'text-emerald-400' : 'text-zinc-500'
                 }`}
               >
-                {game.isActive ? '● ACTIVE IN ROTATION' : '○ BENCHED'}
+                {game.isActive ? '● IN ROTATION' : '○ BENCHED'}
               </span>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => handleOpenEdit(game)}
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 transition-colors"
+                  className="p-1.5 rounded bg-[#201d2a] hover:bg-[#2c283a] text-white"
                   title="Edit Discipline"
                 >
-                  <Edit2 className="w-4 h-4" />
+                  <Edit2 className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => handleDelete(game.id, game.name)}
-                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
+                  className="p-1.5 rounded bg-red-950/40 hover:bg-red-900/60 text-red-400"
                   title="Remove Discipline"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -211,64 +207,62 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
 
       {/* CREATE / EDIT GAME MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-lg rounded-2xl bg-[#0d0f28] border-2 border-purple-500/40 p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85">
+          <div className="relative w-full max-w-md bg-[#15141c] border-3 border-black rounded-xl p-6 shadow-arcade-lg max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white font-mono text-lg"
+              className="absolute top-4 right-4 text-arcade-muted hover:text-white font-mono text-base"
             >
               ✕
             </button>
 
             <h2 className="font-bungee text-xl text-white mb-1">
-              {editingGame ? 'EDIT ARCADE DISCIPLINE' : 'REGISTER NEW DISCIPLINE'}
+              {editingGame ? 'EDIT DISCIPLINE' : 'REGISTER DISCIPLINE'}
             </h2>
-            <p className="text-xs text-gray-400 font-sans mb-6">
-              Configure point rewards, multipliers, and special victory rules.
+            <p className="text-xs text-arcade-muted font-sans mb-4">
+              Configure base score, multiplier, and category.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs font-mono">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-300 mb-1">DISCIPLINE NAME</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">NAME</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Astro Blitz 3000"
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-violet"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none focus:border-arcade-yellow"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-300 mb-1">CATEGORY</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">CATEGORY</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-violet"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   >
-                    {categoryOptions.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
+                    {categoryOptions.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* Icon Selection */}
               <div>
-                <label className="block text-gray-300 mb-2">ARCADE ICON</label>
+                <label className="block text-arcade-muted mb-1 font-bold">ICON</label>
                 <div className="flex flex-wrap gap-2">
                   {iconOptions.map((ic) => (
                     <button
                       type="button"
                       key={ic}
                       onClick={() => setFormData({ ...formData, icon: ic })}
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all ${
+                      className={`w-9 h-9 rounded flex items-center justify-center text-lg border ${
                         formData.icon === ic
-                          ? 'bg-purple-600 border-2 border-arcade-violet scale-110 shadow-neon-purple'
-                          : 'bg-[#070817] border border-purple-500/20 hover:bg-white/5'
+                          ? 'bg-arcade-yellow text-black border-black font-bold shadow-arcade-sm'
+                          : 'bg-[#0e0d14] border-arcade-border'
                       }`}
                     >
                       {ic}
@@ -278,30 +272,29 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-1">DESCRIPTION</label>
+                <label className="block text-arcade-muted mb-1 font-bold">DESCRIPTION</label>
                 <textarea
                   rows="2"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Gameplay synopsis..."
-                  className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-violet"
+                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2.5">
                 <div>
-                  <label className="block text-gray-300 mb-1">BASE PTS</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">BASE PTS</label>
                   <input
                     type="number"
                     min={0}
                     step={10}
                     value={formData.basePoints}
                     onChange={(e) => setFormData({ ...formData, basePoints: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-violet"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-300 mb-1">MULTIPLIER</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">MULTIPLIER</label>
                   <input
                     type="number"
                     min={0.5}
@@ -309,47 +302,45 @@ export default function GameManagement({ games, onSaveGame, onDeleteGame, onTogg
                     step={0.25}
                     value={formData.multiplier}
                     onChange={(e) => setFormData({ ...formData, multiplier: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-violet"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-300 mb-1">MAX ROUNDS</label>
+                  <label className="block text-arcade-muted mb-1 font-bold">MAX ROUNDS</label>
                   <input
                     type="number"
                     min={1}
                     max={10}
                     value={formData.maxRounds}
                     onChange={(e) => setFormData({ ...formData, maxRounds: Number(e.target.value) })}
-                    className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-violet"
+                    className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-1">SCORING RULES & NOTES</label>
+                <label className="block text-arcade-muted mb-1 font-bold">RULES</label>
                 <input
                   type="text"
                   value={formData.rules}
                   onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
-                  placeholder="e.g. Clean run bonus +25 PTS, penalty -10 PTS."
-                  className="w-full px-3 py-2 rounded-lg bg-[#070817] border border-purple-500/30 text-white focus:outline-none focus:border-arcade-violet"
+                  className="w-full px-3 py-2 rounded bg-[#0e0d14] border border-arcade-border text-white focus:outline-none"
                 />
               </div>
 
-              {/* Submit Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-purple-500/20">
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-arcade-border">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-mono"
+                  className="px-4 py-2 rounded bg-[#201d2a] text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-arcade-purple to-purple-600 text-white font-display font-bold tracking-wider shadow-neon-purple hover:scale-105 active:scale-95 transition-all"
+                  className="arcade-btn-yellow"
                 >
-                  {editingGame ? 'SAVE CHANGES' : 'REGISTER DISCIPLINE'}
+                  {editingGame ? 'SAVE DISCIPLINE' : 'REGISTER DISCIPLINE'}
                 </button>
               </div>
             </form>
