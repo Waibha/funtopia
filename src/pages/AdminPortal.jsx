@@ -6,15 +6,12 @@ import {
   Users,
   Gamepad2,
   Coins,
-  UserCheck,
   LogOut,
   ArrowLeft,
-  ShieldCheck,
   Sparkles,
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import EventManagement from './EventManagement';
-import TeamManagement from './TeamManagement';
 import GameManagement from './GameManagement';
 import ScoringManagement from './ScoringManagement';
 import ParticipantRosterManager from '../components/admin/ParticipantRosterManager';
@@ -27,14 +24,12 @@ export default function AdminPortal({
   leaderboard,
   onSaveEvent,
   setActiveEventId,
-  onSaveTeam,
-  onDeleteTeam,
   onSaveGame,
   onDeleteGame,
   onToggleGameActive,
   onAwardScore,
   onRollbackTransaction,
-  onAssignParticipantTeam,
+  onAddParticipant,
   onRemoveParticipant,
   triggerCelebration,
 }) {
@@ -48,8 +43,8 @@ export default function AdminPortal({
     }
   });
 
-  const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'events' | 'teams' | 'games' | 'scoring' | 'participants'
-  const [quickScoreTeamId, setQuickScoreTeamId] = useState(null);
+  const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'events' | 'participants' | 'games' | 'scoring'
+  const [quickScoreParticipantId, setQuickScoreParticipantId] = useState(null);
 
   const activeEvent = data.events.find((e) => e.id === data.activeEventId) || data.events[0];
 
@@ -73,8 +68,8 @@ export default function AdminPortal({
     setCurrentTab(tabId);
   };
 
-  const handleOpenQuickScore = (teamId = null) => {
-    setQuickScoreTeamId(teamId);
+  const handleOpenQuickScore = (participantId = null) => {
+    setQuickScoreParticipantId(participantId);
     setCurrentTab('scoring');
   };
 
@@ -91,10 +86,9 @@ export default function AdminPortal({
   const navItems = [
     { id: 'overview', label: 'OVERVIEW', icon: LayoutDashboard },
     { id: 'events', label: 'EVENTS', icon: Calendar },
-    { id: 'teams', label: 'CREWS', icon: Users },
+    { id: 'participants', label: 'PARTICIPANTS', icon: Users },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
     { id: 'scoring', label: 'SCORING', icon: Coins },
-    { id: 'participants', label: 'ROSTER', icon: UserCheck },
   ];
 
   return (
@@ -120,7 +114,7 @@ export default function AdminPortal({
                       FUNTOPIA
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-pop-yellow text-pop-ink font-arcade text-[9px] font-black uppercase border border-pop-ink shadow-pop-sm">
-                      RESTRICTED ADMIN
+                      ADMIN PORTAL
                     </span>
                   </div>
                   <p className="text-[10px] font-mono text-pop-muted tracking-wider font-bold">
@@ -130,7 +124,7 @@ export default function AdminPortal({
               </div>
 
               {/* Navigation Tabs */}
-              <nav className="hidden lg:flex items-center gap-1.5 bg-pop-butter p-1.5 rounded-2xl border-2 border-pop-ink shadow-pop-sm">
+              <nav className="hidden md:flex items-center gap-1.5 bg-pop-butter p-1.5 rounded-2xl border-2 border-pop-ink shadow-pop-sm">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentTab === item.id;
@@ -138,7 +132,7 @@ export default function AdminPortal({
                     <button
                       key={item.id}
                       onClick={() => handleTabChange(item.id)}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                      className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
                         isActive
                           ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink shadow-pop-sm -translate-y-0.5'
                           : 'text-pop-ink hover:bg-white/80'
@@ -159,7 +153,7 @@ export default function AdminPortal({
                     triggerCelebration();
                   }}
                   className="p-2.5 rounded-xl bg-pop-coral text-white border-2 border-pop-ink shadow-pop-sm hover:-translate-y-0.5 transition-all"
-                  title="Test Winner Fanfare"
+                  title="Test Fanfare"
                 >
                   <Sparkles className="w-4 h-4 text-pop-yellow" />
                 </button>
@@ -167,7 +161,7 @@ export default function AdminPortal({
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pop-butter hover:bg-pop-coral hover:text-white border-2 border-pop-ink text-xs font-mono font-bold shadow-pop-sm transition-all"
-                  title="Log out of admin station"
+                  title="Log out"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">LOGOUT</span>
@@ -176,7 +170,7 @@ export default function AdminPortal({
             </div>
 
             {/* Mobile / Tablet Tab Bar */}
-            <div className="flex lg:hidden items-center gap-1 py-2 border-t-2 border-pop-ink/20 overflow-x-auto">
+            <div className="flex md:hidden items-center gap-1 py-2 border-t-2 border-pop-ink/20 overflow-x-auto">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentTab === item.id;
@@ -203,7 +197,7 @@ export default function AdminPortal({
         <LiveTicker
           activeEvent={activeEvent}
           transactions={data.transactions}
-          teams={data.teams}
+          participants={data.participants}
           games={data.games}
         />
 
@@ -225,16 +219,15 @@ export default function AdminPortal({
               activeEventId={data.activeEventId}
               setActiveEventId={setActiveEventId}
               onSaveEvent={onSaveEvent}
-              teams={data.teams}
-              games={data.games}
             />
           )}
 
-          {currentTab === 'teams' && (
-            <TeamManagement
-              teams={data.teams}
-              onSaveTeam={onSaveTeam}
-              onDeleteTeam={onDeleteTeam}
+          {currentTab === 'participants' && (
+            <ParticipantRosterManager
+              participants={data.participants || []}
+              activeEventId={data.activeEventId}
+              onAddParticipant={onAddParticipant}
+              onRemoveParticipant={onRemoveParticipant}
             />
           )}
 
@@ -252,18 +245,7 @@ export default function AdminPortal({
               data={data}
               onAwardScore={onAwardScore}
               onRollbackTransaction={onRollbackTransaction}
-              quickTeamId={quickScoreTeamId}
-            />
-          )}
-
-          {currentTab === 'participants' && (
-            <ParticipantRosterManager
-              participants={data.participants || []}
-              teams={data.teams}
-              events={data.events}
-              activeEventId={data.activeEventId}
-              onAssignTeam={onAssignParticipantTeam}
-              onRemoveParticipant={onRemoveParticipant}
+              quickParticipantId={quickScoreParticipantId}
             />
           )}
         </main>
@@ -274,10 +256,10 @@ export default function AdminPortal({
             <div className="flex items-center gap-2 font-bold text-pop-ink">
               <span className="font-bungee text-sm">FUNTOPIA</span>
               <span>•</span>
-              <span>RESTRICTED OPERATOR CONSOLE</span>
+              <span>ADMIN CONSOLE</span>
             </div>
             <div className="text-xs font-bold text-pop-ink">
-              SUPABASE ROW LEVEL SECURITY (RLS) ACTIVE
+              AUTHENTICATED SESSION
             </div>
           </div>
         </footer>

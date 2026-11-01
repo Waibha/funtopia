@@ -1,31 +1,47 @@
 import React, { useState } from 'react';
-import { Users, Search, Trash2, UserPlus, Filter } from 'lucide-react';
+import { Users, Search, Trash2, Plus, UserPlus } from 'lucide-react';
 import { soundFx } from '../../utilities/soundFx';
 
 export default function ParticipantRosterManager({
   participants = [],
-  teams = [],
-  events = [],
   activeEventId,
-  onAssignTeam,
+  onAddParticipant,
   onRemoveParticipant,
 }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterTeamId, setFilterTeamId] = useState('all');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    avatar: '👾',
+  });
+
+  const avatars = ['👾', '🚀', '⚡', '🦅', '⚔️', '🌀', '🛡️', '🔥', '🦊', '🐺', '🐉', '⭐'];
 
   const filtered = participants.filter((p) => {
-    const matchesSearch =
+    return (
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.gamertag.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTeam =
-      filterTeamId === 'all'
-        ? true
-        : filterTeamId === 'unassigned'
-        ? !p.teamId
-        : p.teamId === filterTeamId;
-    return matchesSearch && matchesTeam;
+      p.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   });
+
+  const handleAddSubmit = (e) => {
+    e.preventDefault();
+    soundFx.play('coin');
+
+    const newP = {
+      id: `p-${Date.now()}`,
+      eventId: activeEventId || 'evt-1',
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      avatar: formData.avatar,
+      registeredAt: new Date().toISOString(),
+    };
+
+    if (onAddParticipant) onAddParticipant(newP);
+    setFormData({ name: '', email: '', avatar: '👾' });
+    setModalOpen(false);
+  };
 
   return (
     <div className="py-6 space-y-6 max-w-7xl mx-auto select-none">
@@ -35,123 +51,170 @@ export default function ParticipantRosterManager({
           <div className="flex items-center gap-2 mb-1">
             <Users className="w-5 h-5 text-pop-purple" />
             <h1 className="font-bungee text-2xl sm:text-3xl text-pop-ink">
-              PARTICIPANT ROSTER
+              PARTICIPANTS
             </h1>
           </div>
           <p className="text-pop-muted font-sans text-xs sm:text-sm font-medium">
-            Manage incoming player registrations, assign free agents to squads, and audit passes.
+            Manage individual registered participants competing in events.
           </p>
         </div>
 
-        <div className="font-mono text-xs font-black bg-pop-yellow text-pop-ink px-4 py-2 rounded-xl border-2 border-pop-ink shadow-pop-sm">
-          {participants.length} REGISTERED PILOTS
+        <div className="flex items-center gap-3">
+          <div className="font-mono text-xs font-black bg-pop-yellow text-pop-ink px-4 py-2 rounded-xl border-2 border-pop-ink shadow-pop-sm">
+            {participants.length} REGISTERED
+          </div>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="btn-pop-coral flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            <span>ADD PARTICIPANT</span>
+          </button>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border-3 border-pop-ink shadow-pop flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative w-full sm:w-64">
+      {/* Search Bar */}
+      <div className="bg-white p-4 rounded-2xl border-3 border-pop-ink shadow-pop flex items-center justify-between gap-4">
+        <div className="relative w-full max-w-md">
           <Search className="w-4 h-4 text-pop-muted absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search gamertag, name, email..."
+            placeholder="Search participant name or email..."
             className="w-full pl-9 pr-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono font-bold text-pop-ink focus:outline-none"
           />
         </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="w-4 h-4 text-pop-muted" />
-          <select
-            value={filterTeamId}
-            onChange={(e) => setFilterTeamId(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono font-bold text-pop-ink focus:outline-none"
-          >
-            <option value="all">All Squads & Free Agents</option>
-            <option value="unassigned">Unassigned (Free Agent Pool)</option>
-            {teams.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.name} [{t.tag}]
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
-      {/* Roster Table */}
+      {/* Roster Cards List */}
       <div className="bg-white border-3 border-pop-ink rounded-3xl p-6 shadow-pop">
         <div className="space-y-3">
-          {filtered.map((p) => {
-            const team = teams.find((t) => t.id === p.teamId);
-
-            return (
-              <div
-                key={p.id}
-                className="p-4 rounded-2xl bg-pop-butter border-2 border-pop-ink flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-white border-2 border-pop-ink flex items-center justify-center text-2xl shadow-pop-sm">
-                    {p.avatar || '👾'}
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-display font-black text-base text-pop-ink">
-                        {p.gamertag}
-                      </span>
-                      <span className="text-xs text-pop-muted font-sans font-bold">
-                        ({p.name})
-                      </span>
-                    </div>
-                    <div className="text-xs font-mono text-pop-muted font-medium mt-0.5">
-                      {p.email} • ID: {p.id.slice(0, 8)}
-                    </div>
-                  </div>
+          {filtered.map((p) => (
+            <div
+              key={p.id}
+              className="p-4 rounded-2xl bg-pop-butter border-2 border-pop-ink flex items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white border-2 border-pop-ink flex items-center justify-center text-2xl shadow-pop-sm">
+                  {p.avatar || '👾'}
                 </div>
 
-                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                  {/* Crew assignment select */}
-                  <select
-                    value={p.teamId || 'unassigned'}
-                    onChange={(e) => {
-                      soundFx.play('click');
-                      onAssignTeam(p.id, e.target.value === 'unassigned' ? null : e.target.value);
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-white border-2 border-pop-ink text-xs font-mono font-bold text-pop-ink focus:outline-none shadow-pop-sm"
-                  >
-                    <option value="unassigned">Free Agent (Draft Pool)</option>
-                    {teams.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        Assign to: {t.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  <button
-                    onClick={() => {
-                      soundFx.play('scoreDown');
-                      if (window.confirm(`Remove participant "${p.gamertag}"?`)) {
-                        onRemoveParticipant(p.id);
-                      }
-                    }}
-                    className="p-2 rounded-xl bg-pop-coral-light hover:bg-pop-coral hover:text-white text-pop-coral border-2 border-pop-ink shadow-pop-sm transition-all"
-                    title="Remove Participant"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                <div>
+                  <h3 className="font-display font-black text-base text-pop-ink">
+                    {p.name}
+                  </h3>
+                  <div className="text-xs font-mono text-pop-muted font-medium mt-0.5">
+                    {p.email} • ID: {p.id}
+                  </div>
                 </div>
               </div>
-            );
-          })}
+
+              <button
+                onClick={() => {
+                  soundFx.play('scoreDown');
+                  if (window.confirm(`Remove participant "${p.name}"?`)) {
+                    onRemoveParticipant(p.id);
+                  }
+                }}
+                className="p-2.5 rounded-xl bg-white hover:bg-pop-coral hover:text-white text-pop-coral border-2 border-pop-ink shadow-pop-sm transition-all"
+                title="Remove Participant"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
 
           {filtered.length === 0 && (
             <div className="text-center py-12 text-pop-muted font-mono text-xs font-bold">
-              No participants matching query.
+              No participants found matching "{searchQuery}".
             </div>
           )}
         </div>
       </div>
+
+      {/* ADD PARTICIPANT MODAL */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-pop-ink/70 backdrop-blur-xs">
+          <div className="relative w-full max-w-md bg-white border-4 border-pop-ink rounded-3xl p-6 sm:p-8 shadow-pop-xl">
+            <button
+              onClick={() => setModalOpen(false)}
+              className="absolute top-4 right-4 text-pop-muted hover:text-pop-ink font-mono text-lg font-black"
+            >
+              ✕
+            </button>
+
+            <h2 className="font-bungee text-2xl text-pop-ink mb-1">
+              ADD PARTICIPANT
+            </h2>
+            <p className="text-xs text-pop-muted font-sans mb-4 font-bold">
+              Add a new individual participant directly to the roster.
+            </p>
+
+            <form onSubmit={handleAddSubmit} className="space-y-4 text-xs font-mono">
+              <div>
+                <label className="block text-pop-ink mb-1 font-black text-sm">FULL NAME *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. Jordan Lee"
+                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-pop-ink mb-1 font-black text-sm">EMAIL ADDRESS *</label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="jordan@example.com"
+                  className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none focus:border-pop-coral text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-pop-ink mb-2 font-black text-sm">CHOOSE AVATAR</label>
+                <div className="flex flex-wrap gap-2">
+                  {avatars.map((av) => (
+                    <button
+                      type="button"
+                      key={av}
+                      onClick={() => setFormData({ ...formData, avatar: av })}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl border-2 border-pop-ink transition-transform ${
+                        formData.avatar === av
+                          ? 'bg-pop-yellow scale-110 shadow-pop-sm font-black'
+                          : 'bg-pop-butter hover:bg-white'
+                      }`}
+                    >
+                      {av}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t-2 border-pop-ink">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-pop-butter border-2 border-pop-ink text-pop-ink font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-pop-coral"
+                >
+                  ADD PARTICIPANT
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

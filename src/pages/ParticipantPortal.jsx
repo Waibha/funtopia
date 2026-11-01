@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, UserPlus, Gamepad2, ArrowLeft, Sparkles, Volume2, VolumeX } from 'lucide-react';
+import { Trophy, UserPlus, Gamepad2, ArrowLeft, Sparkles, Volume2, VolumeX, Coins } from 'lucide-react';
 import PublicLeaderboard from './PublicLeaderboard';
 import ParticipantRegistration from '../components/participant/ParticipantRegistration';
 import LiveTicker from '../components/LiveTicker';
@@ -61,7 +61,7 @@ export default function ParticipantPortal({
                       FUNTOPIA
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-pop-green text-[#180A28] font-arcade text-[9px] font-black uppercase border border-pop-ink shadow-pop-sm">
-                      PARTICIPANT ARENA
+                      PARTICIPANT PORTAL
                     </span>
                   </div>
                   <p className="text-[10px] font-mono text-pop-muted tracking-wider font-bold">
@@ -81,7 +81,7 @@ export default function ParticipantPortal({
                   }`}
                 >
                   <Trophy className="w-4 h-4" />
-                  <span>STANDINGS</span>
+                  <span>LEADERBOARD</span>
                 </button>
 
                 <button
@@ -105,7 +105,7 @@ export default function ParticipantPortal({
                   }`}
                 >
                   <Gamepad2 className="w-4 h-4" />
-                  <span>DISCIPLINES</span>
+                  <span>GAMES</span>
                 </button>
               </nav>
 
@@ -141,7 +141,7 @@ export default function ParticipantPortal({
                   activeTab === 'leaderboard' ? 'bg-pop-yellow text-pop-ink border-2 border-pop-ink' : 'text-pop-muted'
                 }`}
               >
-                STANDINGS
+                LEADERBOARD
               </button>
               <button
                 onClick={() => handleTabChange('register')}
@@ -167,7 +167,7 @@ export default function ParticipantPortal({
         <LiveTicker
           activeEvent={activeEvent}
           transactions={data.transactions}
-          teams={data.teams}
+          participants={data.participants}
           games={data.games}
         />
 
@@ -179,7 +179,7 @@ export default function ParticipantPortal({
               activeEvent={activeEvent}
               games={data.games}
               transactions={data.transactions}
-              teams={data.teams}
+              participants={data.participants}
               triggerCelebration={triggerCelebration}
             />
           )}
@@ -187,7 +187,6 @@ export default function ParticipantPortal({
           {activeTab === 'register' && (
             <ParticipantRegistration
               activeEvent={activeEvent}
-              teams={data.teams}
               onRegisterParticipant={onRegisterParticipant}
               registeredList={data.participants || []}
             />
@@ -197,13 +196,13 @@ export default function ParticipantPortal({
             <div className="py-8 space-y-6">
               <div className="bg-pop-purple text-white rounded-3xl border-3 border-pop-ink p-6 sm:p-8 shadow-pop-lg">
                 <span className="px-3 py-1 rounded-full bg-pop-yellow text-pop-ink font-arcade text-[10px] font-black uppercase border-2 border-pop-ink shadow-pop-sm inline-block mb-2">
-                  RULEBOOK & FORMAT
+                  EVENT GAMES
                 </span>
                 <h2 className="font-bungee text-3xl sm:text-4xl text-pop-yellow">
-                  CHAMPIONSHIP DISCIPLINES
+                  CHAMPIONSHIP GAMES
                 </h2>
                 <p className="text-purple-100 font-sans text-sm mt-1 max-w-2xl font-medium">
-                  Review base scores, difficulty multipliers, and competitive rules for all active games in {activeEvent?.name}.
+                  Review costs, point values, and active status for all games in {activeEvent?.name}.
                 </p>
               </div>
 
@@ -214,46 +213,38 @@ export default function ParticipantPortal({
                     className="p-6 rounded-3xl bg-white border-3 border-pop-ink shadow-pop space-y-4"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-2xl bg-pop-butter border-2 border-pop-ink shadow-pop-sm flex items-center justify-center text-3xl">
-                          {g.icon}
-                        </div>
-                        <div>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-pop-ink text-white font-black">
-                            {g.category}
-                          </span>
-                          <h3 className="font-display font-black text-xl text-pop-ink mt-1">
-                            {g.name}
-                          </h3>
-                        </div>
+                      <div>
+                        <h3 className="font-display font-black text-2xl text-pop-ink">
+                          {g.name}
+                        </h3>
+                        {g.description && (
+                          <p className="text-sm font-sans text-pop-muted font-medium mt-1">
+                            {g.description}
+                          </p>
+                        )}
                       </div>
 
-                      <span className="px-3 py-1 rounded-full bg-pop-green text-[#180A28] font-arcade text-[9px] font-black border-2 border-pop-ink">
-                        {g.isActive ? 'ACTIVE' : 'OFFLINE'}
+                      <span className={`px-3 py-1 rounded-full font-arcade text-[9px] font-black border-2 border-pop-ink ${
+                        g.isActive ? 'bg-pop-green text-[#180A28]' : 'bg-pop-butter text-pop-muted'
+                      }`}>
+                        {g.isActive ? 'ACTIVE' : 'INACTIVE'}
                       </span>
                     </div>
 
-                    <p className="text-sm font-sans text-pop-muted font-medium">
-                      {g.description}
-                    </p>
-
-                    <div className="grid grid-cols-3 gap-2 bg-pop-butter p-3 rounded-2xl border-2 border-pop-ink text-center font-mono">
+                    <div className="grid grid-cols-2 gap-3 bg-pop-butter p-4 rounded-2xl border-2 border-pop-ink text-center font-mono">
                       <div>
-                        <span className="text-[9px] text-pop-muted block font-bold">BASE PTS</span>
-                        <span className="text-base font-black text-pop-coral">{g.basePoints}</span>
+                        <span className="text-[10px] text-pop-muted block font-bold">GAME COST / BUDGET</span>
+                        <span className="text-xl font-black text-pop-coral flex items-center justify-center gap-1">
+                          <Coins className="w-4 h-4" />
+                          ${Number(g.cost || 0).toLocaleString()}
+                        </span>
                       </div>
                       <div>
-                        <span className="text-[9px] text-pop-muted block font-bold">MULTIPLIER</span>
-                        <span className="text-base font-black text-pop-ink">{g.multiplier}x</span>
+                        <span className="text-[10px] text-pop-muted block font-bold">POINTS VALUE</span>
+                        <span className="text-xl font-black text-pop-purple">
+                          {Number(g.points || 0).toLocaleString()} PTS
+                        </span>
                       </div>
-                      <div>
-                        <span className="text-[9px] text-pop-muted block font-bold">MAX ROUNDS</span>
-                        <span className="text-base font-black text-pop-purple">{g.maxRounds}</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono font-bold text-pop-ink">
-                      Rule Note: {g.rules}
                     </div>
                   </div>
                 ))}
@@ -271,7 +262,7 @@ export default function ParticipantPortal({
               <span>PARTICIPANT EXPERIENCE</span>
             </div>
             <div className="text-xs font-bold text-pop-ink">
-              LIVE ARENA SYSTEM
+              INDIVIDUAL STANDINGS
             </div>
           </div>
         </footer>

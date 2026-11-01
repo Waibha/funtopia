@@ -1,31 +1,26 @@
 import React, { useState } from 'react';
-import {
-  Coins,
-  RotateCcw,
-  Search,
-} from 'lucide-react';
+import { Coins, RotateCcw, Search, Plus, Minus } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
 export default function ScoringManagement({
   data,
   onAwardScore,
   onRollbackTransaction,
-  quickTeamId = null,
+  quickParticipantId = null,
 }) {
-  const [selectedTeamId, setSelectedTeamId] = useState(
-    quickTeamId || (data.teams[0]?.id || '')
+  const [selectedParticipantId, setSelectedParticipantId] = useState(
+    quickParticipantId || (data.participants[0]?.id || '')
   );
   const [selectedGameId, setSelectedGameId] = useState(
     data.games[0]?.id || ''
   );
   const [pointsDelta, setPointsDelta] = useState(100);
-  const [reason, setReason] = useState('');
-  const [adminName, setAdminName] = useState('Chief Marshal Orion');
+  const [note, setNote] = useState('');
   const [isDeduction, setIsDeduction] = useState(false);
 
   // Search & filter state
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterTeam, setFilterTeam] = useState('all');
+  const [filterParticipant, setFilterParticipant] = useState('all');
 
   const quickPills = [25, 50, 100, 150, 250, 500];
 
@@ -42,34 +37,39 @@ export default function ScoringManagement({
     const tx = {
       id: `tx-${Date.now()}`,
       eventId: data.activeEventId,
-      teamId: selectedTeamId,
+      participantId: selectedParticipantId,
       gameId: selectedGameId,
       pointsDelta: finalDelta,
-      reason: reason.trim() || (isDeduction ? 'Manual penalty deduction' : 'Score award'),
+      note: note.trim() || (isDeduction ? 'Point deduction' : 'Score award'),
       timestamp: new Date().toISOString(),
-      admin: adminName.trim() || 'Admin',
+      admin: 'Admin',
     };
 
     onAwardScore(tx);
-    setReason('');
+    setNote('');
   };
 
   const handleRollback = (txId) => {
     soundFx.play('coin');
-    if (window.confirm('Revert and roll back this scoring transaction?')) {
+    if (window.confirm('Revert and undo this score transaction?')) {
       onRollbackTransaction(txId);
     }
   };
 
   const filteredTransactions = data.transactions
     .filter((tx) => {
-      const team = data.teams.find((t) => t.id === tx.teamId);
+      const participant = data.participants.find((p) => p.id === tx.participantId);
+      const game = data.games.find((g) => g.id === tx.gameId);
+      const noteStr = tx.note || tx.reason || '';
+
       const matchesSearch =
-        tx.reason.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        team?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tx.admin.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesTeam = filterTeam === 'all' || tx.teamId === filterTeam;
-      return matchesSearch && matchesTeam;
+        noteStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        participant?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        game?.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesParticipant = filterParticipant === 'all' || tx.participantId === filterParticipant;
+
+      return matchesSearch && matchesParticipant;
     })
     .slice()
     .reverse();
@@ -81,11 +81,11 @@ export default function ScoringManagement({
         <div className="flex items-center gap-2 mb-1">
           <Coins className="w-5 h-5 text-pop-coral" />
           <h1 className="font-bungee text-2xl sm:text-3xl text-pop-ink">
-            SCORING TERMINAL
+            INDIVIDUAL SCORING
           </h1>
         </div>
         <p className="text-pop-muted font-sans text-xs sm:text-sm font-medium">
-          Dispatch point rewards, issue rule deductions, and audit the live verified ledger.
+          Award or deduct points directly to individual participants and reverse mistakes simply.
         </p>
       </div>
 
@@ -94,7 +94,7 @@ export default function ScoringManagement({
         <div className="bg-white border-3 border-pop-ink rounded-3xl p-6 shadow-pop flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-5 border-b-2 border-pop-ink pb-3">
-              <span className="font-arcade text-xs text-pop-ink font-black">DISPATCH PANEL</span>
+              <span className="font-arcade text-xs text-pop-ink font-black">POINT ACTION</span>
               <div className="flex items-center gap-1 bg-pop-butter p-1 rounded-xl border-2 border-pop-ink text-xs font-mono">
                 <button
                   type="button"
@@ -129,22 +129,22 @@ export default function ScoringManagement({
 
             <form onSubmit={handleScoreSubmit} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="block text-pop-ink mb-1 font-black">RECIPIENT CREW</label>
+                <label className="block text-pop-ink mb-1 font-black">PARTICIPANT *</label>
                 <select
-                  value={selectedTeamId}
-                  onChange={(e) => setSelectedTeamId(e.target.value)}
+                  value={selectedParticipantId}
+                  onChange={(e) => setSelectedParticipantId(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-display font-black text-sm focus:outline-none focus:border-pop-coral"
                 >
-                  {data.teams.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.avatar} {t.name} [{t.tag}]
+                  {data.participants.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.avatar} {p.name} ({p.email})
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-pop-ink mb-1 font-black">DISCIPLINE</label>
+                <label className="block text-pop-ink mb-1 font-black">GAME *</label>
                 <select
                   value={selectedGameId}
                   onChange={(e) => setSelectedGameId(e.target.value)}
@@ -152,7 +152,7 @@ export default function ScoringManagement({
                 >
                   {data.games.map((g) => (
                     <option key={g.id} value={g.id}>
-                      {g.icon} {g.name} ({g.basePoints} Base PTS)
+                      {g.name} (${g.cost || 0} cost • {g.points || 0} pts)
                     </option>
                   ))}
                 </select>
@@ -161,7 +161,7 @@ export default function ScoringManagement({
               {/* Point Value & Quick Increment Chips */}
               <div>
                 <label className="block text-pop-ink mb-1 font-black">
-                  POINTS ({isDeduction ? 'PENALTY -' : 'AWARD +'})
+                  POINTS ({isDeduction ? 'DEDUCT -' : 'AWARD +'})
                 </label>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🪙</span>
@@ -197,36 +197,25 @@ export default function ScoringManagement({
               </div>
 
               <div>
-                <label className="block text-pop-ink mb-1 font-black">REASON</label>
+                <label className="block text-pop-ink mb-1 font-black">NOTE (OPTIONAL)</label>
                 <input
                   type="text"
-                  required
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="e.g. 1st Place Podium Finish"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="e.g. Round 1 Winner bonus"
                   className="w-full px-3 py-2.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-medium focus:outline-none focus:border-pop-coral"
-                />
-              </div>
-
-              <div>
-                <label className="block text-pop-ink mb-1 font-black">OPERATOR</label>
-                <input
-                  type="text"
-                  value={adminName}
-                  onChange={(e) => setAdminName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-pop-canvas border-2 border-pop-ink text-pop-ink font-bold focus:outline-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className={`w-full py-3 rounded-2xl font-display font-black text-xs sm:text-sm tracking-wider uppercase border-3 border-pop-ink shadow-pop transition-all hover:-translate-y-0.5 active:translate-y-1 ${
+                className={`w-full py-3.5 rounded-2xl font-display font-black text-sm tracking-wider uppercase border-3 border-pop-ink shadow-pop transition-all hover:-translate-y-0.5 active:translate-y-1 ${
                   isDeduction
                     ? 'bg-pop-coral text-white hover:bg-red-600'
                     : 'bg-pop-yellow text-pop-ink hover:bg-yellow-300'
                 }`}
               >
-                {isDeduction ? `DEDUCT -${pointsDelta} PTS` : `DISPATCH +${pointsDelta} PTS`}
+                {isDeduction ? `DEDUCT -${pointsDelta} PTS` : `AWARD +${pointsDelta} PTS`}
               </button>
             </form>
           </div>
@@ -237,13 +226,13 @@ export default function ScoringManagement({
           <div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 border-b-2 border-pop-ink pb-3">
               <div>
-                <span className="font-arcade text-xs text-pop-ink font-black">VERIFIED AUDIT LEDGER</span>
+                <span className="font-arcade text-xs text-pop-ink font-black">TRANSACTION LOG</span>
                 <p className="text-xs font-mono text-pop-muted mt-0.5 font-bold">
                   Showing {filteredTransactions.length} of {data.transactions.length} entries
                 </p>
               </div>
 
-              {/* Search & Team Filter */}
+              {/* Search & Participant Filter */}
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <div className="relative flex-1 sm:w-48">
                   <Search className="w-3.5 h-3.5 text-pop-muted absolute left-3 top-1/2 -translate-y-1/2" />
@@ -251,20 +240,20 @@ export default function ScoringManagement({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search ledger..."
+                    placeholder="Search logs..."
                     className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono text-pop-ink font-bold focus:outline-none"
                   />
                 </div>
 
                 <select
-                  value={filterTeam}
-                  onChange={(e) => setFilterTeam(e.target.value)}
+                  value={filterParticipant}
+                  onChange={(e) => setFilterParticipant(e.target.value)}
                   className="px-3 py-1.5 rounded-xl bg-pop-canvas border-2 border-pop-ink text-xs font-mono text-pop-ink font-bold focus:outline-none"
                 >
-                  <option value="all">All Crews</option>
-                  {data.teams.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
+                  <option value="all">All Participants</option>
+                  {data.participants.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
                     </option>
                   ))}
                 </select>
@@ -274,9 +263,10 @@ export default function ScoringManagement({
             {/* Transaction Rows */}
             <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
               {filteredTransactions.map((tx) => {
-                const team = data.teams.find((t) => t.id === tx.teamId);
+                const participant = data.participants.find((p) => p.id === tx.participantId);
                 const game = data.games.find((g) => g.id === tx.gameId);
                 const isPositive = Number(tx.pointsDelta) >= 0;
+                const noteText = tx.note || tx.reason || 'Score update';
 
                 return (
                   <div
@@ -284,28 +274,23 @@ export default function ScoringManagement({
                     className="p-3.5 rounded-2xl bg-pop-butter border-2 border-pop-ink flex items-center justify-between gap-3 text-xs font-mono"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border-2 border-pop-ink shadow-pop-sm"
-                        style={{ backgroundColor: team?.color || '#FF2A6D' }}
-                      >
-                        {team?.avatar}
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-xl shrink-0 border-2 border-pop-ink shadow-pop-sm">
+                        {participant?.avatar || '👾'}
                       </div>
 
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-black text-pop-ink font-display text-sm">
-                            {team?.name || 'Unknown'}
+                            {participant?.name || 'Unknown'}
                           </span>
                           <span className="text-[11px] text-pop-muted font-bold">
-                            in {game?.name || 'Discipline'}
+                            in {game?.name || 'Game'}
                           </span>
                         </div>
                         <p className="text-pop-ink text-xs italic mt-0.5 font-medium">
-                          "{tx.reason}"
+                          "{noteText}"
                         </p>
                         <div className="text-[10px] text-pop-muted flex items-center gap-2 mt-0.5 font-bold">
-                          <span>By: {tx.admin}</span>
-                          <span>•</span>
                           <span>{new Date(tx.timestamp).toLocaleTimeString()}</span>
                         </div>
                       </div>
@@ -324,10 +309,11 @@ export default function ScoringManagement({
 
                       <button
                         onClick={() => handleRollback(tx.id)}
-                        title="Revert Transaction"
-                        className="p-2 rounded-xl bg-white hover:bg-pop-coral hover:text-white text-pop-ink border-2 border-pop-ink shadow-pop-sm transition-all"
+                        title="Revert Score Transaction"
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white hover:bg-pop-coral hover:text-white text-pop-ink border-2 border-pop-ink shadow-pop-sm text-xs font-mono font-bold transition-all"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Undo</span>
                       </button>
                     </div>
                   </div>
@@ -336,7 +322,7 @@ export default function ScoringManagement({
 
               {filteredTransactions.length === 0 && (
                 <div className="text-center py-12 text-pop-muted font-mono text-xs font-bold">
-                  No matching transactions found.
+                  No matching score transactions found.
                 </div>
               )}
             </div>

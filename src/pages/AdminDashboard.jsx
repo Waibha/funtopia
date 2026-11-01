@@ -13,43 +13,43 @@ import { soundFx } from '../utilities/soundFx';
 
 export default function AdminDashboard({
   data,
-  leaderboard,
+  leaderboard = [],
   setCurrentView,
   onOpenQuickScore,
   triggerCelebration,
 }) {
   const activeEvent = data.events.find((e) => e.id === data.activeEventId) || data.events[0];
-  const totalPoints = data.transactions.reduce((sum, tx) => sum + Number(tx.pointsDelta), 0);
+  const totalPoints = (data.transactions || []).reduce((sum, tx) => sum + Number(tx.pointsDelta || 0), 0);
 
   const stats = [
     {
-      label: 'ACTIVE TOURNAMENT',
+      label: 'ACTIVE EVENT',
       value: activeEvent ? activeEvent.name : 'None Selected',
-      subtext: `${activeEvent?.code || 'CRC'} • ${activeEvent?.status?.toUpperCase() || 'ACTIVE'}`,
+      subtext: `${activeEvent?.description || 'Active Tournament'}`,
       icon: Calendar,
       colorBar: 'bg-pop-coral',
       action: () => setCurrentView('events'),
     },
     {
-      label: 'REGISTERED CREWS',
-      value: `${data.teams.length} TEAMS`,
-      subtext: `${data.teams.reduce((acc, t) => acc + (t.membersCount || 4), 0)} Players Competing`,
+      label: 'REGISTERED PARTICIPANTS',
+      value: `${(data.participants || []).length} PARTICIPANTS`,
+      subtext: 'Individual Competitors',
       icon: Users,
       colorBar: 'bg-pop-purple',
-      action: () => setCurrentView('teams'),
+      action: () => setCurrentView('participants'),
     },
     {
-      label: 'DISCIPLINE CATALOG',
-      value: `${data.games.length} GAMES`,
-      subtext: `${data.games.filter((g) => g.isActive).length} In Active Rotation`,
+      label: 'GAMES IN ROTATION',
+      value: `${(data.games || []).length} GAMES`,
+      subtext: `${(data.games || []).filter((g) => g.isActive).length} Active Games`,
       icon: Gamepad2,
       colorBar: 'bg-pop-orange',
       action: () => setCurrentView('games'),
     },
     {
-      label: 'DISPATCHED POINTS',
+      label: 'TOTAL SCORES AWARDED',
       value: `${totalPoints.toLocaleString()} PTS`,
-      subtext: `${data.transactions.length} Verified Entries`,
+      subtext: `${(data.transactions || []).length} Total Transactions`,
       icon: Coins,
       colorBar: 'bg-pop-green',
       action: () => setCurrentView('scoring'),
@@ -58,22 +58,20 @@ export default function AdminDashboard({
 
   return (
     <div className="py-8 space-y-8 max-w-7xl mx-auto">
-      {/* ========================================================= */}
-      {/* RETRO POP MASTER CONTROL HERO                             */}
-      {/* ========================================================= */}
+      {/* Master Control Hero */}
       <div className="bg-pop-yellow rounded-3xl border-3 border-pop-ink p-6 sm:p-8 shadow-pop-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2.5 h-2.5 rounded-full bg-pop-coral animate-ping" />
             <span className="font-arcade text-[10px] text-pop-ink tracking-wider font-black">
-              ARCADE OPERATOR STATION • LIVE
+              ADMIN CONTROL PANEL • LIVE
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bungee tracking-wide text-pop-ink">
-            TOURNAMENT MASTER CONTROL
+            EVENT MANAGEMENT CONSOLE
           </h1>
           <p className="text-pop-ink/80 font-sans text-sm sm:text-base mt-1 max-w-xl font-medium">
-            Dispatch points, adjust match rules, register competitive crews, and trigger celebratory confetti for live event champions.
+            Award and deduct individual points, manage event games with costs, and monitor real-time rankings.
           </p>
         </div>
 
@@ -87,18 +85,18 @@ export default function AdminDashboard({
             className="btn-pop-coral flex items-center gap-2"
           >
             <Coins className="w-4 h-4 fill-white" />
-            <span>DISPATCH POINTS</span>
+            <span>AWARD POINTS</span>
           </button>
 
           <button
             onClick={() => {
               soundFx.play('click');
-              setCurrentView('teams');
+              setCurrentView('participants');
             }}
             className="btn-pop-white flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" />
-            <span>ADD TEAM</span>
+            <span>PARTICIPANTS</span>
           </button>
 
           <button
@@ -114,9 +112,7 @@ export default function AdminDashboard({
         </div>
       </div>
 
-      {/* ========================================================= */}
-      {/* STAT TILES (SOLID ACCENT BARS)                            */}
-      {/* ========================================================= */}
+      {/* Stat Tiles */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((st, i) => {
           const Icon = st.icon;
@@ -151,16 +147,14 @@ export default function AdminDashboard({
         })}
       </div>
 
-      {/* ========================================================= */}
-      {/* RANKINGS SNAPSHOT & RECENT LEDGER                         */}
-      {/* ========================================================= */}
+      {/* Standings Snapshot & Recent Transactions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Standings Snapshot (2 cols) */}
         <div className="lg:col-span-2 bg-white border-3 border-pop-ink rounded-3xl p-6 shadow-pop">
           <div className="flex items-center justify-between mb-5 border-b-2 border-pop-ink pb-3">
             <div className="flex items-center gap-2 font-arcade text-xs text-pop-ink font-black">
               <Trophy className="w-4 h-4 text-pop-orange" />
-              <span>CURRENT STANDINGS</span>
+              <span>INDIVIDUAL STANDINGS</span>
             </div>
             <button
               onClick={() => {
@@ -169,52 +163,52 @@ export default function AdminDashboard({
               }}
               className="text-xs font-mono text-pop-purple hover:underline flex items-center gap-1 font-black"
             >
-              <span>Public Stage View</span>
+              <span>Public View</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
           <div className="space-y-2.5">
-            {leaderboard.map((team) => (
+            {leaderboard.map((participant) => (
               <div
-                key={team.id}
+                key={participant.id}
                 className="flex items-center justify-between p-3.5 rounded-2xl bg-pop-butter border-2 border-pop-ink hover:bg-pop-yellow-light transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <span
                     className={`w-8 h-8 rounded-xl flex items-center justify-center font-arcade text-xs font-black border-2 border-pop-ink shadow-pop-sm ${
-                      team.rank === 1
+                      participant.rank === 1
                         ? 'bg-pop-yellow text-pop-ink'
-                        : team.rank === 2
+                        : participant.rank === 2
                         ? 'bg-pop-purple text-white'
-                        : team.rank === 3
+                        : participant.rank === 3
                         ? 'bg-pop-orange text-white'
                         : 'bg-white text-pop-ink'
                     }`}
                   >
-                    #{team.rank}
+                    #{participant.rank}
                   </span>
                   <div className="flex items-center gap-2.5">
-                    <span className="text-2xl">{team.avatar}</span>
+                    <span className="text-2xl">{participant.avatar}</span>
                     <span className="font-display font-black text-pop-ink text-base">
-                      {team.name}
+                      {participant.name}
                     </span>
-                    <span className="text-xs font-mono px-2 py-0.5 rounded-md bg-white border border-pop-ink font-black">
-                      [{team.tag}]
+                    <span className="text-xs font-mono text-pop-muted">
+                      ({participant.email})
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-base font-black text-pop-ink">
-                    🪙 {team.totalPoints.toLocaleString()} PTS
+                    🪙 {participant.totalPoints.toLocaleString()} PTS
                   </span>
                   <button
                     onClick={() => {
                       soundFx.play('coin');
-                      if (onOpenQuickScore) onOpenQuickScore(team.id);
+                      if (onOpenQuickScore) onOpenQuickScore(participant.id);
                     }}
-                    title="Quick Score"
+                    title="Score Participant"
                     className="px-3 py-1 rounded-xl bg-pop-yellow hover:bg-yellow-300 text-pop-ink border-2 border-pop-ink text-xs font-mono font-black shadow-pop-sm transition-all"
                   >
                     +Score
@@ -222,14 +216,20 @@ export default function AdminDashboard({
                 </div>
               </div>
             ))}
+
+            {leaderboard.length === 0 && (
+              <div className="text-center py-8 text-pop-muted font-mono text-xs font-bold">
+                No participants registered yet.
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Operator Ledger Log */}
+        {/* Transaction Log */}
         <div className="bg-white border-3 border-pop-ink rounded-3xl p-6 shadow-pop flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4 border-b-2 border-pop-ink pb-3">
-              <span className="font-arcade text-xs text-pop-ink font-black">OPERATOR LOG</span>
+              <span className="font-arcade text-xs text-pop-ink font-black">RECENT ACTIVITY</span>
               <button
                 onClick={() => {
                   soundFx.play('switch');
@@ -237,17 +237,19 @@ export default function AdminDashboard({
                 }}
                 className="text-xs font-mono text-pop-coral hover:underline font-black"
               >
-                Full Console
+                Scoring Terminal
               </button>
             </div>
 
             <div className="space-y-2.5">
-              {data.transactions
+              {(data.transactions || [])
                 .slice(-5)
                 .reverse()
                 .map((tx) => {
-                  const team = data.teams.find((t) => t.id === tx.teamId);
+                  const participant = (data.participants || []).find((p) => p.id === tx.participantId);
+                  const game = (data.games || []).find((g) => g.id === tx.gameId);
                   const isPositive = Number(tx.pointsDelta) >= 0;
+                  const noteText = tx.note || tx.reason || 'Points update';
 
                   return (
                     <div
@@ -256,7 +258,7 @@ export default function AdminDashboard({
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-black text-pop-ink truncate max-w-[140px]">
-                          {team?.avatar} {team?.name}
+                          {participant?.avatar} {participant?.name || 'Participant'}
                         </span>
                         <span
                           className={`font-black font-mono px-1.5 py-0.5 rounded border border-pop-ink ${
@@ -269,20 +271,20 @@ export default function AdminDashboard({
                         </span>
                       </div>
                       <p className="text-[11px] text-pop-muted truncate mt-0.5 font-medium">
-                        "{tx.reason}"
+                        in {game?.name || 'Game'}: "{noteText}"
                       </p>
                       <div className="text-[10px] text-pop-muted flex justify-between mt-1 font-bold">
-                        <span>By: {tx.admin}</span>
-                        <span>
-                          {new Date(tx.timestamp).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
+                        <span>{new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </div>
                   );
                 })}
+
+              {(data.transactions || []).length === 0 && (
+                <div className="text-center py-6 text-pop-muted font-mono text-xs font-bold">
+                  No recent activity.
+                </div>
+              )}
             </div>
           </div>
 
@@ -293,7 +295,7 @@ export default function AdminDashboard({
             }}
             className="w-full mt-5 py-3 rounded-2xl bg-pop-purple text-white border-2 border-pop-ink shadow-pop text-xs font-display font-black tracking-wider hover:-translate-y-0.5 transition-all"
           >
-            Open Scoring Console
+            Open Scoring Terminal
           </button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
-export default function LiveTicker({ activeEvent, transactions, teams, games }) {
-  const recent = transactions.slice(-4).reverse();
+export default function LiveTicker({ activeEvent, transactions = [], participants = [], games = [] }) {
+  const recent = transactions.slice(-5).reverse();
 
   return (
     <div className="bg-pop-butter border-b-2 border-pop-ink py-2 overflow-hidden select-none">
@@ -9,25 +9,23 @@ export default function LiveTicker({ activeEvent, transactions, teams, games }) 
         {/* Ticker Tag */}
         <div className="flex items-center gap-1.5 bg-pop-coral text-white font-arcade text-[10px] px-3 py-1 rounded-lg font-black shrink-0 mr-4 border-2 border-pop-ink shadow-pop-sm">
           <span className="w-2 h-2 rounded-full bg-pop-yellow animate-ping" />
-          <span>SCORE FEED</span>
+          <span>LIVE SCORES</span>
         </div>
 
         {/* Marquee Content */}
         <div className="overflow-hidden whitespace-nowrap flex items-center text-xs font-mono font-bold">
           <div className="inline-flex items-center gap-8 animate-marquee">
             {recent.map((tx) => {
-              const team = teams.find((t) => t.id === tx.teamId);
+              const participant = participants.find((p) => p.id === tx.participantId);
               const game = games.find((g) => g.id === tx.gameId);
               const isPositive = Number(tx.pointsDelta) >= 0;
 
               return (
                 <div key={tx.id} className="inline-flex items-center gap-2 text-pop-ink">
-                  <span
-                    className="w-3 h-3 rounded-md shrink-0 border border-pop-ink"
-                    style={{ backgroundColor: team?.color || '#FF2A6D' }}
-                  />
-                  <span className="font-black">[{team?.tag || 'CREW'}]</span>
-                  <span className="text-pop-purple font-display">{team?.name}</span>
+                  <span className="text-base">{participant?.avatar || '👾'}</span>
+                  <span className="font-display font-black text-pop-purple">
+                    {participant?.name || 'Participant'}
+                  </span>
                   <span
                     className={`font-mono text-xs px-2 py-0.5 rounded-md border border-pop-ink ${
                       isPositive
@@ -38,7 +36,7 @@ export default function LiveTicker({ activeEvent, transactions, teams, games }) 
                     {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
                   </span>
                   <span className="text-pop-muted">in</span>
-                  <span className="text-pop-orange font-display">{game?.name || 'Match'}</span>
+                  <span className="text-pop-orange font-display">{game?.name || 'Game'}</span>
                   <span className="text-pop-ink font-black">✦</span>
                 </div>
               );
@@ -47,9 +45,11 @@ export default function LiveTicker({ activeEvent, transactions, teams, games }) 
             {/* Event note */}
             <div className="inline-flex items-center gap-2 text-pop-ink">
               <span className="font-arcade text-xs text-pop-purple uppercase">
-                ARENA: {activeEvent?.name}
+                EVENT: {activeEvent?.name}
               </span>
-              <span className="text-pop-muted">— Grand Prize: {activeEvent?.prizePool}</span>
+              {activeEvent?.description && (
+                <span className="text-pop-muted">— {activeEvent.description}</span>
+              )}
               <span className="text-pop-ink font-black">✦</span>
             </div>
           </div>

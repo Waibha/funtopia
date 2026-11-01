@@ -1,34 +1,32 @@
 /**
- * FUNTOPIA - Leaderboard Calculation & Scoring Engine
- * Computes live standings, podium positions, game matrixes, and rank movements.
+ * FUNTOPIA - Individual Leaderboard Calculation
+ * Computes live rankings, individual total scores, and game breakdowns for participants.
  */
 
-export const calculateLeaderboard = (teams, transactions, activeEventId, games) => {
+export const calculateLeaderboard = (participants = [], transactions = [], activeEventId = null, games = []) => {
   // Filter transactions for the selected event
   const eventTx = transactions.filter(
     (tx) => !activeEventId || tx.eventId === activeEventId
   );
 
-  // Map team points
-  const teamStats = teams.map((team) => {
-    const teamTxs = eventTx.filter((tx) => tx.teamId === team.id);
-    const totalPoints = teamTxs.reduce((sum, tx) => sum + Number(tx.pointsDelta), 0);
+  // Compute points for each individual participant
+  const participantStats = participants.map((participant) => {
+    const userTxs = eventTx.filter((tx) => tx.participantId === participant.id);
+    const totalPoints = userTxs.reduce((sum, tx) => sum + Number(tx.pointsDelta || 0), 0);
 
-    // Calculate game breakdown
+    // Calculate game-wise breakdown
     const gameBreakdown = {};
     games.forEach((g) => {
       gameBreakdown[g.id] = 0;
     });
 
-    teamTxs.forEach((tx) => {
-      if (gameBreakdown[tx.gameId] !== undefined) {
-        gameBreakdown[tx.gameId] += Number(tx.pointsDelta);
-      } else {
-        gameBreakdown[tx.gameId] = Number(tx.pointsDelta);
+    userTxs.forEach((tx) => {
+      if (tx.gameId) {
+        gameBreakdown[tx.gameId] = (gameBreakdown[tx.gameId] || 0) + Number(tx.pointsDelta || 0);
       }
     });
 
-    // Count wins / highest game
+    // Identify highest scoring game for participant
     let bestGameId = null;
     let maxGamePts = -Infinity;
     Object.entries(gameBreakdown).forEach(([gId, pts]) => {
@@ -41,23 +39,23 @@ export const calculateLeaderboard = (teams, transactions, activeEventId, games) 
     const bestGame = games.find((g) => g.id === bestGameId);
 
     return {
-      ...team,
+      ...participant,
       totalPoints,
       gameBreakdown,
-      bestGame: bestGame ? bestGame.name : 'Awaiting Match',
-      transactionCount: teamTxs.length,
-      lastUpdated: teamTxs.length > 0 ? teamTxs[teamTxs.length - 1].timestamp : null,
+      bestGame: bestGame ? bestGame.name : '—',
+      transactionCount: userTxs.length,
+      lastUpdated: userTxs.length > 0 ? userTxs[userTxs.length - 1].timestamp : null,
     };
   });
 
   // Sort descending by totalPoints
-  teamStats.sort((a, b) => b.totalPoints - a.totalPoints);
+  participantStats.sort((a, b) => b.totalPoints - a.totalPoints);
 
-  // Assign ranks & delta from 1st place
-  const leaderPoints = teamStats[0]?.totalPoints || 0;
-  return teamStats.map((team, index) => ({
-    ...team,
+  // Assign ranks & point difference from 1st place
+  const leaderPoints = participantStats[0]?.totalPoints || 0;
+  return participantStats.map((participant, index) => ({
+    ...participant,
     rank: index + 1,
-    diffFromFirst: index === 0 ? 0 : leaderPoints - team.totalPoints,
+    diffFromFirst: index === 0 ? 0 : leaderPoints - participant.totalPoints,
   }));
 };

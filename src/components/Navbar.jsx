@@ -25,7 +25,7 @@ export default function Navbar({
     { id: 'leaderboard', label: 'LEADERBOARD', icon: Trophy, isLive: true },
     { id: 'admin', label: 'OPERATOR', icon: LayoutDashboard },
     { id: 'events', label: 'EVENTS', icon: Calendar },
-    { id: 'teams', label: 'CREWS', icon: Users },
+    { id: 'participants', label: 'PARTICIPANTS', icon: Users },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
     { id: 'scoring', label: 'SCORING', icon: Coins },
   ];

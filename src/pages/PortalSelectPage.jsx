@@ -91,11 +91,11 @@ export default function PortalSelectPage() {
               <div className="space-y-2 text-xs font-mono font-bold text-pop-ink mb-8 bg-pop-butter p-4 rounded-2xl border-2 border-pop-ink">
                 <div className="flex items-center gap-2">
                   <span>✓</span>
-                  <span>Player & Crew Registration</span>
+                  <span>Individual Participant Registration</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span>✓</span>
-                  <span>Live Championship Leaderboard & Podium</span>
+                  <span>Individual Leaderboard & Podium</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span>✓</span>
@@ -146,7 +146,7 @@ export default function PortalSelectPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span>✦</span>
-                  <span>Event, Crew & Game Catalog Management</span>
+                  <span>Event, Participant & Game Management</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span>✦</span>

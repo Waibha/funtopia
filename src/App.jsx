@@ -11,33 +11,7 @@ import { soundFx } from './utilities/soundFx';
 
 export default function App() {
   const [data, setData] = useState(() => {
-    const stored = loadStoredData();
-    // Ensure participants array exists
-    if (!stored.participants) {
-      stored.participants = [
-        {
-          id: 'p-1',
-          eventId: 'evt-cosmic-2026',
-          teamId: 'team-vpr',
-          name: 'Nova Chen',
-          gamertag: 'NOVA_SPEED',
-          email: 'nova@funtopia.arcade',
-          avatar: '🦅',
-          registeredAt: '2026-11-01T20:00:00Z',
-        },
-        {
-          id: 'p-2',
-          eventId: 'evt-cosmic-2026',
-          teamId: 'team-pls',
-          name: 'Zara Matrix',
-          gamertag: 'ZARA_PULSE',
-          email: 'zara@funtopia.arcade',
-          avatar: '⚡',
-          registeredAt: '2026-11-01T20:15:00Z',
-        },
-      ];
-    }
-    return stored;
+    return loadStoredData();
   });
 
   const [soundEnabled, setSoundEnabled] = useState(soundFx.enabled);
@@ -47,10 +21,10 @@ export default function App() {
     saveStoredData(data);
   }, [data]);
 
-  // Dynamic leaderboard computed in real-time
+  // Dynamic individual leaderboard computed in real-time
   const leaderboard = useMemo(() => {
-    return calculateLeaderboard(data.teams, data.transactions, data.activeEventId, data.games);
-  }, [data.teams, data.transactions, data.activeEventId, data.games]);
+    return calculateLeaderboard(data.participants || [], data.transactions || [], data.activeEventId, data.games || []);
+  }, [data.participants, data.transactions, data.activeEventId, data.games]);
 
   // Confetti Blast Celebration
   const triggerCelebration = () => {
@@ -81,24 +55,7 @@ export default function App() {
     setData((prev) => ({ ...prev, activeEventId: eventId }));
   };
 
-  const handleSaveTeam = (updatedTeam) => {
-    setData((prev) => {
-      const exists = prev.teams.some((t) => t.id === updatedTeam.id);
-      const newTeams = exists
-        ? prev.teams.map((t) => (t.id === updatedTeam.id ? updatedTeam : t))
-        : [...prev.teams, updatedTeam];
-      return { ...prev, teams: newTeams };
-    });
-  };
-
-  const handleDeleteTeam = (teamId) => {
-    setData((prev) => ({
-      ...prev,
-      teams: prev.teams.filter((t) => t.id !== teamId),
-      transactions: prev.transactions.filter((tx) => tx.teamId !== teamId),
-    }));
-  };
-
+  // Game Handlers
   const handleSaveGame = (updatedGame) => {
     setData((prev) => {
       const exists = prev.games.some((g) => g.id === updatedGame.id);
@@ -125,6 +82,7 @@ export default function App() {
     }));
   };
 
+  // Scoring Handlers (Award / Deduct / Rollback)
   const handleAwardScore = (newTransaction) => {
     setData((prev) => ({
       ...prev,
@@ -139,6 +97,7 @@ export default function App() {
     }));
   };
 
+  // Participant Handlers
   const handleRegisterParticipant = (newParticipant) => {
     setData((prev) => ({
       ...prev,
@@ -146,19 +105,11 @@ export default function App() {
     }));
   };
 
-  const handleAssignParticipantTeam = (participantId, teamId) => {
-    setData((prev) => ({
-      ...prev,
-      participants: (prev.participants || []).map((p) =>
-        p.id === participantId ? { ...p, teamId } : p
-      ),
-    }));
-  };
-
   const handleRemoveParticipant = (participantId) => {
     setData((prev) => ({
       ...prev,
       participants: (prev.participants || []).filter((p) => p.id !== participantId),
+      transactions: (prev.transactions || []).filter((tx) => tx.participantId !== participantId),
     }));
   };
 
@@ -204,14 +155,12 @@ export default function App() {
               leaderboard={leaderboard}
               onSaveEvent={handleSaveEvent}
               setActiveEventId={handleSetActiveEvent}
-              onSaveTeam={handleSaveTeam}
-              onDeleteTeam={handleDeleteTeam}
               onSaveGame={handleSaveGame}
               onDeleteGame={handleDeleteGame}
               onToggleGameActive={handleToggleGameActive}
               onAwardScore={handleAwardScore}
               onRollbackTransaction={handleRollbackTransaction}
-              onAssignParticipantTeam={handleAssignParticipantTeam}
+              onAddParticipant={handleRegisterParticipant}
               onRemoveParticipant={handleRemoveParticipant}
               triggerCelebration={triggerCelebration}
             />
