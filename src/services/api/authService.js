@@ -3,11 +3,16 @@
  *
  * Implements:
  * 1. Cryptographically hashed administrator passkey verification.
- * 2. Real Gmail/email participant registration with Supabase Auth,
- *    actual email confirmation, duplicate prevention, and verified session management.
+ * 2. USN & Secure PIN Participant Authentication:
+ *    - Full Name, University Seat Number (USN), and secure PIN.
+ *    - No dependency on Gmail, email verification, OTPs, or SMTP.
+ *    - Cryptographic SHA-256 PIN hashing with salt.
+ *    - Unique USN identification with duplicate prevention.
+ *    - Session persistence and revocation.
  */
 
-import { supabase, supabaseConfig } from '../supabaseClient.js';
+import { supabase } from '../supabaseClient.js';
+import { dbService } from './dbService.js';
 
 // Cryptographic SHA-256 hashes of authorized administrative passkeys
 const AUTHORIZED_PASSKEY_HASHES = [
@@ -19,18 +24,39 @@ const ADMIN_SESSION_KEY = 'funtopia_admin_session';
 const PARTICIPANT_SESSION_KEY = 'funtopia_participant_session';
 
 /**
- * Computes SHA-256 hex digest using Web Crypto API or Node crypto.
+ * Computes SHA-256 hex digest using Web Crypto API.
  */
 export async function hashString(value) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(value.trim());
-  if (typeof crypto !== 'undefined' && crypto.subtle) {
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const cleanVal = String(value || '').trim();
+  const c = typeof globalThis !== 'undefined' ? globalThis.crypto : (typeof crypto !== 'undefined' ? crypto : null);
+  if (c && c.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(cleanVal);
+    const hashBuffer = await c.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
-  // Fallback for non-subtle crypto environments
-  return 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+  // Deterministic hash fallback for minimal environments without subtle crypto
+  let h1 = 0xdeadbeef, h2 = 0x41c64e6d;
+  for (let i = 0; i < cleanVal.length; i++) {
+    const ch = cleanVal.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(64, '0');
+}
+
+/**
+ * Salts and hashes a participant's PIN with their USN.
+ * Plain-text PINs are NEVER stored.
+ */
+export async function hashPin(pin, usn) {
+  const cleanPin = String(pin || '').trim();
+  const cleanUsn = String(usn || '').trim().toUpperCase();
+  const pepper = 'funtopia_pin_salt_v1';
+  return hashString(`${cleanUsn}:${cleanPin}:${pepper}`);
 }
 
 /* ========================================================================= */
@@ -39,11 +65,6 @@ export async function hashString(value) {
 
 /**
  * Authenticates an administrator using their passkey.
- *
- * @param {Object} credentials
- * @param {string} credentials.passkey - Operator administrative passkey
- * @param {string} [credentials.operatorEmail] - Operator ID or email for audit trails
- * @returns {Promise<{ success: boolean, session?: Object, error?: string }>}
  */
 export async function verifyAdminPasskey({ passkey, operatorEmail = 'admin@funtopia.arcade' }) {
   if (!passkey || typeof passkey !== 'string') {
@@ -98,37 +119,6 @@ export async function verifyAdminPasskey({ passkey, operatorEmail = 'admin@funto
   }
 }
 
-/**
- * Validates active admin session integrity and expiration.
- */
-export async function validateAdminSession(session) {
-  if (!session || typeof session !== 'object') return false;
-  if (session.role !== 'admin') return false;
-  if (!session.expiresAt || typeof session.expiresAt !== 'number') return false;
-  const operatorId = session.operator || session.email;
-  if (!session.signature || !operatorId) return false;
-
-  // Check expiration
-  if (Date.now() > session.expiresAt) {
-    revokeAdminSession();
-    return false;
-  }
-
-  // Validate cryptographic signature against authorized hashes
-  try {
-    for (const hash of AUTHORIZED_PASSKEY_HASHES) {
-      const expectedSig = await hashString(`${hash}:${operatorId}:${session.expiresAt}`);
-      if (expectedSig === session.signature) {
-        return true;
-      }
-    }
-  } catch (e) {
-    return false;
-  }
-
-  return false;
-}
-
 export function saveAdminSession(session) {
   try {
     const serialized = JSON.stringify(session);
@@ -158,6 +148,23 @@ export function getAdminSession() {
   }
 }
 
+export async function validateAdminSession(session) {
+  if (!session || !session.signature || !session.expiresAt || !session.operator) {
+    return false;
+  }
+  if (Date.now() > session.expiresAt) {
+    revokeAdminSession();
+    return false;
+  }
+  for (const hash of AUTHORIZED_PASSKEY_HASHES) {
+    const expectedSig = await hashString(`${hash}:${session.operator}:${session.expiresAt}`);
+    if (expectedSig === session.signature) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function revokeAdminSession() {
   try {
     if (typeof sessionStorage !== 'undefined') {
@@ -172,337 +179,148 @@ export function revokeAdminSession() {
 }
 
 /* ========================================================================= */
-/* 2. REAL GMAIL / EMAIL PARTICIPANT AUTHENTICATION (SUPABASE AUTH)          */
+/* 2. PARTICIPANT REGISTRATION & LOGIN VIA USN & SECURE PIN                 */
 /* ========================================================================= */
 
 /**
- * Initiates registration with real Supabase Auth email confirmation.
- * Dispatches an actual verification email to the user's Gmail/inbox.
- * Never displays or exposes an OTP on screen.
+ * Registers a new participant using Full Name, USN, and Secure PIN.
+ * No email address, OTP, or verification code required.
  */
-export async function initiateParticipantRegistration({
+export async function registerParticipantWithUSN({
   name,
-  email,
-  password,
+  usn,
+  pin,
   avatar = '👾',
-  startingCoins = 0,
+  startingCoins = 5,
   existingParticipants = [],
 }) {
-  if (!name || name.trim().length < 2) {
+  const cleanName = (name || '').trim();
+  if (cleanName.length < 2) {
     return { success: false, error: 'Full name is required (minimum 2 characters).' };
   }
 
-  const cleanEmail = (email || '').trim().toLowerCase();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!cleanEmail || !emailRegex.test(cleanEmail)) {
-    return { success: false, error: 'Please enter a valid email address (e.g. name@gmail.com).' };
+  const cleanUsn = (usn || '').trim().toUpperCase();
+  if (!cleanUsn || cleanUsn.length < 3) {
+    return { success: false, error: 'Valid USN (University Seat Number) is required (minimum 3 characters).' };
   }
 
-  if (!password || password.length < 6) {
-    return { success: false, error: 'Password must be at least 6 characters long.' };
+  const cleanPin = String(pin || '').trim();
+  if (!cleanPin || cleanPin.length < 4) {
+    return { success: false, error: 'Secure PIN must be at least 4 digits or characters.' };
   }
 
-  // Pre-check for duplicate registered participants
-  const isDuplicate = existingParticipants.some(
-    (p) => (p.email || '').trim().toLowerCase() === cleanEmail
+  // Duplicate USN Check (case-insensitive)
+  const isDuplicate = (existingParticipants || []).some(
+    (p) => (p.usn || '').trim().toUpperCase() === cleanUsn
   );
   if (isDuplicate) {
     return {
       success: false,
-      error: 'An account with this email address already exists. Please sign in instead.',
+      error: `A participant with USN "${cleanUsn}" is already registered. Please Sign In using your PIN.`,
     };
   }
 
-  // If Supabase is configured, use real Supabase Auth email confirmation
-  if (supabase) {
-    try {
-      const redirectUrl = (typeof window !== 'undefined' && window.location?.origin)
-        ? `${window.location.origin}/auth/callback`
-        : 'http://localhost:5173/auth/callback';
+  try {
+    const pinHash = await hashPin(cleanPin, cleanUsn);
+    const allocatedCoins = Number(startingCoins ?? 5);
 
-      const { data, error } = await supabase.auth.signUp({
-        email: cleanEmail,
-        password,
-        options: {
-          data: {
-            name: name.trim(),
-            avatar: avatar || '👾',
-            startingCoins: Number(startingCoins ?? 0),
-          },
-          emailRedirectTo: redirectUrl,
-        },
-      });
+    const participant = {
+      id: `p-${cleanUsn.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Date.now().toString(36)}`,
+      name: cleanName,
+      usn: cleanUsn,
+      pinHash,
+      avatar: avatar || '👾',
+      coins: allocatedCoins,
+      registeredAt: new Date().toISOString(),
+    };
 
-      if (error) {
-        return {
-          success: false,
-          error: error.message || 'Failed to dispatch verification email via Supabase Auth.',
-        };
-      }
+    const session = {
+      role: 'participant',
+      participantId: participant.id,
+      name: participant.name,
+      usn: participant.usn,
+      avatar: participant.avatar,
+      issuedAt: Date.now(),
+    };
 
-      // Supabase returns an empty identities array if user already exists with email confirmations on
-      if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        return {
-          success: false,
-          error: 'An account with this email address already exists. Please sign in instead.',
-        };
-      }
+    saveParticipantSession(session);
 
-      return {
-        success: true,
-        cleanEmail,
-        requiresVerification: true,
-        message: `An actual verification email has been dispatched to ${cleanEmail}. Please check your inbox and spam folder.`,
-      };
-    } catch (err) {
-      return {
-        success: false,
-        error: `Supabase Auth error: ${err.message}`,
-      };
-    }
+    // Sync to Supabase in background
+    dbService.saveParticipant(participant).catch((err) => {
+      console.warn('[authService] Supabase participant save error:', err);
+    });
+
+    return {
+      success: true,
+      participant,
+      session,
+      message: `Registration successful! Welcome to FUNTOPIA, ${cleanName}!`,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: `Registration error: ${err.message}`,
+    };
   }
-
-  // If Supabase is NOT configured, report honest configuration error
-  return {
-    success: false,
-    missingConfig: true,
-    cleanEmail,
-    error: 'Live email verification requires Supabase configuration. VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be provided in .env connected to an active SMTP provider.',
-    details: 'To send genuine verification emails to Gmail, connect your Supabase project in .env and enable Email Confirmations in Supabase Auth.',
-  };
 }
 
 /**
- * Confirms email verification via Supabase Auth OTP verification.
- * Only marks account as verified after real verification succeeds.
+ * Signs in an existing participant using USN and secure PIN.
  */
-export async function completeParticipantVerification({ email, code, startingCoins = 0 }) {
-  const cleanEmail = (email || '').trim().toLowerCase();
-  const cleanCode = (code || '').trim();
-
-  if (!cleanCode || cleanCode.length < 6) {
-    return { success: false, error: 'Please enter the 6-digit verification code from your email.' };
+export async function loginParticipantWithUSN({ usn, pin, participants = [] }) {
+  const cleanUsn = (usn || '').trim().toUpperCase();
+  if (!cleanUsn) {
+    return { success: false, error: 'University Seat Number (USN) is required.' };
   }
 
-  if (supabase) {
-    try {
-      // Attempt verification with signup token type
-      let res = await supabase.auth.verifyOtp({
-        email: cleanEmail,
-        token: cleanCode,
-        type: 'signup',
-      });
-
-      if (res.error) {
-        // Fallback check with email token type
-        res = await supabase.auth.verifyOtp({
-          email: cleanEmail,
-          token: cleanCode,
-          type: 'email',
-        });
-      }
-
-      if (res.error) {
-        return {
-          success: false,
-          error: res.error.message || 'Invalid or expired verification code. Please check your inbox or request a new code.',
-        };
-      }
-
-      const user = res.data?.user;
-      if (!user) {
-        return { success: false, error: 'Verification failed. No user record returned by Supabase.' };
-      }
-
-      const allocatedCoins = typeof user.user_metadata?.startingCoins === 'number'
-        ? user.user_metadata.startingCoins
-        : Number(startingCoins ?? 0);
-
-      const verifiedParticipant = {
-        id: user.id,
-        name: user.user_metadata?.name || 'Verified Player',
-        email: user.email,
-        avatar: user.user_metadata?.avatar || '👾',
-        isEmailVerified: true,
-        coins: allocatedCoins,
-        registeredAt: new Date().toISOString(),
-      };
-
-      const session = {
-        role: 'participant',
-        participantId: verifiedParticipant.id,
-        name: verifiedParticipant.name,
-        email: verifiedParticipant.email,
-        avatar: verifiedParticipant.avatar,
-        issuedAt: Date.now(),
-      };
-
-      saveParticipantSession(session);
-
-      return {
-        success: true,
-        participant: verifiedParticipant,
-        session,
-      };
-    } catch (err) {
-      return {
-        success: false,
-        error: `Supabase verification error: ${err.message}`,
-      };
-    }
+  const cleanPin = String(pin || '').trim();
+  if (!cleanPin) {
+    return { success: false, error: 'PIN is required to sign in.' };
   }
 
-  return {
-    success: false,
-    error: 'Live verification requires Supabase credentials. VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be configured in .env.',
-  };
-}
-
-/**
- * Resends a genuine verification email via Supabase Auth.
- */
-export async function resendParticipantVerification({ email }) {
-  const cleanEmail = (email || '').trim().toLowerCase();
-  if (!cleanEmail) {
-    return { success: false, error: 'Email address is required to resend verification.' };
-  }
-
-  if (supabase) {
-    try {
-      const redirectUrl = (typeof window !== 'undefined' && window.location?.origin)
-        ? `${window.location.origin}/auth/callback`
-        : 'http://localhost:5173/auth/callback';
-
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: cleanEmail,
-        options: {
-          emailRedirectTo: redirectUrl,
-        },
-      });
-
-      if (error) {
-        return { success: false, error: error.message || 'Failed to resend verification email.' };
-      }
-
-      return {
-        success: true,
-        message: `A new verification email has been dispatched to ${cleanEmail}. Please check your inbox.`,
-      };
-    } catch (err) {
-      return { success: false, error: `Resend error: ${err.message}` };
-    }
-  }
-
-  return {
-    success: false,
-    error: 'Cannot resend verification: Supabase is not configured in .env.',
-  };
-}
-
-/**
- * Signs in an existing verified participant with email and password.
- * Unverified accounts are strictly blocked with an email confirmation requirement error.
- */
-export async function loginParticipant({ email, password, registeredParticipants = [] }) {
-  const cleanEmail = (email || '').trim().toLowerCase();
-  if (!cleanEmail || !password) {
-    return { success: false, error: 'Email and password are required.' };
-  }
-
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password,
-      });
-
-      if (error) {
-        if (error.message.toLowerCase().includes('email not confirmed')) {
-          return {
-            success: false,
-            unconfirmed: true,
-            email: cleanEmail,
-            error: 'Your email address has not been verified yet. Please check your inbox and verify your email before logging in.',
-          };
-        }
-        return {
-          success: false,
-          error: error.message || 'Invalid email or password.',
-        };
-      }
-
-      const user = data.user;
-      const existing = registeredParticipants.find(
-        (p) => (p.email || '').trim().toLowerCase() === cleanEmail
-      );
-
-      const participant = existing || {
-        id: user.id,
-        name: user.user_metadata?.name || 'Verified Player',
-        email: user.email,
-        avatar: user.user_metadata?.avatar || '👾',
-        coins: typeof user.user_metadata?.startingCoins === 'number' ? user.user_metadata.startingCoins : 0,
-        isEmailVerified: true,
-      };
-
-      const session = {
-        role: 'participant',
-        participantId: participant.id,
-        name: participant.name,
-        email: participant.email,
-        avatar: participant.avatar,
-        issuedAt: Date.now(),
-      };
-
-      saveParticipantSession(session);
-
-      return {
-        success: true,
-        participant,
-        session,
-      };
-    } catch (err) {
-      return {
-        success: false,
-        error: `Supabase login error: ${err.message}`,
-      };
-    }
-  }
-
-  // Offline / Local database check
-  const participant = registeredParticipants.find(
-    (p) => (p.email || '').trim().toLowerCase() === cleanEmail
+  const participant = (participants || []).find(
+    (p) => (p.usn || '').trim().toUpperCase() === cleanUsn
   );
 
   if (!participant) {
-    return { success: false, error: 'No account registered with this email address. Please register.' };
+    return {
+      success: false,
+      error: `No participant found with USN "${cleanUsn}". Please check your USN or Sign Up.`,
+    };
   }
 
-  if (!participant.isEmailVerified) {
-    return { success: false, error: 'Email has not been verified. Please verify your email first.' };
+  try {
+    const inputHash = await hashPin(cleanPin, cleanUsn);
+    if (participant.pinHash !== inputHash) {
+      return {
+        success: false,
+        error: 'ACCESS DENIED: Incorrect PIN. Please try again.',
+      };
+    }
+
+    const session = {
+      role: 'participant',
+      participantId: participant.id,
+      name: participant.name,
+      usn: participant.usn,
+      avatar: participant.avatar,
+      issuedAt: Date.now(),
+    };
+
+    saveParticipantSession(session);
+
+    return {
+      success: true,
+      participant,
+      session,
+      message: `Welcome back, ${participant.name}!`,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error: `Sign in error: ${err.message}`,
+    };
   }
-
-  const inputHash = await hashString(password);
-  if (participant.passwordHash && participant.passwordHash !== inputHash) {
-    return { success: false, error: 'Incorrect password for this email account.' };
-  }
-
-  const session = {
-    role: 'participant',
-    participantId: participant.id,
-    name: participant.name,
-    email: participant.email,
-    avatar: participant.avatar,
-    issuedAt: Date.now(),
-  };
-  saveParticipantSession(session);
-
-  return {
-    success: true,
-    participant,
-    session,
-  };
 }
 
 export function saveParticipantSession(session) {
@@ -511,22 +329,18 @@ export function saveParticipantSession(session) {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(PARTICIPANT_SESSION_KEY, serialized);
     }
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem(PARTICIPANT_SESSION_KEY, serialized);
-    }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Failed to store participant session', e);
+  }
 }
 
 export function getParticipantSession() {
   try {
-    let raw = null;
     if (typeof localStorage !== 'undefined') {
-      raw = localStorage.getItem(PARTICIPANT_SESSION_KEY);
+      const raw = localStorage.getItem(PARTICIPANT_SESSION_KEY);
+      return raw ? JSON.parse(raw) : null;
     }
-    if (!raw && typeof sessionStorage !== 'undefined') {
-      raw = sessionStorage.getItem(PARTICIPANT_SESSION_KEY);
-    }
-    return raw ? JSON.parse(raw) : null;
+    return null;
   } catch (e) {
     return null;
   }
@@ -537,11 +351,7 @@ export function revokeParticipantSession() {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(PARTICIPANT_SESSION_KEY);
     }
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem(PARTICIPANT_SESSION_KEY);
-    }
-    if (supabase) {
-      supabase.auth.signOut().catch(() => {});
-    }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Failed to revoke participant session', e);
+  }
 }

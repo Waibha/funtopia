@@ -21,6 +21,8 @@ import PublicLeaderboard from './PublicLeaderboard';
 import ParticipantRegistration from '../components/participant/ParticipantRegistration';
 import LiveTicker from '../components/LiveTicker';
 import AudioSettingsModal from '../components/AudioSettingsModal';
+import ParticipantAuthScreen from '../components/participant/ParticipantAuthScreen';
+import ParticipantArcadeBackground from '../components/backgrounds/ParticipantArcadeBackground';
 import { soundFx } from '../utilities/soundFx';
 import { getParticipantSession, revokeParticipantSession } from '../services/api/authService';
 
@@ -163,9 +165,28 @@ export default function ParticipantPortal({
     }
   };
 
+  // Dedicated Participant Welcome / Authentication Screen (Sign Up & Sign In)
+  if (!session || !session.participantId) {
+    return (
+      <ParticipantAuthScreen
+        startingCoins={data.settings?.startingCoins ?? 5}
+        registeredParticipants={data.participants || []}
+        triggerCelebration={triggerCelebration}
+        onAuthSuccess={(participant, newSession, isNew) => {
+          if (isNew && onRegisterParticipant) {
+            onRegisterParticipant(participant);
+          }
+          setSession(newSession);
+          setActiveTab('leaderboard');
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#451B75] text-white flex flex-col justify-between selection:bg-[#FFDE25] selection:text-[#0D0518] font-sans">
-      {/* Background Graphic Texture */}
+    <div className="relative min-h-screen bg-[#451B75] text-white flex flex-col justify-between selection:bg-[#FFDE25] selection:text-[#0D0518] font-sans">
+      {/* Background Graphic Texture & Animation */}
+      <ParticipantArcadeBackground />
       <div
         className="fixed inset-0 opacity-[0.06] pointer-events-none"
         style={{
@@ -297,7 +318,7 @@ export default function ParticipantPortal({
                           {loggedInParticipant.name}
                         </span>
                         <span className="text-[9px] text-[#28C76F] font-bold flex items-center gap-0.5">
-                          <ShieldCheck className="w-2.5 h-2.5" /> Verified
+                          <ShieldCheck className="w-2.5 h-2.5" /> {loggedInParticipant.usn || 'Verified'}
                         </span>
                       </div>
                       <button
@@ -383,11 +404,11 @@ export default function ParticipantPortal({
                       {loggedInParticipant.name}
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[8px] font-black uppercase border border-[#0D0518]">
-                      VERIFIED GMAIL
+                      VERIFIED PLAYER
                     </span>
                   </div>
                   <span className="text-xs font-mono text-purple-200">
-                    {loggedInParticipant.email}
+                    USN: {loggedInParticipant.usn || loggedInParticipant.email || 'N/A'}
                   </span>
                 </div>
               </div>
@@ -438,11 +459,11 @@ export default function ParticipantPortal({
                         {loggedInParticipant.name}
                       </h2>
                       <span className="px-2.5 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border border-[#0D0518]">
-                        <ShieldCheck className="w-2.5 h-2.5 inline mr-0.5" /> VERIFIED GMAIL
+                        <ShieldCheck className="w-2.5 h-2.5 inline mr-0.5" /> VERIFIED PLAYER
                       </span>
                     </div>
                     <p className="font-mono text-xs text-purple-200 mt-1">
-                      {loggedInParticipant.email}
+                      USN: {loggedInParticipant.usn || loggedInParticipant.email || 'N/A'}
                     </p>
                   </div>
                 </div>

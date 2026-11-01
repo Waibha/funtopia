@@ -36,7 +36,13 @@ export default function ScoringManagement({
   const [isGameDropdownOpen, setIsGameDropdownOpen] = useState(false);
 
   // Score action states
-  const [pointsDelta, setPointsDelta] = useState(10);
+  const [pointsDelta, setPointsDelta] = useState(() => {
+    const initialGame = data.games[0];
+    if (initialGame && initialGame.defaultPoints !== undefined && initialGame.defaultPoints !== null && initialGame.defaultPoints !== '') {
+      return Number(initialGame.defaultPoints);
+    }
+    return '';
+  });
   const [note, setNote] = useState('');
   const [isDeduction, setIsDeduction] = useState(false);
   const [recentSuccessBanner, setRecentSuccessBanner] = useState(null);
@@ -47,6 +53,20 @@ export default function ScoringManagement({
 
   const participantRef = useRef(null);
   const gameRef = useRef(null);
+
+  // Automatically populate pointsDelta with selected game's default points earned
+  useEffect(() => {
+    if (!selectedGameId) {
+      setPointsDelta('');
+      return;
+    }
+    const game = data.games.find((g) => g.id === selectedGameId);
+    if (game && game.defaultPoints !== undefined && game.defaultPoints !== null && game.defaultPoints !== '') {
+      setPointsDelta(Number(game.defaultPoints));
+    } else {
+      setPointsDelta('');
+    }
+  }, [selectedGameId, data.games]);
 
   // Click outside to close dropdowns
   useEffect(() => {
@@ -86,6 +106,7 @@ export default function ScoringManagement({
     return data.participants.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
+        (p.usn && p.usn.toLowerCase().includes(q)) ||
         (p.email && p.email.toLowerCase().includes(q))
     );
   }, [data.participants, participantSearch]);
@@ -309,7 +330,7 @@ export default function ScoringManagement({
                           {selectedParticipant.name}
                         </span>
                         <span className="text-[10px] text-gray-500 truncate block font-bold">
-                          {selectedParticipant.email || 'No email registered'}
+                          USN: {selectedParticipant.usn || selectedParticipant.email || 'N/A'}
                         </span>
                       </div>
                     </div>
@@ -330,7 +351,7 @@ export default function ScoringManagement({
                           autoFocus
                           value={participantSearch}
                           onChange={(e) => setParticipantSearch(e.target.value)}
-                          placeholder="Search participant name or email..."
+                          placeholder="Search participant name or USN..."
                           className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono font-bold text-[#0D0518] focus:outline-none focus:border-[#FF5FA0]"
                         />
                       </div>
@@ -361,7 +382,7 @@ export default function ScoringManagement({
                                   {p.name}
                                 </div>
                                 <div className="text-[10px] text-gray-600 truncate font-semibold">
-                                  {p.email}
+                                  USN: {p.usn || p.email || 'N/A'}
                                 </div>
                               </div>
                             </div>
@@ -440,6 +461,11 @@ export default function ScoringManagement({
                             onClick={() => {
                               soundFx.play('click');
                               setSelectedGameId(g.id);
+                              if (g.defaultPoints !== undefined && g.defaultPoints !== null && g.defaultPoints !== '') {
+                                setPointsDelta(Number(g.defaultPoints));
+                              } else {
+                                setPointsDelta('');
+                              }
                               setIsGameDropdownOpen(false);
                               setGameSearch('');
                             }}
@@ -521,7 +547,8 @@ export default function ScoringManagement({
                       min={1}
                       required
                       value={pointsDelta}
-                      onChange={(e) => setPointsDelta(Number(e.target.value))}
+                      onChange={(e) => setPointsDelta(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder={selectedGame?.defaultPoints !== undefined && selectedGame?.defaultPoints !== null ? `Default: ${selectedGame.defaultPoints}` : 'Enter points'}
                       className={`w-full px-3.5 py-2 rounded-xl bg-white border-3 text-xl font-mono font-black focus:outline-none ${
                         isDeduction
                           ? 'border-[#FF5FA0] text-[#FF5FA0]'

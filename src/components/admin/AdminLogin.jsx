@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Lock, ArrowLeft, AlertTriangle, KeyRound } from 'lucide-react';
 import { soundFx } from '../../utilities/soundFx';
 import { verifyAdminPasskey } from '../../services/api/authService';
+import AuthArcadeBackground from '../backgrounds/AuthArcadeBackground';
 
 export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
   const [operatorEmail, setOperatorEmail] = useState('');
@@ -38,16 +39,9 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between p-4 sm:p-8 select-none font-sans">
-      {/* Background Graphic Grid */}
-      <div
-        className="fixed inset-0 opacity-[0.06] pointer-events-none"
-        style={{
-          backgroundImage: `linear-gradient(#FFDE25 1px, transparent 1px), linear-gradient(90deg, #FFDE25 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
-        }}
-      />
-      <div className="fixed inset-0 bg-radial-at-t from-purple-700/25 via-transparent to-[#1F0738]/90 pointer-events-none" />
+    <div className="relative min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between p-4 sm:p-8 select-none font-sans overflow-hidden">
+      {/* Background Animated Arcade Elements */}
+      <AuthArcadeBackground />
 
       <div className="relative z-10 max-w-md mx-auto w-full flex items-center justify-between">
         <button

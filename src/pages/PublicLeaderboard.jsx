@@ -300,7 +300,7 @@ export default function PublicLeaderboard({
                     {selectedParticipant.name}
                   </h3>
                   <p className="text-xs text-gray-500 font-mono font-bold">
-                    {selectedParticipant.email}
+                    USN: {selectedParticipant.usn || selectedParticipant.email || 'N/A'}
                   </p>
                 </div>
               </div>

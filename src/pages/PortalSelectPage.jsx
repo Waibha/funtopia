@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, ShieldCheck, ArrowRight, ArrowLeft, Users, Lock, Sparkles, Gamepad2, Coins, Calendar, UserPlus } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
+import AuthArcadeBackground from '../components/backgrounds/AuthArcadeBackground';
 
 export default function PortalSelectPage() {
   const navigate = useNavigate();
@@ -18,6 +19,9 @@ export default function PortalSelectPage() {
 
   return (
     <div className="relative min-h-screen bg-[#451B75] text-white flex flex-col justify-between select-none overflow-x-hidden font-sans">
+      {/* Background Animated Arcade Elements */}
+      <AuthArcadeBackground />
+
       {/* Background Graphic Grid & Layering */}
       <div
         className="absolute inset-0 opacity-[0.08] pointer-events-none"

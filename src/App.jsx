@@ -5,8 +5,7 @@ import WelcomeHomepage from './pages/WelcomeHomepage';
 import PortalSelectPage from './pages/PortalSelectPage';
 import ParticipantPortal from './pages/ParticipantPortal';
 import AdminPortal from './pages/AdminPortal';
-import AuthCallback from './pages/AuthCallback';
-import { supabase } from './services/supabaseClient';
+import { dbService } from './services/api/dbService';
 import { loadStoredData, saveStoredData, INITIAL_DATA } from './services/mockData';
 import { calculateLeaderboard } from './utilities/leaderboardEngine';
 import { soundFx } from './utilities/soundFx';
@@ -23,38 +22,22 @@ export default function App() {
     saveStoredData(data);
   }, [data]);
 
-  // Synchronize authenticated Supabase session on auth state changes
+  // Load persistent state from Supabase on application mount
   useEffect(() => {
-    if (!supabase) return;
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-        const user = session?.user;
-        if (user && user.email) {
-          setData((prev) => {
-            const cleanEmail = (user.email || '').toLowerCase();
-            const exists = (prev.participants || []).some(
-              (p) => (p.email || '').toLowerCase() === cleanEmail || p.id === user.id
-            );
-            if (exists) {
-              return {
-                ...prev,
-                participants: prev.participants.map((p) =>
-                  (p.email || '').toLowerCase() === cleanEmail || p.id === user.id
-                    ? { ...p, isEmailVerified: true }
-                    : p
-                ),
-              };
-            }
-            return prev;
-          });
-        }
+    async function initSupabaseData() {
+      const remote = await dbService.loadFromSupabase();
+      if (remote) {
+        setData((prev) => ({
+          ...prev,
+          participants: remote.participants.length > 0 ? remote.participants : prev.participants,
+          games: remote.games.length > 0 ? remote.games : prev.games,
+          transactions: remote.transactions.length > 0 ? remote.transactions : prev.transactions,
+          coinTransactions: remote.coinTransactions.length > 0 ? remote.coinTransactions : prev.coinTransactions,
+          settings: remote.settings || prev.settings,
+        }));
       }
-    });
-
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
+    }
+    initSupabaseData();
   }, []);
 
   // Dynamic individual leaderboard computed in real-time
@@ -78,6 +61,7 @@ export default function App() {
 
   // Game Handlers
   const handleSaveGame = (updatedGame) => {
+    dbService.saveGame(updatedGame);
     setData((prev) => {
       const exists = prev.games.some((g) => g.id === updatedGame.id);
       const newGames = exists
@@ -88,6 +72,7 @@ export default function App() {
   };
 
   const handleDeleteGame = (gameId) => {
+    dbService.deleteGame(gameId);
     setData((prev) => ({
       ...prev,
       games: prev.games.filter((g) => g.id !== gameId),
@@ -96,16 +81,19 @@ export default function App() {
   };
 
   const handleToggleGameActive = (gameId) => {
-    setData((prev) => ({
-      ...prev,
-      games: prev.games.map((g) =>
+    setData((prev) => {
+      const updatedGames = prev.games.map((g) =>
         g.id === gameId ? { ...g, isActive: !g.isActive } : g
-      ),
-    }));
+      );
+      const target = updatedGames.find((g) => g.id === gameId);
+      if (target) dbService.saveGame(target);
+      return { ...prev, games: updatedGames };
+    });
   };
 
   // Scoring Handlers (Award / Deduct / Rollback)
   const handleAwardScore = (newTransaction) => {
+    dbService.saveScoreTransaction(newTransaction);
     setData((prev) => ({
       ...prev,
       transactions: [...prev.transactions, newTransaction],
@@ -113,6 +101,7 @@ export default function App() {
   };
 
   const handleRollbackTransaction = (txId) => {
+    dbService.deleteScoreTransaction(txId);
     setData((prev) => ({
       ...prev,
       transactions: prev.transactions.filter((tx) => tx.id !== txId),
@@ -122,6 +111,7 @@ export default function App() {
   // Starting Coins Setting Handler (Admin controlled, applies to future registrations only)
   const handleUpdateStartingCoins = (amount) => {
     const val = Math.max(0, Number(amount || 0));
+    dbService.saveStartingCoinsSetting(val);
     setData((prev) => ({
       ...prev,
       settings: {
@@ -157,6 +147,9 @@ export default function App() {
         timestamp: new Date().toISOString(),
         admin,
       };
+
+      dbService.saveParticipant({ ...participant, coins: newBalance });
+      dbService.saveCoinTransaction(coinTx);
 
       return {
         ...prev,
@@ -206,6 +199,9 @@ export default function App() {
       admin: 'Participant Action',
     };
 
+    dbService.saveParticipant({ ...participant, coins: newBalance });
+    dbService.saveCoinTransaction(coinTx);
+
     setData((prev) => ({
       ...prev,
       participants: prev.participants.map((p) =>
@@ -225,9 +221,9 @@ export default function App() {
   // Participant Handlers
   const handleRegisterParticipant = (newParticipant) => {
     setData((prev) => {
-      const cleanEmail = (newParticipant.email || '').trim().toLowerCase();
+      const cleanUsn = (newParticipant.usn || '').trim().toUpperCase();
       const existingIdx = (prev.participants || []).findIndex(
-        (p) => p.id === newParticipant.id || ((p.email || '').trim().toLowerCase() === cleanEmail && cleanEmail.length > 0)
+        (p) => p.id === newParticipant.id || ((p.usn || '').trim().toUpperCase() === cleanUsn && cleanUsn.length > 0)
       );
 
       if (existingIdx !== -1) {
@@ -235,8 +231,8 @@ export default function App() {
         updated[existingIdx] = {
           ...updated[existingIdx],
           ...newParticipant,
-          isEmailVerified: true,
         };
+        dbService.saveParticipant(updated[existingIdx]);
         return {
           ...prev,
           participants: updated,
@@ -256,6 +252,9 @@ export default function App() {
         admin: 'System Automation',
       };
 
+      dbService.saveParticipant(newParticipant);
+      dbService.saveCoinTransaction(startingAllocationTx);
+
       return {
         ...prev,
         participants: [...(prev.participants || []), newParticipant],
@@ -265,6 +264,7 @@ export default function App() {
   };
 
   const handleRemoveParticipant = (participantId) => {
+    dbService.deleteParticipant(participantId);
     setData((prev) => ({
       ...prev,
       participants: (prev.participants || []).filter((p) => p.id !== participantId),
@@ -291,16 +291,10 @@ export default function App() {
         {/* Portal Selection Screen */}
         <Route path="/select-portal" element={<PortalSelectPage />} />
 
-        {/* Supabase Email Confirmation & PKCE Exchange Callback */}
+        {/* Legacy callback route redirects to Participant Portal */}
         <Route
           path="/auth/callback"
-          element={
-            <AuthCallback
-              onRegisterParticipant={handleRegisterParticipant}
-              startingCoins={data.settings?.startingCoins ?? 0}
-              triggerCelebration={triggerCelebration}
-            />
-          }
+          element={<Navigate to="/participant" replace />}
         />
 
         {/* Experience 2: Participant Portal */}

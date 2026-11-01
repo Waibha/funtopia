@@ -12,16 +12,18 @@ export default function ParticipantRosterManager({
   const [modalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    usn: '',
     avatar: '👾',
   });
 
   const avatars = ['👾', '🤠', '🧕', '🦊', '🧑‍🎤', '🐻', '🚀', '⚡', '⚔️', '🐉', '🔥', '⭐'];
 
   const filtered = participants.filter((p) => {
+    const q = searchQuery.toLowerCase();
     return (
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.email.toLowerCase().includes(searchQuery.toLowerCase())
+      (p.name && p.name.toLowerCase().includes(q)) ||
+      (p.usn && p.usn.toLowerCase().includes(q)) ||
+      (p.email && p.email.toLowerCase().includes(q))
     );
   });
 
@@ -29,17 +31,19 @@ export default function ParticipantRosterManager({
     e.preventDefault();
     soundFx.play('coin');
 
+    const cleanUsn = formData.usn.trim().toUpperCase();
     const newP = {
-      id: `p-${Date.now()}`,
+      id: `p-${cleanUsn.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Date.now().toString(36)}`,
       eventId: activeEventId || 'evt-1',
       name: formData.name.trim(),
-      email: formData.email.trim(),
+      usn: cleanUsn,
       avatar: formData.avatar,
+      coins: 5,
       registeredAt: new Date().toISOString(),
     };
 
     if (onAddParticipant) onAddParticipant(newP);
-    setFormData({ name: '', email: '', avatar: '👾' });
+    setFormData({ name: '', usn: '', avatar: '👾' });
     setModalOpen(false);
   };
 
@@ -81,7 +85,7 @@ export default function ParticipantRosterManager({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search participant name or email..."
+            placeholder="Search participant name or USN..."
             className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono font-bold text-[#0D0518] focus:outline-none"
           />
         </div>
@@ -105,7 +109,7 @@ export default function ParticipantRosterManager({
                     {p.name}
                   </h3>
                   <div className="text-xs font-mono text-gray-500 font-medium mt-0.5">
-                    {p.email} • ID: {p.id}
+                    USN: {p.usn || p.email || 'N/A'} • ID: {p.id}
                   </div>
                 </div>
               </div>
@@ -173,14 +177,14 @@ export default function ParticipantRosterManager({
               </div>
 
               <div>
-                <label className="block text-[#0D0518] mb-1 font-black text-sm">EMAIL ADDRESS *</label>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm">UNIVERSITY SEAT NUMBER (USN) *</label>
                 <input
-                  type="email"
+                  type="text"
                   required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="jordan@example.com"
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0] text-sm"
+                  value={formData.usn}
+                  onChange={(e) => setFormData({ ...formData, usn: e.target.value.toUpperCase() })}
+                  placeholder="e.g. 1RV21CS001"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-mono font-bold uppercase focus:outline-none focus:border-[#FF5FA0] text-sm"
                 />
               </div>
 

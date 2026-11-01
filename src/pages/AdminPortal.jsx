@@ -19,6 +19,7 @@ import ParticipantRosterManager from '../components/admin/ParticipantRosterManag
 import CoinEconomyManager from '../components/admin/CoinEconomyManager';
 import AdminLogin from '../components/admin/AdminLogin';
 import LiveTicker from '../components/LiveTicker';
+import AdminArcadeBackground from '../components/backgrounds/AdminArcadeBackground';
 import { soundFx } from '../utilities/soundFx';
 import { getAdminSession, validateAdminSession, revokeAdminSession } from '../services/api/authService';
 
@@ -126,7 +127,10 @@ export default function AdminPortal({
   ];
 
   return (
-    <div className="min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between selection:bg-[#FFDE25] selection:text-[#0D0518] font-sans">
+    <div className="relative min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between selection:bg-[#FFDE25] selection:text-[#0D0518] font-sans">
+      {/* Background Animated Arcade Elements */}
+      <AdminArcadeBackground />
+
       <div className="relative z-10 flex flex-col flex-grow">
         {/* Admin Header */}
         <header className="sticky top-0 z-40 bg-[#40186D]/95 backdrop-blur-md border-b-4 border-[#0D0518] select-none">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Gamepad2, Plus, Edit2, Trash2, Power, Coins } from 'lucide-react';
+import { Gamepad2, Plus, Edit2, Trash2, Power, Coins, Trophy } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
 export default function GameManagement({ games = [], onSaveGame, onDeleteGame, onToggleGameActive }) {
@@ -9,6 +9,7 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
   const [formData, setFormData] = useState({
     name: '',
     cost: 50,
+    defaultPoints: 10,
     isActive: true,
   });
 
@@ -18,6 +19,7 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
     setFormData({
       name: '',
       cost: 50,
+      defaultPoints: 10,
       isActive: true,
     });
     setModalOpen(true);
@@ -29,6 +31,7 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
     setFormData({
       name: game.name || '',
       cost: game.cost !== undefined ? game.cost : 50,
+      defaultPoints: game.defaultPoints !== undefined && game.defaultPoints !== null ? game.defaultPoints : 10,
       isActive: game.isActive !== undefined ? game.isActive : true,
     });
     setModalOpen(true);
@@ -49,6 +52,7 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
       id: editingGame ? editingGame.id : `game-${Date.now()}`,
       name: formData.name.trim(),
       cost: Number(formData.cost || 0),
+      defaultPoints: formData.defaultPoints !== '' && formData.defaultPoints !== null ? Number(formData.defaultPoints) : 10,
       isActive: Boolean(formData.isActive),
     };
 
@@ -130,15 +134,27 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
                 </button>
               </div>
 
-              {/* Coin Entry Cost Card */}
-              <div className="bg-[#FAF7EE] p-3.5 rounded-2xl border-3 border-[#0D0518] mb-4 text-center font-mono">
-                <span className="text-[10px] text-gray-500 block font-bold uppercase tracking-wider">
-                  ENTRY COST TO PLAY
-                </span>
-                <span className="text-lg font-black text-[#FF5FA0] flex items-center justify-center gap-1.5 mt-0.5">
-                  <Coins className="w-5 h-5 text-[#FFDE25]" />
-                  {Number(game.cost || 0).toLocaleString()} COINS
-                </span>
+              {/* Game Economics: Cost & Default Points */}
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="bg-[#FAF7EE] p-3 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
+                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-wider">
+                    ENTRY COST
+                  </span>
+                  <span className="text-base font-black text-[#FF5FA0] flex items-center justify-center gap-1 mt-0.5">
+                    <Coins className="w-4 h-4 text-[#FFDE25]" />
+                    {Number(game.cost || 0).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="bg-[#FAF7EE] p-3 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
+                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-wider">
+                    DEFAULT POINTS
+                  </span>
+                  <span className="text-base font-black text-[#28C76F] flex items-center justify-center gap-1 mt-0.5">
+                    <Trophy className="w-4 h-4 text-[#28C76F]" />
+                    {game.defaultPoints !== undefined && game.defaultPoints !== null ? game.defaultPoints : '—'} PTS
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -236,6 +252,28 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
                 </div>
                 <p className="text-[10px] text-gray-500 mt-1 font-bold">
                   Number of arcade coins required for a participant to enter this game.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm flex items-center justify-between">
+                  <span>DEFAULT POINTS EARNED</span>
+                  <span className="text-[10px] text-[#28C76F] font-black uppercase">Suggested in Scoring</span>
+                </label>
+                <div className="relative">
+                  <Trophy className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={formData.defaultPoints}
+                    onChange={(e) => setFormData({ ...formData, defaultPoints: e.target.value })}
+                    placeholder="e.g. 10"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-mono font-black text-base focus:outline-none focus:border-[#FF5FA0]"
+                  />
+                </div>
+                <p className="text-[10px] text-gray-500 mt-1 font-bold">
+                  Points automatically pre-filled when awarding scores for this game. Can be edited at scoring time.
                 </p>
               </div>
 
