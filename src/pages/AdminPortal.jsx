@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -20,6 +20,7 @@ import ParticipantRosterManager from '../components/admin/ParticipantRosterManag
 import AdminLogin from '../components/admin/AdminLogin';
 import LiveTicker from '../components/LiveTicker';
 import { soundFx } from '../utilities/soundFx';
+import { getAdminSession, validateAdminSession, revokeAdminSession } from '../services/api/authService';
 
 export default function AdminPortal({
   data,
@@ -36,34 +37,52 @@ export default function AdminPortal({
   triggerCelebration,
 }) {
   const navigate = useNavigate();
-  const [adminSession, setAdminSession] = useState(() => {
-    try {
-      const saved = sessionStorage.getItem('funtopia_admin_session');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }
-  });
+  const [adminSession, setAdminSession] = useState(() => getAdminSession());
+  const [isVerifyingSession, setIsVerifyingSession] = useState(true);
 
   const [currentTab, setCurrentTab] = useState('overview'); // 'overview' | 'events' | 'participants' | 'games' | 'scoring'
   const [quickScoreParticipantId, setQuickScoreParticipantId] = useState(null);
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
+  // Validate session integrity on mount and prevent spoofing
+  useEffect(() => {
+    let isMounted = true;
+    async function verify() {
+      const current = getAdminSession();
+      if (!current) {
+        if (isMounted) {
+          setAdminSession(null);
+          setIsVerifyingSession(false);
+        }
+        return;
+      }
+      const isValid = await validateAdminSession(current);
+      if (isMounted) {
+        if (!isValid) {
+          revokeAdminSession();
+          setAdminSession(null);
+        } else {
+          setAdminSession(current);
+        }
+        setIsVerifyingSession(false);
+      }
+    }
+    verify();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const activeEvent = data.events.find((e) => e.id === data.activeEventId) || data.events[0];
 
   const handleLoginSuccess = (session) => {
     setAdminSession(session);
-    try {
-      sessionStorage.setItem('funtopia_admin_session', JSON.stringify(session));
-    } catch (e) {}
   };
 
   const handleLogout = () => {
     soundFx.play('click');
+    revokeAdminSession();
     setAdminSession(null);
-    try {
-      sessionStorage.removeItem('funtopia_admin_session');
-    } catch (e) {}
   };
 
   const handleTabChange = (tabId) => {
@@ -75,6 +94,18 @@ export default function AdminPortal({
     setQuickScoreParticipantId(participantId);
     setCurrentTab('scoring');
   };
+
+  // If verifying active session token, display brief secure loader
+  if (isVerifyingSession && getAdminSession()) {
+    return (
+      <div className="min-h-screen bg-[#5C2D91] flex items-center justify-center text-white font-mono text-sm">
+        <div className="retro-os-window p-6 rounded-2xl bg-[#D1D5DB] text-[#0D0518] text-center border-3 border-[#0D0518] shadow-pixel">
+          <div className="animate-bounce text-3xl mb-2">👾</div>
+          <p className="font-arcade text-xs font-black">VERIFYING OPERATOR PASSKEY...</p>
+        </div>
+      </div>
+    );
+  }
 
   // If not logged in as admin, show the restricted login screen
   if (!adminSession) {

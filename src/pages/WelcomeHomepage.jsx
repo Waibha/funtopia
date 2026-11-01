@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight, Sliders } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight, Sliders, Zap } from 'lucide-react';
 import AudioSettingsModal from '../components/AudioSettingsModal';
+import TetrisArcadeBackground from '../components/TetrisArcadeBackground';
 import { soundFx } from '../utilities/soundFx';
 
 export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, triggerCelebration }) {
@@ -27,19 +28,22 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
   };
 
   return (
-    <div className="relative min-h-screen bg-[#451B75] text-white flex flex-col justify-between overflow-hidden select-none font-sans">
+    <div className="relative min-h-screen bg-[#35125E] text-white flex flex-col justify-between overflow-hidden select-none font-sans">
       {/* ========================================================================= */}
-      {/* LAYER 1: VIBRANT RETRO ARCADE SKY & PIXEL CITYSCAPE BACKGROUND            */}
+      {/* LAYER 1: CONTINUOUS ANIMATED TETRIS BLOCKS & ARCADE BACKGROUND CANVAS     */}
       {/* ========================================================================= */}
+      <TetrisArcadeBackground />
+
+      {/* Retro Arcade Grid Overlay */}
       <div
-        className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        className="absolute inset-0 opacity-[0.06] pointer-events-none z-0"
         style={{
           backgroundImage: `radial-gradient(#FFDE25 1.5px, transparent 1.5px), radial-gradient(#FF5FA0 1.5px, transparent 1.5px)`,
           backgroundSize: '24px 24px',
           backgroundPosition: '0 0, 12px 12px',
         }}
       />
-      <div className="absolute inset-0 bg-radial-at-t from-purple-600/25 via-transparent to-[#1F0738]/90 pointer-events-none" />
+      <div className="absolute inset-0 bg-radial-at-t from-purple-600/30 via-transparent to-[#1F0738]/95 pointer-events-none z-0" />
 
       {/* Floating Pixel Clouds */}
       <div className="absolute top-16 left-6 sm:left-20 opacity-85 pointer-events-none animate-bounce-subtle">
@@ -147,6 +151,14 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
 
         {/* Grand Marquee Arcade Title "FUNTOPIA" */}
         <div className="relative mb-2">
+          {/* Animated decorative glints around title */}
+          <div className="absolute -top-4 -left-6 sm:-left-10 text-[#FFDE25] text-2xl animate-spin-slow pointer-events-none">
+            ✦
+          </div>
+          <div className="absolute -bottom-3 -right-6 sm:-right-10 text-[#FF5FA0] text-2xl animate-bounce pointer-events-none">
+            ✦
+          </div>
+
           <h1 className="font-bungee text-6xl sm:text-8xl md:text-9xl tracking-wider text-[#FFDE25] pixel-title-yellow select-none hover:scale-105 transition-transform duration-200">
             FUNTOPIA
           </h1>

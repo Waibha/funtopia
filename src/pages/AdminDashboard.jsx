@@ -85,7 +85,7 @@ export default function AdminDashboard({
             className="btn-pixel-yellow flex items-center gap-2"
           >
             <Coins className="w-4 h-4" />
-            <span>DISPATCH POINTS</span>
+            <span>UPDATE SCORES</span>
           </button>
 
           <button
