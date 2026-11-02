@@ -153,7 +153,8 @@ export default function AdminGuessWhoPage() {
     setIsLoggingIn(true);
     setLoginError(null);
     try {
-      const { data, error } = await signInCoordinator({ email: loginEmail.trim(), password: loginPassword });
+      const cleanEmail = loginEmail.trim().toLowerCase();
+      const { data, error } = await signInCoordinator({ email: cleanEmail, password: loginPassword });
       if (error) {
         setLoginError(error.message);
       } else if (data?.user) {

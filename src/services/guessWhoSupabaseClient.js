@@ -218,7 +218,8 @@ export const signInCoordinator = async ({ email, password }) => {
   if (!isGwSupabaseConfigured()) {
     return { data: null, error: new Error('Guess Who Supabase is not configured.') };
   }
-  return await gwSupabase.auth.signInWithPassword({ email, password });
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  return await gwSupabase.auth.signInWithPassword({ email: cleanEmail, password });
 };
 
 export const signOutCoordinator = async () => {

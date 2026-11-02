@@ -18,6 +18,10 @@ import {
   gwSupabase,
   GW_SUPABASE_TABLES,
   verifyCoordinatorRole,
+  signInCoordinator,
+  signOutCoordinator,
+  getCoordinatorSession,
+  onCoordinatorAuthStateChange,
 } from '../src/services/guessWhoSupabaseClient.js';
 
 import { getSupabaseSyncStatus } from '../src/services/guessWhoService.js';
@@ -122,5 +126,19 @@ test('--- DUAL SUPABASE CLIENTS ARCHITECTURE & INDEPENDENCE ---', async (t) => {
       true,
       'is_coordinator flag in app_metadata must be granted access'
     );
+  });
+
+  await t.test('6. Coordinator Auth flow handles offline safety and session lifecycle', async () => {
+    // In unconfigured/offline test environment:
+    const session = await getCoordinatorSession();
+    assert.equal(session.user, null, 'Offline session user must be null');
+    assert.equal(session.session, null, 'Offline session token must be null');
+
+    const authSub = onCoordinatorAuthStateChange(() => {});
+    assert.ok(authSub && typeof authSub.unsubscribe === 'function', 'Auth subscription must return unsubscribe');
+    authSub.unsubscribe();
+
+    const signoutResult = await signOutCoordinator();
+    assert.equal(signoutResult.error, null, 'Signout in offline mode should succeed without throw');
   });
 });
