@@ -103,7 +103,7 @@ export default function MeetCreatorsModal({ isOpen, onClose }) {
                   className="px-2.5 py-1 rounded-lg bg-[#200B3B] text-[#FFDE25] border-2 border-[#0D0518] hover:bg-[#FF5FA0] hover:text-white transition-all text-[11px] font-mono font-bold flex items-center gap-1 shrink-0 shadow-pixel-sm"
                   title="View Waibha on GitHub"
                 >
-                  <Github className="w-3.5 h-3.5" />
+                  <GithubIcon className="w-3.5 h-3.5" />
                   <span>@Waibha</span>
                   <ExternalLink className="w-2.5 h-2.5 opacity-70" />
                 </a>
@@ -176,7 +176,7 @@ export default function MeetCreatorsModal({ isOpen, onClose }) {
                   className="px-2.5 py-1 rounded-lg bg-[#200B3B] text-[#FF5FA0] border-2 border-[#0D0518] hover:bg-[#FF5FA0] hover:text-white transition-all text-[11px] font-mono font-bold flex items-center gap-1 shrink-0 shadow-pixel-sm"
                   title="View hania on GitHub"
                 >
-                  <Github className="w-3.5 h-3.5" />
+                  <GithubIcon className="w-3.5 h-3.5" />
                   <span>@hania</span>
                   <ExternalLink className="w-2.5 h-2.5 opacity-70" />
                 </a>

@@ -96,7 +96,7 @@ export default function MeetCreatorsPage() {
                   className="px-3 py-1.5 rounded-xl bg-[#200B3B] text-[#FFDE25] border-2 border-[#0D0518] hover:bg-[#FF5FA0] hover:text-white transition-all text-xs font-mono font-bold flex items-center gap-1.5 shadow-pixel-sm shrink-0"
                   title="View Waibha on GitHub"
                 >
-                  <Github className="w-4 h-4" />
+                  <GithubIcon className="w-4 h-4" />
                   <span>@Waibha</span>
                   <ExternalLink className="w-3 h-3 opacity-70" />
                 </a>
@@ -167,7 +167,7 @@ export default function MeetCreatorsPage() {
                   className="px-3 py-1.5 rounded-xl bg-[#200B3B] text-[#FF5FA0] border-2 border-[#0D0518] hover:bg-[#FF5FA0] hover:text-white transition-all text-xs font-mono font-bold flex items-center gap-1.5 shadow-pixel-sm shrink-0"
                   title="View hania on GitHub"
                 >
-                  <Github className="w-4 h-4" />
+                  <GithubIcon className="w-4 h-4" />
                   <span>@hania</span>
                   <ExternalLink className="w-3 h-3 opacity-70" />
                 </a>
