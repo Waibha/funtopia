@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Volume2, VolumeX, Sparkles, Gamepad2, ArrowRight, Sliders, Trophy, Flame, Play } from 'lucide-react';
 import AudioSettingsModal from '../components/AudioSettingsModal';
+import MeetCreatorsModal from '../components/creators/MeetCreatorsModal';
 import TetrisArcadeBackground from '../components/TetrisArcadeBackground';
 import { soundFx } from '../utilities/soundFx';
 
@@ -9,6 +10,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
   const navigate = useNavigate();
   const [insertCoinActive, setInsertCoinActive] = useState(false);
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
+  const [isCreatorsModalOpen, setIsCreatorsModalOpen] = useState(false);
 
   const handleStart = () => {
     soundFx.play('coin');
@@ -129,8 +131,17 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </div>
         </div>
 
-        {/* Audio Synthesizer Toggle */}
+        {/* Action Controls: Audio & Meet Creators */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCreatorsModalOpen(true)}
+            className="btn-pixel-white py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-mono font-black"
+            title="Meet the Creators"
+          >
+            <Trophy className="w-3.5 h-3.5 text-[#FF5FA0]" />
+            <span className="hidden sm:inline">CREATORS</span>
+          </button>
+
           <button
             onClick={() => setIsAudioModalOpen(true)}
             className="btn-pixel-yellow py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-mono font-black"
@@ -294,6 +305,12 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
       <AudioSettingsModal
         isOpen={isAudioModalOpen}
         onClose={() => setIsAudioModalOpen(false)}
+      />
+
+      {/* Meet the Creators Modal */}
+      <MeetCreatorsModal
+        isOpen={isCreatorsModalOpen}
+        onClose={() => setIsCreatorsModalOpen(false)}
       />
     </div>
   );

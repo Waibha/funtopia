@@ -5,6 +5,8 @@ import WelcomeHomepage from './pages/WelcomeHomepage';
 import PortalSelectPage from './pages/PortalSelectPage';
 import ParticipantPortal from './pages/ParticipantPortal';
 import AdminPortal from './pages/AdminPortal';
+import MeetCreatorsPage from './pages/MeetCreatorsPage';
+import ErrorBoundary from './components/ErrorBoundary';
 import { dbService } from './services/api/dbService';
 import { loadStoredData, saveStoredData, INITIAL_DATA } from './services/mockData';
 import { calculateLeaderboard } from './utilities/leaderboardEngine';
@@ -274,8 +276,9 @@ export default function App() {
   };
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
         {/* Experience 1: Animated Public Welcome Homepage */}
         <Route
           path="/"
@@ -290,6 +293,10 @@ export default function App() {
 
         {/* Portal Selection Screen */}
         <Route path="/select-portal" element={<PortalSelectPage />} />
+
+        {/* Meet the Creators / About */}
+        <Route path="/creators" element={<MeetCreatorsPage />} />
+        <Route path="/about" element={<MeetCreatorsPage />} />
 
         {/* Legacy callback route redirects to Participant Portal */}
         <Route
@@ -338,5 +345,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  );
+  </ErrorBoundary>
+);
 }

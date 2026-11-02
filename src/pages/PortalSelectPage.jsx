@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, ShieldCheck, ArrowRight, ArrowLeft, Users, Lock, Sparkles, Gamepad2, Coins, Calendar, UserPlus } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 import AuthArcadeBackground from '../components/backgrounds/AuthArcadeBackground';
+import MeetCreatorsModal from '../components/creators/MeetCreatorsModal';
 
 export default function PortalSelectPage() {
   const navigate = useNavigate();
+  const [isCreatorsModalOpen, setIsCreatorsModalOpen] = useState(false);
 
   const handleSelect = (destination) => {
     soundFx.play('coin');
@@ -42,9 +44,20 @@ export default function PortalSelectPage() {
           <span>RETURN TO TITLE</span>
         </button>
 
-        <div className="flex items-center gap-2 font-arcade text-[10px] text-[#FFDE25]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#28C76F] animate-ping" />
-          <span>STAGE SELECT • TWO DESTINATIONS</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsCreatorsModalOpen(true)}
+            className="btn-pixel-white text-[10px] py-1.5 px-3 flex items-center gap-1.5 font-mono font-bold"
+            title="Meet the Creators"
+          >
+            <Trophy className="w-3.5 h-3.5 text-[#FF5FA0]" />
+            <span className="hidden sm:inline">CREATORS</span>
+          </button>
+
+          <div className="flex items-center gap-2 font-arcade text-[10px] text-[#FFDE25]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#28C76F] animate-ping" />
+            <span>STAGE SELECT</span>
+          </div>
         </div>
       </div>
 
@@ -122,7 +135,7 @@ export default function PortalSelectPage() {
               <div className="space-y-2 text-xs font-mono font-bold text-[#0D0518] mb-6 bg-[#FFFDF5] p-4 rounded-2xl border-2 border-[#0D0518]">
                 <div className="flex items-center gap-2">
                   <UserPlus className="w-4 h-4 text-[#28C76F] shrink-0" />
-                  <span>Register or access participant profile</span>
+                  <span>Competitor profile & virtual coin wallet</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-[#FFDE25] shrink-0" />
@@ -242,6 +255,12 @@ export default function PortalSelectPage() {
           MADAGASCAR CHAMPIONSHIP CIRCUIT • TWO DISTINCT EXPERIENCES
         </div>
       </footer>
+
+      {/* Meet the Creators Modal */}
+      <MeetCreatorsModal
+        isOpen={isCreatorsModalOpen}
+        onClose={() => setIsCreatorsModalOpen(false)}
+      />
     </div>
   );
 }
