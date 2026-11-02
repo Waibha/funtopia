@@ -54,7 +54,7 @@ export default function Navbar({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bungee text-xl sm:text-2xl tracking-wide text-[#FFDE25] pixel-title-yellow">
-                  MADAGASCAR
+                  FUNTOPIA
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-[#FF5FA0] text-white font-arcade text-[9px] font-black tracking-widest uppercase border border-[#0D0518] shadow-pixel-sm">
                   ARCADE

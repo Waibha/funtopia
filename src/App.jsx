@@ -1,14 +1,28 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
+
+// Championship Platform Pages (Person 1 Scope)
 import WelcomeHomepage from './pages/WelcomeHomepage';
 import PortalSelectPage from './pages/PortalSelectPage';
 import ParticipantPortal from './pages/ParticipantPortal';
 import AdminPortal from './pages/AdminPortal';
 import MeetCreatorsPage from './pages/MeetCreatorsPage';
 import ErrorBoundary from './components/ErrorBoundary';
+
+// Guess Who Game Pages (Person 2 Scope)
+import GuessWhoHubPage from './pages/guess-who/GuessWhoHubPage';
+import GuessWhoLobbyPage from './pages/guess-who/GuessWhoLobbyPage';
+import AdminGuessWhoPage from './pages/admin/AdminGuessWhoPage';
+
+// Public Informational Pages
+import LeaderboardPage from './pages/public/LeaderboardPage';
+import SchedulePage from './pages/public/SchedulePage';
+import RulesPage from './pages/public/RulesPage';
+
+// Services and Utilities
 import { dbService } from './services/api/dbService';
-import { loadStoredData, saveStoredData, INITIAL_DATA } from './services/mockData';
+import { loadStoredData, saveStoredData } from './services/mockData';
 import { calculateLeaderboard } from './utilities/leaderboardEngine';
 import { soundFx } from './utilities/soundFx';
 
@@ -144,8 +158,8 @@ export default function App() {
         participantName: participant.name,
         amountDelta: delta,
         newBalance,
-        type: 'admin_adjustment',
-        reason: reason || (delta > 0 ? 'Admin bonus credit' : 'Admin manual debit'),
+        type: delta > 0 ? 'admin_grant' : 'admin_deduction',
+        reason: reason || (delta > 0 ? 'Admin Coin Grant' : 'Admin Coin Deduction'),
         timestamp: new Date().toISOString(),
         admin,
       };
@@ -161,37 +175,32 @@ export default function App() {
     });
   };
 
-  // Participant Join Game Handler (Atomic coin deduction, validation, duplicate protection)
+  // Game Entry Handler (Deducts entry cost coins from participant)
   const handleJoinGame = ({ participantId, gameId }) => {
     const participant = (data.participants || []).find((p) => p.id === participantId);
     const game = (data.games || []).find((g) => g.id === gameId);
 
-    if (!participant) {
-      return { success: false, error: 'Participant profile not found. Please log in.' };
-    }
-    if (!game) {
-      return { success: false, error: 'Game not found in tournament rotation.' };
+    if (!participant || !game) {
+      return { success: false, reason: 'Participant or Game not found.' };
     }
 
     const currentCoins = Number(participant.coins || 0);
-    const entryCost = Number(game.cost || 0);
+    const entryCost = Math.max(0, Number(game.entryFeeCoins || 0));
 
     if (currentCoins < entryCost) {
       return {
         success: false,
-        error: `Insufficient virtual coins! ${game.name} requires ${entryCost} coins, but your current balance is ${currentCoins} coins.`,
-        required: entryCost,
-        current: currentCoins,
+        reason: `Insufficient coins. Required: ${entryCost}, Available: ${currentCoins}.`,
       };
     }
 
     const newBalance = currentCoins - entryCost;
 
     const coinTx = {
-      id: `ctx-game-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      id: `ctx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       participantId,
       participantName: participant.name,
-      gameId,
+      gameId: game.id,
       gameName: game.name,
       amountDelta: -entryCost,
       newBalance,
@@ -279,72 +288,94 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <Routes>
-        {/* Experience 1: Animated Public Welcome Homepage */}
-        <Route
-          path="/"
-          element={
-            <WelcomeHomepage
-              soundEnabled={soundEnabled}
-              setSoundEnabled={setSoundEnabled}
-              triggerCelebration={triggerCelebration}
-            />
-          }
-        />
+          {/* ================================================================= */}
+          {/* CHAMPIONSHIP PLATFORM ROUTES (PERSON 1 SCOPE)                     */}
+          {/* ================================================================= */}
+          {/* Welcome Stage & Landing Experience */}
+          <Route
+            path="/"
+            element={
+              <WelcomeHomepage
+                soundEnabled={soundEnabled}
+                setSoundEnabled={setSoundEnabled}
+                triggerCelebration={triggerCelebration}
+              />
+            }
+          />
 
-        {/* Portal Selection Screen */}
-        <Route path="/select-portal" element={<PortalSelectPage />} />
+          {/* Portal Selection Screen */}
+          <Route path="/select-portal" element={<PortalSelectPage />} />
 
-        {/* Meet the Creators / About */}
-        <Route path="/creators" element={<MeetCreatorsPage />} />
-        <Route path="/about" element={<MeetCreatorsPage />} />
+          {/* Meet the Creators / About */}
+          <Route path="/creators" element={<MeetCreatorsPage />} />
+          <Route path="/about" element={<MeetCreatorsPage />} />
 
-        {/* Legacy callback route redirects to Participant Portal */}
-        <Route
-          path="/auth/callback"
-          element={<Navigate to="/participant" replace />}
-        />
+          {/* Legacy callback route redirects to Participant Portal */}
+          <Route
+            path="/auth/callback"
+            element={<Navigate to="/participant" replace />}
+          />
 
-        {/* Experience 2: Participant Portal */}
-        <Route
-          path="/participant/*"
-          element={
-            <ParticipantPortal
-              data={data}
-              leaderboard={leaderboard}
-              onRegisterParticipant={handleRegisterParticipant}
-              onJoinGame={handleJoinGame}
-              triggerCelebration={triggerCelebration}
-              soundEnabled={soundEnabled}
-              setSoundEnabled={setSoundEnabled}
-            />
-          }
-        />
+          {/* Participant Portal */}
+          <Route
+            path="/participant/*"
+            element={
+              <ParticipantPortal
+                data={data}
+                leaderboard={leaderboard}
+                onRegisterParticipant={handleRegisterParticipant}
+                onJoinGame={handleJoinGame}
+                triggerCelebration={triggerCelebration}
+                soundEnabled={soundEnabled}
+                setSoundEnabled={setSoundEnabled}
+              />
+            }
+          />
 
-        {/* Experience 3: Restricted Admin Portal */}
-        <Route
-          path="/admin/*"
-          element={
-            <AdminPortal
-              data={data}
-              leaderboard={leaderboard}
-              onSaveGame={handleSaveGame}
-              onDeleteGame={handleDeleteGame}
-              onToggleGameActive={handleToggleGameActive}
-              onAwardScore={handleAwardScore}
-              onRollbackTransaction={handleRollbackTransaction}
-              onAddParticipant={handleRegisterParticipant}
-              onRemoveParticipant={handleRemoveParticipant}
-              onUpdateStartingCoins={handleUpdateStartingCoins}
-              onAdjustParticipantCoins={handleAdjustParticipantCoins}
-              triggerCelebration={triggerCelebration}
-            />
-          }
-        />
+          {/* ================================================================= */}
+          {/* GUESS WHO? DEDUCTION GAME ROUTES (PERSON 2 SCOPE)                 */}
+          {/* ================================================================= */}
+          {/* Dedicated Clean Public Projector Display Interface */}
+          <Route path="/guess-who" element={<GuessWhoHubPage />} />
 
-        {/* Fallback to Welcome Homepage */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
-  </ErrorBoundary>
-);
+          {/* Staging / Fallback Match Lobby */}
+          <Route path="/guess-who/lobby" element={<GuessWhoLobbyPage />} />
+
+          {/* Guess Who Administrative Control & Scoring Hub */}
+          <Route path="/admin/guess-who" element={<AdminGuessWhoPage />} />
+
+          {/* ================================================================= */}
+          {/* CHAMPIONSHIP ADMIN PORTAL                                         */}
+          {/* ================================================================= */}
+          <Route
+            path="/admin/*"
+            element={
+              <AdminPortal
+                data={data}
+                leaderboard={leaderboard}
+                onSaveGame={handleSaveGame}
+                onDeleteGame={handleDeleteGame}
+                onToggleGameActive={handleToggleGameActive}
+                onAwardScore={handleAwardScore}
+                onRollbackTransaction={handleRollbackTransaction}
+                onAddParticipant={handleRegisterParticipant}
+                onRemoveParticipant={handleRemoveParticipant}
+                onUpdateStartingCoins={handleUpdateStartingCoins}
+                onAdjustParticipantCoins={handleAdjustParticipantCoins}
+                triggerCelebration={triggerCelebration}
+              />
+            }
+          />
+
+          {/* Public Informational Routes */}
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/rules" element={<RulesPage />} />
+
+          {/* Fallback to Welcome Homepage */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
+  );
 }

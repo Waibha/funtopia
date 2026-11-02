@@ -70,7 +70,7 @@ export default function MeetCreatorsModal({ isOpen, onClose }) {
         <div className="overflow-y-auto p-5 sm:p-7 space-y-6 flex-grow">
           <div className="text-center max-w-xl mx-auto">
             <p className="font-mono text-xs sm:text-sm text-purple-200">
-              The architects and developers behind <strong className="text-[#FFDE25]">MADAGASCAR</strong>. Engineered for real-time arcade tournaments and interactive competition.
+              The architects and developers behind <strong className="text-[#FFDE25]">FUNTOPIA</strong>. Engineered for real-time arcade tournaments and interactive competition.
             </p>
           </div>
 
@@ -118,7 +118,7 @@ export default function MeetCreatorsModal({ isOpen, onClose }) {
 
               {/* Exact Contribution Description */}
               <p className="font-sans text-xs sm:text-sm text-[#2A1640] leading-relaxed mb-4 font-medium bg-[#FAF7EE] p-3.5 rounded-xl border-2 border-[#0D0518]">
-                Engineered the core MADAGASCAR tournament platform, including the arcade leaderboard, Admin Portal, Participant Portal, USN-based authentication, virtual coin system and Supabase integration.
+                Engineered the core FUNTOPIA tournament platform, including the arcade leaderboard, Admin Portal, Participant Portal, USN-based authentication, virtual coin system and Supabase integration.
               </p>
 
               {/* Key Highlights Tags */}
@@ -228,7 +228,7 @@ export default function MeetCreatorsModal({ isOpen, onClose }) {
         <div className="bg-[#120422] border-t-3 border-[#0D0518] px-6 py-3 flex items-center justify-between text-xs font-mono text-purple-200 shrink-0">
           <div className="flex items-center gap-2 text-[10px] font-arcade text-[#FFDE25]">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>MADAGASCAR 2-PERSON DEV TEAM</span>
+            <span>FUNTOPIA 2-PERSON DEV TEAM</span>
           </div>
           <button
             onClick={handleClose}

@@ -123,7 +123,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </div>
           <div className="font-mono text-xs">
             <span className="text-[#FFDE25] font-black uppercase tracking-wider block">
-              MADAGASCAR ARCADE • ROM v3.0
+              FUNTOPIA ARCADE • ROM v3.0
             </span>
             <span className="text-purple-200 text-[10px] font-bold">
               16-BIT CHAMPIONSHIP SYSTEM
@@ -176,7 +176,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           <span>✦ PLAYER 1 READY • INSERT 25¢ ✦</span>
         </div>
 
-        {/* Grand Marquee Arcade Title "MADAGASCAR" */}
+        {/* Grand Marquee Arcade Title "FUNTOPIA" */}
         <div className="relative mb-2">
           {/* Animated decorative glints around title */}
           <div className="absolute -top-6 -left-8 sm:-left-12 text-[#FFDE25] text-3xl animate-spin-slow pointer-events-none">
@@ -187,7 +187,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </div>
 
           <h1 className="font-bungee text-6xl sm:text-8xl md:text-9xl tracking-wider text-[#FFDE25] pixel-title-yellow select-none hover:scale-105 transition-transform duration-200">
-            MADAGASCAR
+            FUNTOPIA
           </h1>
           <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-48 sm:w-80 h-1.5 bg-[#FFDE25] shadow-[0_0_24px_#FFDE25] rounded-full" />
         </div>
@@ -229,7 +229,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           </svg>
         </div>
 
-        {/* PRIMARY 'ENTER MADAGASCAR' / 'PRESS START' INTERACTION */}
+        {/* PRIMARY 'ENTER FUNTOPIA' / 'PRESS START' INTERACTION */}
         <button
           onClick={handleStart}
           disabled={insertCoinActive}
@@ -238,7 +238,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
           }`}
         >
           <Gamepad2 className="w-7 h-7 text-[#0D0518] group-hover:rotate-12 transition-transform" />
-          <span>{insertCoinActive ? 'INSERTING COIN...' : 'ENTER MADAGASCAR'}</span>
+          <span>{insertCoinActive ? 'INSERTING COIN...' : 'ENTER FUNTOPIA'}</span>
           <ArrowRight className="w-7 h-7 text-[#0D0518] group-hover:translate-x-1 transition-transform" />
         </button>
 
@@ -246,7 +246,7 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
         <div className="mt-5 max-w-md bg-white text-[#0D0518] rounded-2xl border-4 border-[#0D0518] shadow-pixel p-3 relative text-xs font-mono font-bold flex items-center gap-3">
           <span className="text-3xl shrink-0">👾</span>
           <p className="text-left text-xs leading-relaxed font-semibold">
-            Press <strong className="text-[#FF5FA0]">ENTER MADAGASCAR</strong> to choose between the <strong className="text-[#5C2D91]">Admin Portal</strong> or <strong className="text-[#28C76F]">Participant Arena</strong>!
+            Press <strong className="text-[#FF5FA0]">ENTER FUNTOPIA</strong> to choose between the <strong className="text-[#5C2D91]">Admin Portal</strong> or <strong className="text-[#28C76F]">Participant Arena</strong>!
           </p>
         </div>
       </main>

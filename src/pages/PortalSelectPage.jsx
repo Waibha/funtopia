@@ -71,7 +71,7 @@ export default function PortalSelectPage() {
             CHOOSE YOUR PORTAL
           </h2>
           <p className="text-purple-200 font-mono text-xs sm:text-sm mt-2 max-w-lg mx-auto">
-            Select your destination in the MADAGASCAR universe. Enter as a competitor or manage the tournament as an administrator.
+            Select your destination in the FUNTOPIA universe. Enter as a competitor or manage the tournament as an administrator.
           </p>
         </div>
 
@@ -252,7 +252,7 @@ export default function PortalSelectPage() {
       <footer className="relative z-10 w-full mt-6">
         <div className="pixel-grass-strip h-3 w-full" />
         <div className="pixel-brick-strip py-3.5 px-6 text-center text-xs font-arcade text-[#FFDE25]">
-          MADAGASCAR CHAMPIONSHIP CIRCUIT • TWO DISTINCT EXPERIENCES
+          FUNTOPIA CHAMPIONSHIP CIRCUIT • TWO DISTINCT EXPERIENCES
         </div>
       </footer>
 

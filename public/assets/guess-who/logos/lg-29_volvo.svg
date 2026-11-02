@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <!-- Ancient Iron Chemical Glyph / Volvo Emblem (Wordmark removed for deduction gameplay) -->
+  <g fill="#0d3896" stroke="#0d3896">
+    <!-- Arrow pointing northeast (45 degrees) -->
+    <path d="M145,95 L195,45 M160,45 L195,45 L195,80" fill="none" stroke-width="18" stroke-linecap="square" stroke-linejoin="miter"/>
+    <!-- Iron Circle -->
+    <circle cx="105" cy="135" r="68" fill="none" stroke-width="18"/>
+    <!-- Diagonal Bar across upper-right -->
+    <line x1="80" y1="160" x2="165" y2="75" stroke="#0d3896" stroke-width="8"/>
+    <!-- Iconic horizontal badge bar across center -->
+    <rect x="22" y="120" width="166" height="30" rx="4" fill="#0d3896" stroke="none"/>
+    <rect x="26" y="124" width="158" height="22" rx="2" fill="#1e4da8" stroke="none"/>
+  </g>
+</svg>
