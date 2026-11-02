@@ -9,7 +9,7 @@ test('--- PORTAL SELECTION: GUESS WHO & CORE PORTALS INTEGRITY ---', async (t) =
 
   const content = fs.readFileSync(portalSelectPath, 'utf8');
 
-  await t.test('1. Guess Who portal navigation and target route', () => {
+  await t.test('1. Guess Who player portal navigation and target route', () => {
     assert.match(
       content,
       /\/guess-who/,
@@ -20,22 +20,6 @@ test('--- PORTAL SELECTION: GUESS WHO & CORE PORTALS INTEGRITY ---', async (t) =
       /handleSelect\('\/guess-who'\)/,
       'Clicking Guess Who card must invoke handleSelect with /guess-who'
     );
-  });
-
-  await t.test('2. Core participant and admin portal routes preserved', () => {
-    assert.match(
-      content,
-      /handleSelect\('\/participant'\)/,
-      'Participant portal route must be preserved'
-    );
-    assert.match(
-      content,
-      /handleSelect\('\/admin'\)/,
-      'Admin portal route must be preserved'
-    );
-  });
-
-  await t.test('3. Card UI content, badges, and Call-to-Action', () => {
     assert.match(content, /GUESS WHO\?/, 'Must display GUESS WHO? title');
     assert.match(content, /PLAY NOW/, 'Must contain PLAY NOW button');
     assert.match(content, /12 PUZZLES/, 'Must feature 12 PUZZLES badge');
@@ -43,11 +27,67 @@ test('--- PORTAL SELECTION: GUESS WHO & CORE PORTALS INTEGRITY ---', async (t) =
     assert.match(content, /PROJECTOR/, 'Must feature PROJECTOR badge');
   });
 
+  await t.test('2. Guess Who admin/coordinator portal navigation and target route', () => {
+    assert.match(
+      content,
+      /\/admin\/guess-who/,
+      'PortalSelectPage must reference the /admin/guess-who route'
+    );
+    assert.match(
+      content,
+      /handleSelect\('\/admin\/guess-who'\)/,
+      'Clicking coordinator card must invoke handleSelect with /admin/guess-who'
+    );
+    assert.match(
+      content,
+      /GUESS WHO — ADMIN \/ COORDINATOR/,
+      'Must display GUESS WHO — ADMIN / COORDINATOR title'
+    );
+    assert.match(
+      content,
+      /COORDINATOR LOGIN/,
+      'Must contain COORDINATOR LOGIN button label'
+    );
+    assert.match(
+      content,
+      /COORDINATOR ACCESS/,
+      'Must contain COORDINATOR ACCESS badge'
+    );
+    assert.match(
+      content,
+      /GW_COORDINATOR_CONSOLE\.SYS/,
+      'Must display retro coordinator marquee bar'
+    );
+  });
+
+  await t.test('3. Core participant and championship admin portal routes preserved', () => {
+    assert.match(
+      content,
+      /handleSelect\('\/participant'\)/,
+      'Participant portal route must be preserved'
+    );
+    assert.match(
+      content,
+      /ENTER PARTICIPANT PORTAL/,
+      'Participant portal button must be preserved'
+    );
+    assert.match(
+      content,
+      /handleSelect\('\/admin'\)/,
+      'Admin portal route must be preserved'
+    );
+    assert.match(
+      content,
+      /ACCESS ADMIN PORTAL/,
+      'Admin portal button must be preserved'
+    );
+  });
+
   await t.test('4. Grid layout responsiveness and branding', () => {
     assert.match(
       content,
-      /lg:grid-cols-3/,
-      'Must support 3-column layout on large screens for 3 portal cards'
+      /grid-cols-1 md:grid-cols-2/,
+      'Must support responsive 1-column mobile and 2-column grid layout'
     );
     assert.match(
       content,
