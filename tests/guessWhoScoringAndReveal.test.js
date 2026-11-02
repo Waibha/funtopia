@@ -23,7 +23,12 @@ import {
   replaceSlabSlot,
   isSlabComplete,
   getQuestionLibrary,
+  getSupabaseSyncStatus,
 } from '../src/services/guessWhoService.js';
+
+import {
+  isSupabaseConfigured,
+} from '../src/services/supabaseClient.js';
 
 import {
   resolveGuessWhoImageUrl,
@@ -420,38 +425,107 @@ test('--- 10. IMAGE RELIABILITY RESOLVER & ASSET DISK INTEGRITY ---', () => {
 
 test('--- 11. SUPABASE SQL SECURITY & COORDINATOR AUTHORIZATION ---', () => {
   const schemaPath = path.join(process.cwd(), 'docs', 'guess_who_schema.sql');
+  const migrationPath = path.join(process.cwd(), 'supabase', 'migrations', '20261102000000_guess_who_complete_schema.sql');
   assert.ok(fs.existsSync(schemaPath), 'guess_who_schema.sql must exist in docs/');
+  assert.ok(fs.existsSync(migrationPath), '20261102000000_guess_who_complete_schema.sql must exist in supabase/migrations/');
   const sql = fs.readFileSync(schemaPath, 'utf8');
+  const migrationSql = fs.readFileSync(migrationPath, 'utf8');
 
-  // 1. Verify gw_coordinators table definition
-  assert.ok(sql.includes('CREATE TABLE IF NOT EXISTS public.gw_coordinators'), 'Must define gw_coordinators table');
-  assert.ok(sql.includes('user_id UUID PRIMARY KEY'), 'gw_coordinators must have user_id as PRIMARY KEY');
+  // Verify both files contain identical structural features
+  for (const [name, content] of [['docs/guess_who_schema.sql', sql], ['20261102000000_guess_who_complete_schema.sql', migrationSql]]) {
+    // 1. Verify gw_coordinators table definition
+    assert.ok(content.includes('CREATE TABLE IF NOT EXISTS public.gw_coordinators'), `${name} must define gw_coordinators table`);
+    assert.ok(content.includes('user_id UUID PRIMARY KEY'), `${name} must have user_id as PRIMARY KEY`);
 
-  // 2. Verify SECURITY DEFINER and search_path hardening
-  assert.ok(sql.includes('SECURITY DEFINER'), 'gw_submit_turn must be SECURITY DEFINER');
-  assert.ok(sql.includes('SET search_path = public, pg_temp'), 'Must explicitly set immutable search_path for SECURITY DEFINER');
+    // 2. Verify SECURITY DEFINER and search_path hardening
+    assert.ok(content.includes('SECURITY DEFINER'), `${name}: gw_submit_turn must be SECURITY DEFINER`);
+    assert.ok(content.includes('SET search_path = public, pg_temp'), `${name} must explicitly set immutable search_path for SECURITY DEFINER`);
 
-  // 3. Verify coordinator authorization check inside RPC
-  assert.ok(sql.includes('SELECT 1 FROM public.gw_coordinators'), 'Must check user presence in gw_coordinators');
-  assert.ok(sql.includes('app_metadata'), 'Must support JWT app_metadata role fallback');
+    // 3. Verify coordinator authorization check inside RPC
+    assert.ok(content.includes('SELECT 1 FROM public.gw_coordinators'), `${name} must check user presence in gw_coordinators`);
+    assert.ok(content.includes('app_metadata'), `${name} must support JWT app_metadata role fallback`);
 
-  // 4. Verify privilege revocations
-  assert.ok(sql.includes('REVOKE ALL ON FUNCTION public.gw_submit_turn') && sql.includes('FROM PUBLIC;'), 'Must revoke privileges from PUBLIC');
-  assert.ok(sql.includes('REVOKE ALL ON FUNCTION public.gw_submit_turn') && sql.includes('FROM anon;'), 'Must revoke privileges from anon');
-  assert.ok(sql.includes('GRANT EXECUTE ON FUNCTION public.gw_submit_turn') && sql.includes('TO authenticated, service_role;'), 'Must grant execute exclusively to authenticated, service_role');
+    // 4. Verify privilege revocations
+    assert.ok(content.includes('REVOKE ALL ON FUNCTION public.gw_submit_turn') && content.includes('FROM PUBLIC;'), `${name} must revoke privileges from PUBLIC`);
+    assert.ok(content.includes('REVOKE ALL ON FUNCTION public.gw_submit_turn') && content.includes('FROM anon;'), `${name} must revoke privileges from anon`);
+    assert.ok(content.includes('GRANT EXECUTE ON FUNCTION public.gw_submit_turn') && content.includes('TO authenticated, service_role;'), `${name} must grant execute exclusively to authenticated, service_role`);
 
-  // 5. Verify direct table insert restrictions on turn events
-  assert.ok(sql.includes('CREATE POLICY "Coordinator insert turn events" ON public.gw_turn_events'), 'gw_turn_events must block direct public/anon inserts');
+    // 5. Verify direct table insert restrictions on turn events
+    assert.ok(content.includes('CREATE POLICY "Coordinator insert turn events" ON public.gw_turn_events'), `${name}: gw_turn_events must block direct public/anon inserts`);
 
-  // 6. Verify 7-win early victory, 12-puzzle completion, and result bands in SQL
-  assert.ok(sql.includes('v_is_early_win := (v_new_score >= 7);'), 'RPC must check early win at 7 correct answers');
-  assert.ok(sql.includes('v_is_final := (p_slot_number >= v_state.total_questions);'), 'RPC must check completion at total_questions (12)');
-  assert.ok(sql.includes("v_result_message := 'Congratulations! You Won!';"), 'RPC must include tier 7 message');
-  assert.ok(sql.includes("v_result_message := 'So Close! Just a Little More!';"), 'RPC must include tier 5-6 message');
-  assert.ok(sql.includes("v_result_message := 'Good Try! Better Luck Next Time!';"), 'RPC must include tier 0-4 message');
-  assert.ok(sql.includes('total_questions INTEGER NOT NULL DEFAULT 12'), 'gw_game_state must default total_questions to 12');
+    // 6. Verify 7-win early victory, 12-puzzle completion, and result bands in SQL
+    assert.ok(content.includes('v_is_early_win := (v_new_score >= 7);'), `${name}: RPC must check early win at 7 correct answers`);
+    assert.ok(content.includes('v_is_final := (p_slot_number >= v_state.total_questions);'), `${name}: RPC must check completion at total_questions (12)`);
+    assert.ok(content.includes("v_result_message := 'Congratulations! You Won!';"), `${name}: RPC must include tier 7 message`);
+    assert.ok(content.includes("v_result_message := 'So Close! Just a Little More!';"), `${name}: RPC must include tier 5-6 message`);
+    assert.ok(content.includes("v_result_message := 'Good Try! Better Luck Next Time!';"), `${name}: RPC must include tier 0-4 message`);
+    assert.ok(content.includes('total_questions INTEGER NOT NULL DEFAULT 12'), `${name}: gw_game_state must default total_questions to 12`);
 
-  // 7. Test authorization logic predicate simulator
+    // 7. Verify song_clue_text and subtype columns in gw_game_state and parameters in gw_submit_turn
+    assert.ok(content.includes('song_clue_text TEXT'), `${name}: gw_game_state must include song_clue_text column`);
+    assert.ok(content.includes('subtype TEXT'), `${name}: gw_game_state must include subtype column`);
+    assert.ok(content.includes('p_next_song_clue_text TEXT DEFAULT NULL'), `${name}: gw_submit_turn must accept p_next_song_clue_text`);
+    assert.ok(content.includes('p_next_subtype TEXT DEFAULT NULL'), `${name}: gw_submit_turn must accept p_next_subtype`);
+
+    // 8. Verify helper registration function, overload cleanup, role allowlist and permission lockdown
+    assert.ok(content.includes('DROP FUNCTION IF EXISTS public.gw_register_coordinator_by_email(TEXT);'), `${name} must drop 1-param overload`);
+    assert.ok(content.includes('DROP FUNCTION IF EXISTS public.gw_register_coordinator_by_email(TEXT, TEXT);'), `${name} must drop 2-param overload`);
+    assert.ok(content.includes("COALESCE(auth.role(), '') = 'service_role'"), `${name} must use NULL-safe check for service_role`);
+    assert.ok(content.includes("SESSION_USER IN ('postgres', 'supabase_admin')"), `${name} must use SESSION_USER to allow direct database administrator execution in SQL Editor while preventing SECURITY DEFINER owner bypass`);
+    assert.ok(content.includes("v_normalized_role NOT IN ('coordinator', 'lead_coordinator', 'admin')"), `${name} must enforce role allowlist`);
+    assert.ok(content.includes('REVOKE ALL ON FUNCTION public.gw_register_coordinator_by_email(TEXT, TEXT) FROM PUBLIC;'), `${name} must revoke from PUBLIC`);
+    assert.ok(content.includes('REVOKE ALL ON FUNCTION public.gw_register_coordinator_by_email(TEXT, TEXT) FROM anon;'), `${name} must revoke from anon`);
+    assert.ok(content.includes('REVOKE ALL ON FUNCTION public.gw_register_coordinator_by_email(TEXT, TEXT) FROM authenticated;'), `${name} must revoke from authenticated`);
+    assert.ok(content.includes('GRANT EXECUTE ON FUNCTION public.gw_register_coordinator_by_email(TEXT, TEXT) TO service_role, postgres;'), `${name} must grant to service_role and postgres`);
+
+    // 9. Verify security barrier on public view and non-destructive game-state seed
+    assert.ok(content.includes('WITH (security_barrier = true)'), `${name} must declare security_barrier on gw_public_questions`);
+    assert.ok(content.includes('ON CONFLICT (id) DO NOTHING;'), `${name} must preserve existing active game state with ON CONFLICT (id) DO NOTHING`);
+  }
+
+  // 10. Simulator for gw_register_coordinator_by_email authorization & allowlist
+  const simulateRegisterCoordinator = (callerContext, email, role = 'coordinator') => {
+    const isServiceRole = callerContext && callerContext.role === 'service_role';
+    const isDbAdmin = callerContext && (callerContext.sessionUser === 'postgres' || callerContext.sessionUser === 'supabase_admin');
+    if (!isServiceRole && !isDbAdmin) {
+      throw new Error('Authorization denied: service_role required.');
+    }
+    const normalized = (role || '').toLowerCase().trim();
+    const ALLOWED_ROLES = new Set(['coordinator', 'lead_coordinator', 'admin']);
+    if (!ALLOWED_ROLES.has(normalized)) {
+      throw new Error(`Invalid role: ${role}. Permitted roles are coordinator, lead_coordinator, admin.`);
+    }
+    return { registered: true, email: email.toLowerCase().trim(), role: normalized };
+  };
+
+  // Anon caller attempting registration -> BLOCKED
+  assert.throws(() => simulateRegisterCoordinator(null, 'attacker@evil.com'), /Authorization denied/);
+  assert.throws(() => simulateRegisterCoordinator({ role: 'anon', sessionUser: 'authenticator' }, 'attacker@evil.com'), /Authorization denied/);
+
+  // Ordinary authenticated user attempting registration -> BLOCKED
+  assert.throws(() => simulateRegisterCoordinator({ role: 'authenticated', sessionUser: 'authenticator', uid: 'user-xyz' }, 'attacker@evil.com'), /Authorization denied/);
+
+  // Authenticated user attempting self-promotion to admin -> BLOCKED
+  assert.throws(() => simulateRegisterCoordinator({ role: 'authenticated', sessionUser: 'authenticator', uid: 'user-xyz' }, 'attacker@evil.com', 'admin'), /Authorization denied/);
+
+  // Service role with invalid role -> BLOCKED by allowlist
+  assert.throws(() => simulateRegisterCoordinator({ role: 'service_role', sessionUser: 'authenticator' }, 'coord@funtopia.com', 'superadmin'), /Invalid role/);
+
+  // Service role with valid allowlisted roles -> PERMITTED
+  const res1 = simulateRegisterCoordinator({ role: 'service_role', sessionUser: 'authenticator' }, 'coord@funtopia.com', 'coordinator');
+  assert.equal(res1.registered, true);
+  assert.equal(res1.role, 'coordinator');
+
+  // Database Administrator in Supabase SQL Editor (sessionUser: postgres) -> PERMITTED
+  const resAdmin = simulateRegisterCoordinator({ role: null, sessionUser: 'postgres' }, 'lead@funtopia.com', 'lead_coordinator');
+  assert.equal(resAdmin.registered, true);
+  assert.equal(resAdmin.role, 'lead_coordinator');
+
+  const res2 = simulateRegisterCoordinator({ role: 'service_role', sessionUser: 'authenticator' }, 'admin@funtopia.com', 'admin');
+  assert.equal(res2.registered, true);
+  assert.equal(res2.role, 'admin');
+
+  // 11. Test authorization logic predicate simulator
   const checkCoordinatorAuth = (authContext, coordinatorSet) => {
     if (!authContext) return false;
     if (authContext.role === 'service_role') return true;
@@ -863,3 +937,73 @@ test('--- 18. GUESS THE LANGUAGE 20 PUZZLES INTEGRITY, NATIVE SCRIPTS & PRIVACY 
     assert.equal(sanitized.revealType, 'crop');
   }
 });
+
+test('--- 20. SUPABASE REALTIME CONFIGURATION, VERSIONED MIGRATION & TELEMETRY ---', () => {
+  // 1. Verify sync status telemetry
+  const status = getSupabaseSyncStatus();
+  assert.ok(status !== null && typeof status === 'object', 'getSupabaseSyncStatus must return a status object');
+  assert.ok('status' in status, 'syncStatus must contain status field');
+  assert.ok('isSubscribed' in status, 'syncStatus must contain isSubscribed field');
+  assert.ok('mode' in status, 'syncStatus must contain mode field');
+
+  // 2. Client configuration check
+  const isConfigured = isSupabaseConfigured();
+  assert.equal(typeof isConfigured, 'boolean', 'isSupabaseConfigured must return a boolean');
+
+  // 3. Inspect versioned migration file
+  const migrationPath = path.join(process.cwd(), 'supabase', 'migrations', '20261102000000_guess_who_complete_schema.sql');
+  assert.ok(fs.existsSync(migrationPath), 'Migration file must exist');
+  const migrationSql = fs.readFileSync(migrationPath, 'utf8');
+
+  // Check RLS on all 6 tables
+  const expectedTables = [
+    'gw_game_state',
+    'gw_turn_events',
+    'gw_attempts',
+    'gw_players',
+    'gw_questions',
+    'gw_coordinators'
+  ];
+
+  for (const table of expectedTables) {
+    assert.ok(
+      migrationSql.includes(`ALTER TABLE public.${table} ENABLE ROW LEVEL SECURITY;`),
+      `Migration must enable RLS on public.${table}`
+    );
+  }
+
+  // Check critical security policies
+  assert.ok(
+    migrationSql.includes('CREATE POLICY "Public read sanitized game state" ON public.gw_game_state'),
+    'Migration must include projector read policy on gw_game_state'
+  );
+  assert.ok(
+    migrationSql.includes('CREATE POLICY "Coordinator write authoritative game state" ON public.gw_game_state'),
+    'Migration must include coordinator write policy on gw_game_state'
+  );
+  assert.ok(
+    migrationSql.includes('CREATE POLICY "Restrict raw questions access to coordinators" ON public.gw_questions'),
+    'Migration must restrict raw questions table with secrets to coordinators'
+  );
+  assert.ok(
+    migrationSql.includes('CREATE OR REPLACE VIEW public.gw_public_questions'),
+    'Migration must provide sanitized public view for questions'
+  );
+
+  // Check Realtime replica identity for full row updates
+  assert.ok(
+    migrationSql.includes('ALTER TABLE public.gw_game_state REPLICA IDENTITY FULL;'),
+    'Migration must set REPLICA IDENTITY FULL on gw_game_state for Realtime synchronization'
+  );
+  assert.ok(
+    migrationSql.includes('ALTER PUBLICATION supabase_realtime ADD TABLE public.gw_game_state;'),
+    'Migration must add gw_game_state to supabase_realtime publication'
+  );
+
+  // Check schema columns song_clue_text and subtype
+  assert.ok(migrationSql.includes('song_clue_text TEXT'), 'Migration must declare song_clue_text on gw_game_state');
+  assert.ok(migrationSql.includes('subtype TEXT'), 'Migration must declare subtype on gw_game_state');
+  assert.ok(migrationSql.includes('p_next_song_clue_text TEXT DEFAULT NULL'), 'Migration RPC must accept p_next_song_clue_text');
+  assert.ok(migrationSql.includes('p_next_subtype TEXT DEFAULT NULL'), 'Migration RPC must accept p_next_subtype');
+});
+

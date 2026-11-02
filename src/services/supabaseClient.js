@@ -35,25 +35,36 @@ const createFallbackClient = () => {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-      signInWithPassword: async () => ({ error: new Error('Supabase not configured. Check .env file.') }),
-      signUp: async () => ({ error: new Error('Supabase not configured. Check .env file.') }),
+      signInWithPassword: async () => ({ data: { user: null, session: null }, error: new Error('Supabase not configured. Check .env file.') }),
+      signUp: async () => ({ data: { user: null, session: null }, error: new Error('Supabase not configured. Check .env file.') }),
       signOut: async () => ({ error: null }),
     },
     from: (table) => ({
       select: () => ({
         order: () => Promise.resolve({ data: [], error: null }),
-        eq: () => Promise.resolve({ data: [], error: null }),
+        eq: () => ({
+          maybeSingle: () => Promise.resolve({ data: null, error: null }),
+          single: () => Promise.resolve({ data: null, error: null }),
+        }),
         limit: () => Promise.resolve({ data: [], error: null }),
         single: () => Promise.resolve({ data: null, error: null }),
+        maybeSingle: () => Promise.resolve({ data: null, error: null }),
       }),
       insert: () => Promise.resolve({ data: null, error: null }),
       update: () => Promise.resolve({ data: null, error: null }),
+      upsert: () => Promise.resolve({ data: null, error: null }),
       delete: () => Promise.resolve({ data: null, error: null }),
     }),
+    rpc: () => Promise.resolve({ data: null, error: new Error('RPC unavailable in offline mode.') }),
     channel: () => ({
-      on: () => ({ subscribe: () => {} }),
-      subscribe: () => {},
+      on: function() { return this; },
+      subscribe: function(callback) {
+        if (typeof callback === 'function') callback('SUBSCRIBED');
+        return this;
+      },
+      send: () => Promise.resolve('ok'),
     }),
+    removeChannel: () => Promise.resolve('ok'),
   };
 };
 
@@ -66,6 +77,9 @@ export const supabase = isSupabaseConfigured()
     })
   : createFallbackClient();
 
+/**
+ * Checks Supabase connection status and verifies whether the Guess Who schema is reachable.
+ */
 export const checkSupabaseConnection = async () => {
   if (!isSupabaseConfigured()) {
     return {
@@ -75,15 +89,56 @@ export const checkSupabaseConnection = async () => {
   }
 
   try {
-    const { error } = await supabase.from('participants').select('count', { count: 'exact', head: true });
-    if (error && error.code !== 'PGRST116') {
+    // Probe authoritative game state table
+    const { error } = await supabase.from('gw_game_state').select('id', { count: 'exact', head: true });
+    if (!error) {
+      return { connected: true, note: 'Connected to Supabase (Guess Who schema verified)' };
+    }
+    if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
       return { connected: true, note: 'Connected to Supabase project (ready for schema migration)' };
     }
-    return { connected: true, note: 'Connected and authenticated with Supabase anon role' };
+    return { connected: true, note: `Connected to Supabase (${error.message || 'Ready'})` };
   } catch (err) {
     return {
       connected: false,
       message: err.message || 'Unable to connect to Supabase.',
     };
   }
+};
+
+/**
+ * Coordinator authentication helpers for verified administrative operations.
+ */
+export const signInCoordinator = async ({ email, password }) => {
+  if (!isSupabaseConfigured()) {
+    return { data: null, error: new Error('Supabase is not configured.') };
+  }
+  return await supabase.auth.signInWithPassword({ email, password });
+};
+
+export const signOutCoordinator = async () => {
+  if (!isSupabaseConfigured()) {
+    return { error: null };
+  }
+  return await supabase.auth.signOut();
+};
+
+export const getCoordinatorSession = async () => {
+  if (!isSupabaseConfigured()) {
+    return { session: null, user: null };
+  }
+  const { data } = await supabase.auth.getSession();
+  return { session: data?.session || null, user: data?.session?.user || null };
+};
+
+export const onCoordinatorAuthStateChange = (callback) => {
+  if (!isSupabaseConfigured()) {
+    return { unsubscribe: () => {} };
+  }
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    if (typeof callback === 'function') {
+      callback(event, session);
+    }
+  });
+  return data?.subscription || { unsubscribe: () => {} };
 };

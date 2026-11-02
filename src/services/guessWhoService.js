@@ -521,6 +521,34 @@ export const recordPlayerTurn = (playerName, slotNumber, result) => {
 let liveChannel = null;
 let activeRealtimeChannel = null;
 
+let syncStatus = {
+  status: isSupabaseConfigured() ? 'ready' : 'offline',
+  mode: isSupabaseConfigured() ? 'supabase' : 'local_fallback',
+  isConfigured: isSupabaseConfigured(),
+  isRealtimeConnected: false,
+  isSubscribed: false,
+  lastSyncTime: null,
+  error: null,
+};
+const syncStatusListeners = new Set();
+const localStateSubscribers = new Set();
+
+const updateSyncStatus = (patch) => {
+  syncStatus = { ...syncStatus, ...patch };
+  syncStatusListeners.forEach((fn) => {
+    try { fn(syncStatus); } catch (e) {}
+  });
+};
+
+export const getSupabaseSyncStatus = () => ({ ...syncStatus, isConfigured: isSupabaseConfigured() });
+
+export const subscribeToSyncStatus = (listener) => {
+  if (typeof listener !== 'function') return () => {};
+  syncStatusListeners.add(listener);
+  listener(getSupabaseSyncStatus());
+  return () => syncStatusListeners.delete(listener);
+};
+
 const getLiveChannel = () => {
   if (typeof window === 'undefined') return null;
   if (!liveChannel && typeof window.BroadcastChannel !== 'undefined') {
@@ -533,6 +561,15 @@ const getSupabaseRealtimeChannel = () => {
   if (!isSupabaseConfigured() || !supabase) return null;
   if (!activeRealtimeChannel) {
     activeRealtimeChannel = supabase.channel('gw_game_state_sync');
+    if (typeof activeRealtimeChannel.subscribe === 'function') {
+      activeRealtimeChannel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          updateSyncStatus({ isRealtimeConnected: true, isSubscribed: true, status: 'connected', error: null });
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          updateSyncStatus({ isRealtimeConnected: false, isSubscribed: false, status: 'error', error: `Realtime connection: ${status}` });
+        }
+      });
+    }
   }
   return activeRealtimeChannel;
 };
@@ -617,7 +654,13 @@ export const getDisplayState = () => {
  */
 export const publishAuthoritativeState = async (updates = {}) => {
   const current = getDisplayState();
-  const merged = { ...current, ...updates, updatedAt: Date.now() };
+  const explicitScore = updates.score !== undefined ? updates.score : updates.finalScore;
+  const merged = {
+    ...current,
+    ...updates,
+    ...(explicitScore !== undefined ? { score: explicitScore, finalScore: explicitScore } : {}),
+    updatedAt: Date.now(),
+  };
   const sanitized = sanitizeGameStateForProjector(merged);
 
   // 1. Local fallback persistence
@@ -626,6 +669,11 @@ export const publishAuthoritativeState = async (updates = {}) => {
     setStoredValue(STORAGE_KEYS.DISPLAY_STATE, serialized);
     setStoredValue(STORAGE_KEYS.AUTHORITATIVE_STATE, serialized);
   } catch (err) {}
+
+  // Local in-memory subscribers (SSR, testing, instant updates)
+  localStateSubscribers.forEach((fn) => {
+    try { fn(sanitized); } catch (e) {}
+  });
 
   // 2. Local BroadcastChannel for same-browser testing
   const localCh = getLiveChannel();
@@ -669,10 +717,14 @@ export const publishAuthoritativeState = async (updates = {}) => {
         .then(({ error }) => {
           if (error && error.code !== '42P01') {
             console.warn('gw_game_state upsert notice:', error.message);
+            updateSyncStatus({ error: error.message });
+          } else if (!error) {
+            updateSyncStatus({ lastSyncTime: Date.now(), error: null });
           }
         });
     } catch (err) {
       console.warn('Supabase state upsert exception:', err);
+      updateSyncStatus({ error: err.message });
     }
 
     // B) Realtime instant broadcast
@@ -732,13 +784,19 @@ export const fetchAuthoritativeState = async () => {
  * - Local BroadcastChannel / storage event fallback
  */
 export const subscribeToAuthoritativeState = (callback) => {
-  if (typeof window === 'undefined') return () => {};
-
   const notify = (raw) => {
     if (!raw) return;
     const sanitized = sanitizeGameStateForProjector(raw);
     callback(sanitized);
   };
+
+  localStateSubscribers.add(notify);
+
+  if (typeof window === 'undefined') {
+    return () => {
+      localStateSubscribers.delete(notify);
+    };
+  }
 
   // 1. Local BroadcastChannel
   const handleLocalChannel = (event) => {
@@ -797,6 +855,7 @@ export const subscribeToAuthoritativeState = (callback) => {
   fetchAuthoritativeState().then(notify);
 
   return () => {
+    localStateSubscribers.delete(notify);
     if (localCh) {
       localCh.removeEventListener('message', handleLocalChannel);
     }
@@ -869,14 +928,18 @@ export const submitAuthoritativeTurn = async ({
         p_next_dialogue_text: nextQuestion ? nextQuestion.dialogue_text : null,
         p_next_reveal_type: nextQuestion ? (nextQuestion.reveal_type || 'crop') : 'crop',
         p_next_reveal_metadata: nextQuestion ? (nextQuestion.reveal_metadata || null) : null,
+        p_next_song_clue_text: nextQuestion ? (nextQuestion.song_clue_text || (nextQuestion.subtype === 'bollywood_song_guess' ? nextQuestion.clue : null)) : null,
+        p_next_subtype: nextQuestion ? (nextQuestion.subtype || null) : null,
       });
 
       if (error) {
         console.error('Supabase atomic scoring rejection:', error.message);
+        updateSyncStatus({ error: error.message });
         throw new Error(error.message);
       }
 
       if (data) {
+        updateSyncStatus({ lastSyncTime: Date.now(), error: null });
         const sanitized = sanitizeGameStateForProjector(data);
         setStoredValue(STORAGE_KEYS.DISPLAY_STATE, JSON.stringify(sanitized));
         setStoredValue(STORAGE_KEYS.AUTHORITATIVE_STATE, JSON.stringify(sanitized));
