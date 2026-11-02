@@ -293,13 +293,6 @@ export default function WelcomeHomepage({ soundEnabled, setSoundEnabled, trigger
               <span className="text-xl">⭐</span>
               <span className="text-[#FFDE25] font-arcade text-[10px]">16-BIT CHAMPIONSHIP ENGINE</span>
               <span className="text-purple-200 text-[10px] hidden md:inline">• PRESS START TO CHOOSE PORTAL</span>
-              <span className="text-purple-300 text-[10px] hidden lg:inline">•</span>
-              <button
-                onClick={() => setIsCreatorsModalOpen(true)}
-                className="text-[#FFDE25] hover:text-white underline decoration-[#FFDE25] font-arcade text-[10px] transition-colors cursor-pointer"
-              >
-                MEET THE CREATORS
-              </button>
             </div>
             <div className="text-[10px] font-arcade text-white/90">
               HIGH SCORE: 999,990 • SYSTEM LIVE

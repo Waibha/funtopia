@@ -251,14 +251,8 @@ export default function PortalSelectPage() {
       {/* Footer Platform */}
       <footer className="relative z-10 w-full mt-6">
         <div className="pixel-grass-strip h-3 w-full" />
-        <div className="pixel-brick-strip py-3.5 px-6 flex flex-col sm:flex-row items-center justify-between text-center text-xs font-arcade text-[#FFDE25] gap-2 max-w-6xl mx-auto">
-          <span>MADAGASCAR CHAMPIONSHIP CIRCUIT • TWO DISTINCT EXPERIENCES</span>
-          <button
-            onClick={() => setIsCreatorsModalOpen(true)}
-            className="hover:text-white underline decoration-[#FFDE25] transition-colors cursor-pointer"
-          >
-            MEET THE CREATORS
-          </button>
+        <div className="pixel-brick-strip py-3.5 px-6 text-center text-xs font-arcade text-[#FFDE25]">
+          MADAGASCAR CHAMPIONSHIP CIRCUIT • TWO DISTINCT EXPERIENCES
         </div>
       </footer>
 
