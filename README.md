@@ -317,6 +317,17 @@ Detailed table schemas, SQL migration scripts, and RLS policies are documented i
 
 ---
 
+## 👥 Meet the Creators
+
+MADAGASCAR is created and developed by a dedicated 2-person development team:
+
+| Creator | Role | GitHub | Contribution Scope |
+| :--- | :--- | :--- | :--- |
+| **Waibha** | Lead Architect & Full-Stack Developer | [@Waibha](https://github.com/Waibha) | Engineered the core MADAGASCAR tournament platform, including the arcade leaderboard, Admin Portal, Participant Portal, USN-based authentication, virtual coin system and Supabase integration. |
+| **hania** | Guess Who? Game Developer | [@hania](https://github.com/hania) | Developed the interactive Guess Who? game, including its puzzle and deduction mechanics, question categories, visual reveal experience and scoring integration. |
+
+---
+
 ## 📄 License
 
 This project is licensed under the [MIT License](./package.json).
