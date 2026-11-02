@@ -563,48 +563,84 @@ export default function ParticipantPortal({
               {/* Games Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Featured Game: GUESS WHO? */}
-                <div className="col-span-1 md:col-span-2 p-6 sm:p-8 rounded-3xl bg-[#200B3B] text-white border-4 border-[#FFDE25] shadow-pixel-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                  <div className="flex items-center gap-5">
-                    <div className="w-20 h-20 rounded-2xl bg-[#FF5FA0] border-4 border-[#0D0518] shadow-pixel flex items-center justify-center text-4xl shrink-0">
-                      🎯
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2.5 py-0.5 rounded-full bg-[#FFDE25] text-[#0D0518] font-arcade text-[9px] font-black uppercase border border-[#0D0518]">
-                          FEATURED ARENA
-                        </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border border-[#0D0518]">
-                          LIVE PROJECTOR
-                        </span>
+                {(() => {
+                  const guessWhoGame = (data.games || []).find((g) => g.id === 'game-guess-who' || g.name.toLowerCase().includes('guess who')) || {
+                    id: 'game-guess-who',
+                    name: 'Guess Who?',
+                    cost: 5,
+                    defaultPoints: 7,
+                    isActive: true,
+                  };
+                  const gwCost = guessWhoGame.cost !== undefined ? guessWhoGame.cost : (guessWhoGame.entryFeeCoins || 5);
+                  const isGwJoined = Boolean(joinedGames[guessWhoGame.id]);
+                  const canAffordGw = loggedInParticipant ? currentCoins >= gwCost : false;
+
+                  return (
+                    <div className="col-span-1 md:col-span-2 p-6 sm:p-8 rounded-3xl bg-[#200B3B] text-white border-4 border-[#FFDE25] shadow-pixel-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                      <div className="flex items-center gap-5">
+                        <div className="w-20 h-20 rounded-2xl bg-[#FF5FA0] border-4 border-[#0D0518] shadow-pixel flex items-center justify-center text-4xl shrink-0">
+                          🎯
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#FFDE25] text-[#0D0518] font-arcade text-[9px] font-black uppercase border border-[#0D0518]">
+                              FEATURED ARENA
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border border-[#0D0518]">
+                              ENTRY: {gwCost} COINS
+                            </span>
+                          </div>
+                          <h3 className="font-bungee text-2xl sm:text-3xl text-[#FFDE25]">
+                            GUESS WHO? PUZZLE ARENA
+                          </h3>
+                          <p className="text-purple-200 text-xs sm:text-sm font-sans mt-1 max-w-xl">
+                            Interactive deduction challenge featuring 12 mystery puzzles, visual reveal tiers, and audience projector sync. 7 correct answers wins championship points!
+                          </p>
+                        </div>
                       </div>
-                      <h3 className="font-bungee text-2xl sm:text-3xl text-[#FFDE25]">
-                        GUESS WHO? PUZZLE ARENA
-                      </h3>
-                      <p className="text-purple-200 text-xs sm:text-sm font-sans mt-1 max-w-xl">
-                        Interactive deduction challenge featuring 12 progressive mystery puzzles, visual reveal tiers, and multi-category clues.
-                      </p>
+
+                      <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full md:w-auto">
+                        {isGwJoined ? (
+                          <div className="flex items-center gap-2">
+                            <span className="px-3 py-1.5 rounded-xl bg-[#28C76F] text-[#0D0518] font-arcade text-[10px] font-black border-2 border-[#0D0518]">
+                              ENTERED ✓
+                            </span>
+                            <button
+                              onClick={() => navigate('/guess-who')}
+                              className="btn-pixel-yellow text-xs py-3 px-5 flex items-center justify-center gap-2 font-black"
+                            >
+                              <Gamepad2 className="w-4 h-4" />
+                              <span>VIEW PROJECTOR</span>
+                              <ArrowRight className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <button
+                              onClick={() => handleJoinGameClick(guessWhoGame)}
+                              disabled={isJoining || (loggedInParticipant && !canAffordGw)}
+                              className={`btn-pixel-green text-xs py-3 px-5 flex items-center justify-center gap-2 w-full sm:w-auto font-black ${
+                                loggedInParticipant && !canAffordGw ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
+                            >
+                              <Coins className="w-4 h-4" />
+                              <span>JOIN GAME ({gwCost} COINS)</span>
+                            </button>
+                            <button
+                              onClick={() => navigate('/guess-who')}
+                              className="btn-pixel-white text-xs py-3 px-4 flex items-center justify-center gap-1.5 font-bold"
+                              title="Open audience display"
+                            >
+                              <span>PROJECTOR</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  );
+                })()}
 
-                  <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full md:w-auto">
-                    <button
-                      onClick={() => navigate('/guess-who')}
-                      className="btn-pixel-yellow text-xs py-3 px-5 flex items-center justify-center gap-2 w-full sm:w-auto font-black"
-                    >
-                      <Gamepad2 className="w-4 h-4" />
-                      <span>LAUNCH GAME</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => navigate('/guess-who/lobby')}
-                      className="btn-pixel-white text-xs py-3 px-4 flex items-center justify-center gap-1.5 w-full sm:w-auto font-bold"
-                    >
-                      <span>LOBBY</span>
-                    </button>
-                  </div>
-                </div>
-
-                {data.games.map((g) => {
+                {data.games.filter(g => g.id !== 'game-guess-who').map((g) => {
                   const entryCost = Number(g.cost || 0);
                   const isJoined = Boolean(joinedGames[g.id]);
                   const canAfford = loggedInParticipant ? currentCoins >= entryCost : false;

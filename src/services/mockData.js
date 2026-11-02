@@ -14,10 +14,18 @@ export const INITIAL_DATA = {
   },
   // Admin-controlled system settings
   settings: {
-    startingCoins: 5, // Configurable by administrator; applies to future registrations
+    startingCoins: 10, // Configurable by administrator; applies to future registrations
     lastUpdated: new Date().toISOString(),
   },
-  games: [],
+  games: [
+    {
+      id: 'game-guess-who',
+      name: 'Guess Who?',
+      cost: 5,
+      defaultPoints: 7,
+      isActive: true,
+    },
+  ],
   participants: [],
   transactions: [], // Competition performance points (Leaderboard ranking)
   coinTransactions: [], // Virtual coin audit trail (Entry fees, starting allocations, admin adjustments)

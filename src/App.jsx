@@ -10,10 +10,8 @@ import AdminPortal from './pages/AdminPortal';
 import MeetCreatorsPage from './pages/MeetCreatorsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 
-// Guess Who Game Pages (Person 2 Scope)
+// Guess Who Game Pages (Public Projector)
 import GuessWhoHubPage from './pages/guess-who/GuessWhoHubPage';
-import GuessWhoLobbyPage from './pages/guess-who/GuessWhoLobbyPage';
-import AdminGuessWhoPage from './pages/admin/AdminGuessWhoPage';
 
 // Public Informational Pages
 import LeaderboardPage from './pages/public/LeaderboardPage';
@@ -338,11 +336,8 @@ export default function App() {
           {/* Dedicated Clean Public Projector Display Interface */}
           <Route path="/guess-who" element={<GuessWhoHubPage />} />
 
-          {/* Staging / Fallback Match Lobby */}
-          <Route path="/guess-who/lobby" element={<GuessWhoLobbyPage />} />
-
-          {/* Guess Who Administrative Control & Scoring Hub */}
-          <Route path="/admin/guess-who" element={<AdminGuessWhoPage />} />
+          {/* Standalone admin route redirects to integrated Main Admin Portal */}
+          <Route path="/admin/guess-who" element={<Navigate to="/admin" replace />} />
 
           {/* ================================================================= */}
           {/* CHAMPIONSHIP ADMIN PORTAL                                         */}
@@ -362,6 +357,7 @@ export default function App() {
                 onRemoveParticipant={handleRemoveParticipant}
                 onUpdateStartingCoins={handleUpdateStartingCoins}
                 onAdjustParticipantCoins={handleAdjustParticipantCoins}
+                onJoinGame={handleJoinGame}
                 triggerCelebration={triggerCelebration}
               />
             }

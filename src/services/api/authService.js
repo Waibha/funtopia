@@ -191,7 +191,7 @@ export async function registerParticipantWithUSN({
   usn,
   pin,
   avatar = '👾',
-  startingCoins = 5,
+  startingCoins = 10,
   existingParticipants = [],
 }) {
   const cleanName = (name || '').trim();
@@ -222,7 +222,7 @@ export async function registerParticipantWithUSN({
 
   try {
     const pinHash = await hashPin(cleanPin, cleanUsn);
-    const allocatedCoins = Number(startingCoins ?? 5);
+    const allocatedCoins = Number(startingCoins ?? 10);
 
     const participant = {
       id: `p-${cleanUsn.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Date.now().toString(36)}`,

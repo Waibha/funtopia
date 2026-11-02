@@ -37,6 +37,7 @@ export default function AdminPortal({
   onRemoveParticipant,
   onUpdateStartingCoins,
   onAdjustParticipantCoins,
+  onJoinGame,
   triggerCelebration,
 }) {
   const navigate = useNavigate();
@@ -289,7 +290,14 @@ export default function AdminPortal({
           )}
 
           {currentTab === 'guess-who' && (
-            <AdminGuessWhoPage />
+            <AdminGuessWhoPage
+              data={data}
+              participants={data.participants || []}
+              games={data.games || []}
+              onAwardScore={onAwardScore}
+              onJoinGame={onJoinGame}
+              triggerCelebration={triggerCelebration}
+            />
           )}
 
           {currentTab === 'coins' && (

@@ -22,7 +22,7 @@ import AuthArcadeBackground from '../backgrounds/AuthArcadeBackground';
 
 export default function ParticipantAuthScreen({
   onAuthSuccess,
-  startingCoins = 5,
+  startingCoins = 10,
   registeredParticipants = [],
   triggerCelebration,
 }) {

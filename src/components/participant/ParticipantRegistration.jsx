@@ -9,7 +9,7 @@ import ParticipantAuthScreen from './ParticipantAuthScreen';
 export default function ParticipantRegistration({
   onRegisterParticipant,
   onParticipantLogin,
-  startingCoins = 5,
+  startingCoins = 10,
   registeredList = [],
   triggerCelebration,
 }) {
