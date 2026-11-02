@@ -1,6 +1,6 @@
 # Guess Who? Master Dataset Status: Cleared for Manual Ingestion
 
-The **FUNTOPIA Guess Who?** master dataset (`src/data/guessWhoMasterDataset.json`) has been completely cleared (0 records) to allow manual selection, folder curation, and upload of custom puzzle images.
+The **MADAGASCAR Guess Who?** master dataset (`src/data/guessWhoMasterDataset.json`) has been completely cleared (0 records) to allow manual selection, folder curation, and upload of custom puzzle images.
 
 ---
 

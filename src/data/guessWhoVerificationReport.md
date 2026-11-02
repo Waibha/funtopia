@@ -1,6 +1,6 @@
 # Guess Who? Master Dataset Verification Report: Cleared State & Backup Audit
 
-**Project:** FUNTOPIA Arcade Championship  
+**Project:** MADAGASCAR Arcade Championship (Repository: FUNTOPIA)  
 **Module:** Guess Who? Cosmic Deduction Arena  
 **Dataset State:** CLEARED FOR MANUAL SELECTION  
 **Active Records:** 0  

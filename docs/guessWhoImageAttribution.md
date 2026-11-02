@@ -1,6 +1,6 @@
 # Guess Who? Dataset — Image Attribution & Licensing Report
 
-**Project:** FUNTOPIA Arcade Championship  
+**Project:** MADAGASCAR Arcade Championship (Repository: FUNTOPIA)  
 **Module:** Guess Who? Cosmic Deduction Arena  
 **Dataset Version:** 3.0.0 (Master Corrected & Expanded Dataset — 190 Records)  
 **Total Records:** 190 Questions  
