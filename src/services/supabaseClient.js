@@ -129,9 +129,9 @@ export const checkSupabaseConnection = async () => {
   }
 
   try {
-    const { error } = await supabase.from('gw_game_state').select('id', { count: 'exact', head: true });
+    const { error } = await supabase.from('games').select('id', { count: 'exact', head: true });
     if (!error) {
-      return { connected: true, note: 'Connected to Supabase (Guess Who schema verified)' };
+      return { connected: true, note: 'Connected to Supabase (Platform schema verified)' };
     }
     if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
       return { connected: true, note: 'Connected to Supabase project (ready for schema migration)' };
@@ -147,37 +147,16 @@ export const checkSupabaseConnection = async () => {
 
 /**
  * Coordinator authentication helpers for verified administrative operations.
+ * Routed to the dedicated Guess Who Supabase client (guessWhoSupabaseClient.js)
+ * to maintain complete backward compatibility while isolating Guess Who credentials.
  */
-export const signInCoordinator = async ({ email, password }) => {
-  if (!isSupabaseConfigured()) {
-    return { data: null, error: new Error('Supabase is not configured.') };
-  }
-  return await supabase.auth.signInWithPassword({ email, password });
-};
-
-export const signOutCoordinator = async () => {
-  if (!isSupabaseConfigured()) {
-    return { error: null };
-  }
-  return await supabase.auth.signOut();
-};
-
-export const getCoordinatorSession = async () => {
-  if (!isSupabaseConfigured()) {
-    return { session: null, user: null };
-  }
-  const { data } = await supabase.auth.getSession();
-  return { session: data?.session || null, user: data?.session?.user || null };
-};
-
-export const onCoordinatorAuthStateChange = (callback) => {
-  if (!isSupabaseConfigured()) {
-    return { unsubscribe: () => {} };
-  }
-  const { data } = supabase.auth.onAuthStateChange((event, session) => {
-    if (typeof callback === 'function') {
-      callback(event, session);
-    }
-  });
-  return data?.subscription || { unsubscribe: () => {} };
-};
+export {
+  signInCoordinator,
+  signOutCoordinator,
+  getCoordinatorSession,
+  onCoordinatorAuthStateChange,
+  verifyCoordinatorRole,
+  isGwSupabaseConfigured,
+  gwSupabase,
+  GW_SUPABASE_TABLES,
+} from './guessWhoSupabaseClient.js';

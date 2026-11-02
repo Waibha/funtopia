@@ -49,9 +49,9 @@ import {
   getSupabaseSyncStatus,
   subscribeToSyncStatus
 } from '../../services/guessWhoService';
-import { 
-  isSupabaseConfigured
-} from '../../services/supabaseClient';
+import {
+  isGwSupabaseConfigured
+} from '../../services/guessWhoSupabaseClient';
 import { APPROVED_CATEGORIES } from '../../data/guessWhoSeedDecks';
 import { playArcadeSound } from '../../utilities/sound';
 
@@ -73,7 +73,7 @@ export default function AdminGuessWhoPage({
   const [currentStep, setCurrentStep] = useState('step_player');
 
   // Supabase Auth & Synchronization Telemetry
-  const isSupabaseReady = isSupabaseConfigured();
+  const isSupabaseReady = isGwSupabaseConfigured();
   const [syncTelemetry, setSyncTelemetry] = useState(getSupabaseSyncStatus());
 
   // Player, Participant & Slab state

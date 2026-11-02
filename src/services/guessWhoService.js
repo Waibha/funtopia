@@ -17,7 +17,7 @@
  */
 
 import { INITIAL_QUESTION_LIBRARY, APPROVED_CATEGORIES } from '../data/guessWhoSeedDecks.js';
-import { supabase, isSupabaseConfigured } from './supabaseClient.js';
+import { gwSupabase as supabase, isGwSupabaseConfigured as isSupabaseConfigured, isGwSupabaseConfigured } from './guessWhoSupabaseClient.js';
 
 const STORAGE_KEYS = {
   LIBRARY: 'funtopia_gw_library',
