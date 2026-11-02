@@ -12,7 +12,7 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('Unhandled UI Error caught by MADAGASCAR ErrorBoundary:', error, errorInfo);
+    console.error('Unhandled UI Error caught by FUNTOPIA ErrorBoundary:', error, errorInfo);
   }
 
   handleReset = () => {

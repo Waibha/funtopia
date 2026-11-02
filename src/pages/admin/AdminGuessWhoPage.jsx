@@ -45,19 +45,39 @@ import {
   submitAuthoritativeTurn,
   getDisplayState,
   archiveCompletedRun,
-  getRunHistory
+  getRunHistory,
+  getSupabaseSyncStatus,
+  subscribeToSyncStatus
 } from '../../services/guessWhoService';
+import { 
+  isSupabaseConfigured,
+  signInCoordinator,
+  signOutCoordinator,
+  getCoordinatorSession,
+  onCoordinatorAuthStateChange
+} from '../../services/supabaseClient';
 import { APPROVED_CATEGORIES } from '../../data/guessWhoSeedDecks';
 import { playArcadeSound } from '../../utilities/sound';
 
 // Modals
 import AddQuestionModal from '../../components/guess-who/AddQuestionModal';
 import QuestionBrowserModal from '../../components/guess-who/QuestionBrowserModal';
+import Modal from '../../components/ui/Modal';
 
 export default function AdminGuessWhoPage() {
   // Navigation workflow state:
   // 'step_player' | 'step_generate' | 'step_review' | 'step_gameplay' | 'step_result'
   const [currentStep, setCurrentStep] = useState('step_player');
+
+  // Supabase Auth & Synchronization Telemetry
+  const isSupabaseReady = isSupabaseConfigured();
+  const [coordinatorUser, setCoordinatorUser] = useState(null);
+  const [syncTelemetry, setSyncTelemetry] = useState(getSupabaseSyncStatus());
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState(null);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Player & Slab state
   const [playerNameInput, setPlayerNameInput] = useState('');
@@ -87,6 +107,57 @@ export default function AdminGuessWhoPage() {
   useEffect(() => {
     setPlayersList(getRegisteredPlayers());
   }, []);
+
+  // Monitor Coordinator Authentication & Supabase Synchronization
+  useEffect(() => {
+    if (isSupabaseReady) {
+      getCoordinatorSession().then(({ user }) => {
+        setCoordinatorUser(user);
+      });
+      const authSub = onCoordinatorAuthStateChange((event, session) => {
+        setCoordinatorUser(session?.user || null);
+      });
+      const syncSub = subscribeToSyncStatus((status) => {
+        setSyncTelemetry(status);
+      });
+      return () => {
+        if (typeof authSub?.unsubscribe === 'function') authSub.unsubscribe();
+        syncSub();
+      };
+    }
+  }, [isSupabaseReady]);
+
+  const handleCoordinatorLogin = async (e) => {
+    e.preventDefault();
+    if (!loginEmail.trim() || !loginPassword.trim()) {
+      setLoginError('Coordinator email and password are required.');
+      return;
+    }
+    setIsLoggingIn(true);
+    setLoginError(null);
+    try {
+      const { data, error } = await signInCoordinator({ email: loginEmail.trim(), password: loginPassword });
+      if (error) {
+        setLoginError(error.message);
+      } else {
+        setCoordinatorUser(data?.user || null);
+        setIsLoginModalOpen(false);
+        setLoginEmail('');
+        setLoginPassword('');
+        playArcadeSound('laser');
+      }
+    } catch (err) {
+      setLoginError(err.message || 'Login failed.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleCoordinatorLogout = async () => {
+    await signOutCoordinator();
+    setCoordinatorUser(null);
+    playArcadeSound('blip');
+  };
 
   const library = getQuestionLibrary();
 
@@ -544,6 +615,68 @@ export default function AdminGuessWhoPage() {
           </a>
         </div>
       </div>
+
+      {/* Supabase Synchronization & Coordinator Auth Telemetry Banner */}
+      <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono">
+        <div className="flex items-center gap-2 flex-wrap">
+          {isSupabaseReady ? (
+            <>
+              <Badge variant={coordinatorUser ? 'emerald' : 'gold'} size="sm">
+                {coordinatorUser ? '🟢 SUPABASE SYNC ACTIVE' : '🟡 SUPABASE ONLINE'}
+              </Badge>
+              {coordinatorUser ? (
+                <span className="text-slate-300">
+                  Coordinator: <strong className="text-cyan-300">{coordinatorUser.email}</strong>
+                </span>
+              ) : (
+                <span className="text-amber-300">
+                  Sign in as coordinator to synchronize authoritative scores to Supabase
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <Badge variant="purple" size="sm">⚪ OFFLINE MODE</Badge>
+              <span className="text-slate-400">
+                Local in-memory / localStorage mode active (No Supabase credentials detected)
+              </span>
+            </>
+          )}
+        </div>
+
+        {isSupabaseReady && (
+          <div className="flex items-center gap-2 shrink-0">
+            {coordinatorUser ? (
+              <Button variant="ghost" size="sm" onClick={handleCoordinatorLogout} className="text-[11px] py-1 px-2.5">
+                Sign Out
+              </Button>
+            ) : (
+              <Button variant="cyan" size="sm" onClick={() => setIsLoginModalOpen(true)} className="text-[11px] py-1 px-2.5 shadow-sm">
+                🔐 Coordinator Login
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Sync Warning Banner if write error exists */}
+      {isSupabaseReady && syncTelemetry?.error && (
+        <div className="p-3 rounded-xl bg-amber-950/60 border border-amber-500/50 text-amber-200 text-xs font-mono flex items-center justify-between gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>
+              <strong>Supabase Sync Notice:</strong> {syncTelemetry.error}. Operating in transactional local fallback mode.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSyncTelemetry({ ...syncTelemetry, error: null })}
+            className="text-amber-400 hover:text-white text-[11px] underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* ===================================================================== */}
       {/* STEP 1: ENTER PLAYER NAME                                             */}
@@ -1333,6 +1466,70 @@ export default function AdminGuessWhoPage() {
           onSelectQuestion={handleReplaceSlotQuestion}
         />
       )}
+
+      {/* Coordinator Authentication Modal */}
+      <Modal
+        isOpen={isLoginModalOpen}
+        onClose={() => {
+          setIsLoginModalOpen(false);
+          setLoginError(null);
+        }}
+        title="COORDINATOR AUTHENTICATION"
+      >
+        <form onSubmit={handleCoordinatorLogin} className="space-y-4">
+          <p className="text-xs text-slate-300 font-sans leading-relaxed">
+            Sign in with verified coordinator credentials to authorize authoritative scoring and live Realtime state broadcasts to the projector display.
+          </p>
+          {loginError && (
+            <div className="p-3 rounded-lg bg-pink-950/70 border border-pink-500/50 text-pink-300 text-xs font-mono">
+              ⚠️ {loginError}
+            </div>
+          )}
+          <div>
+            <label className="block text-xs font-mono text-slate-300 mb-1">Coordinator Email:</label>
+            <input
+              type="email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              placeholder="coordinator@example.com"
+              className="w-full px-3 py-2 rounded-lg bg-cosmic-950 border border-purple-500/40 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-mono text-slate-300 mb-1">Password:</label>
+            <input
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              placeholder="••••••••••••"
+              className="w-full px-3 py-2 rounded-lg bg-cosmic-950 border border-purple-500/40 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+            />
+          </div>
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setIsLoginModalOpen(false);
+                setLoginError(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="cyan"
+              size="sm"
+              disabled={isLoggingIn}
+              className="shadow-neon-cyan"
+            >
+              {isLoggingIn ? 'Authenticating...' : 'Sign In as Coordinator'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

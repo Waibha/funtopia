@@ -101,7 +101,7 @@ export default function ParticipantAuthScreen({
 
       soundFx.play('fanfare');
       if (triggerCelebration) triggerCelebration();
-      setSuccessMsg(`Welcome to MADAGASCAR, ${res.participant.name}!`);
+      setSuccessMsg(`Welcome to FUNTOPIA, ${res.participant.name}!`);
 
       setTimeout(() => {
         if (onAuthSuccess) {
@@ -172,7 +172,7 @@ export default function ParticipantAuthScreen({
 
         <div className="flex items-center gap-2">
           <span className="font-bungee text-2xl tracking-wider text-[#FFDE25] pixel-title-yellow">
-            MADAGASCAR
+            FUNTOPIA
           </span>
           <span className="px-2 py-0.5 rounded-full bg-[#00F0FF] text-[#0D0518] font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518]">
             ARENA ENTRANCE
@@ -212,7 +212,7 @@ export default function ParticipantAuthScreen({
                   KIOSK ONLINE
                 </span>
                 <span className="text-[#00F0FF] tracking-wider hidden sm:inline">
-                  MADAGASCAR ROM v3.2
+                  FUNTOPIA ROM v3.2
                 </span>
                 <span className="text-[#FFDE25] bg-[#11041F] px-2 py-0.5 rounded border border-[#FFDE25]/40 font-mono">
                   1P READY
@@ -517,7 +517,7 @@ export default function ParticipantAuthScreen({
 
       {/* Retro Footer */}
       <footer className="relative z-10 py-4 px-6 text-center text-xs font-mono text-purple-200 select-none">
-        MADAGASCAR 16-BIT RETRO CHAMPIONSHIP PLATFORM
+        FUNTOPIA 16-BIT RETRO CHAMPIONSHIP PLATFORM
       </footer>
     </div>
   );
