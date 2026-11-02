@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Gamepad2, Plus, Edit2, Trash2, Power, Coins, Trophy, Sparkles, Swords } from 'lucide-react';
+import { Gamepad2, Plus, Edit2, Trash2, Power, Coins, Trophy } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 
 export default function GameManagement({ games = [], onSaveGame, onDeleteGame, onToggleGameActive }) {
@@ -39,7 +39,7 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
 
   const handleDelete = (gameId, name) => {
     soundFx.play('scoreDown');
-    if (window.confirm(`Delete trial "${name}"?`)) {
+    if (window.confirm(`Delete game "${name}"?`)) {
       onDeleteGame(gameId);
     }
   };
@@ -61,27 +61,27 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
   };
 
   return (
-    <div className="py-4 space-y-8 max-w-7xl mx-auto font-sans text-slate-100">
+    <div className="py-4 space-y-8 max-w-7xl mx-auto font-sans">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Swords className="w-6 h-6 text-[#FFC837]" />
-            <h1 className="font-cinzel text-2xl sm:text-4xl text-[#FFC837] fantasy-title-gold">
-              QUEST TRIALS CATALOG
+            <Gamepad2 className="w-6 h-6 text-[#FF7A00]" />
+            <h1 className="font-bungee text-2xl sm:text-4xl text-[#FFDE25] pixel-title-yellow">
+              GAMES CATALOG
             </h1>
           </div>
-          <p className="text-slate-300 font-jakarta text-xs sm:text-sm font-medium">
-            Forge quest trials, specify gold coin entry tributes, set default renown scores, and toggle kingdom rotation.
+          <p className="text-purple-200 font-mono text-xs sm:text-sm font-medium">
+            Add games, rename, set coin entry costs, and toggle tournament activation.
           </p>
         </div>
 
         <button
           onClick={handleOpenCreate}
-          className="btn-fantasy-primary flex items-center gap-2 text-xs py-3 px-5 font-cinzel font-black"
+          className="btn-pixel-yellow flex items-center gap-2"
         >
-          <Plus className="w-4 h-4 text-[#0A091A]" />
-          <span>ADD QUEST TRIAL</span>
+          <Plus className="w-4 h-4" />
+          <span>ADD GAME</span>
         </button>
       </div>
 
@@ -90,30 +90,30 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
         {games.map((game) => (
           <div
             key={game.id}
-            className={`rounded-3xl p-6 border flex flex-col justify-between transition-all duration-200 text-slate-100 ${
+            className={`group rounded-3xl p-6 border-4 border-[#0D0518] flex flex-col justify-between transition-all duration-200 text-[#0D0518] ${
               game.isActive
-                ? 'bg-gradient-to-b from-[#111928] via-[#0E1524] to-[#0A101C] border-white/15 shadow-fantasy-card hover:-translate-y-1 hover:border-[#FFC837]/40'
-                : 'bg-[#080C16] opacity-60 border-slate-800'
+                ? 'bg-white shadow-pixel-lg hover:-translate-y-1.5 hover:shadow-pixel-xl hover:border-[#FFDE25]'
+                : 'bg-gray-100 opacity-60 border-gray-400'
             }`}
           >
             <div>
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400/20 via-emerald-500/20 to-teal-500/20 border border-[#FFC837]/40 shadow-fantasy-gold flex items-center justify-center text-2xl shrink-0">
-                    ⚔️
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel-sm flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                    🕹️
                   </div>
                   <div>
-                    <h3 className="font-cinzel font-bold text-lg text-amber-200 leading-tight">
+                    <h3 className="font-display font-black text-xl text-[#0D0518] leading-tight">
                       {game.name}
                     </h3>
                     <span
-                      className={`inline-block mt-1 text-[9px] font-cinzel font-bold px-2 py-0.5 rounded border ${
+                      className={`inline-block mt-1 text-[9px] font-arcade font-black px-2 py-0.5 rounded border-2 border-[#0D0518] ${
                         game.isActive
-                          ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40'
-                          : 'bg-slate-800 text-slate-400 border-slate-700'
+                          ? 'bg-[#28C76F] text-[#0D0518]'
+                          : 'bg-gray-200 text-gray-600'
                       }`}
                     >
-                      {game.isActive ? 'ACTIVE IN ROTATION' : 'SEALED'}
+                      {game.isActive ? 'ACTIVE' : 'INACTIVE'}
                     </span>
                   </div>
                 </div>
@@ -123,59 +123,59 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
                     soundFx.play('click');
                     onToggleGameActive(game.id);
                   }}
-                  className={`p-2 rounded-xl border text-xs font-bold transition-all ${
+                  className={`p-2 rounded-xl border-2 border-[#0D0518] font-mono text-xs font-black shadow-pixel-sm transition-all ${
                     game.isActive
-                      ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40 hover:bg-emerald-900'
-                      : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
+                      ? 'bg-[#28C76F] text-[#0D0518]'
+                      : 'bg-gray-200 text-gray-500'
                   }`}
-                  title={game.isActive ? 'Deactivate Trial' : 'Activate Trial'}
+                  title={game.isActive ? 'Deactivate Game' : 'Activate Game'}
                 >
                   <Power className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Game Economics: Cost & Default Points */}
-              <div className="grid grid-cols-2 gap-2.5 mb-4">
-                <div className="bg-[#080E1C] p-3 rounded-2xl border border-white/10 text-center font-jakarta">
-                  <span className="text-[9px] text-slate-400 block font-cinzel font-bold uppercase tracking-wider">
-                    ENTRY TRIBUTE
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="bg-[#FAF7EE] p-3 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
+                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-wider">
+                    ENTRY COST
                   </span>
-                  <span className="text-base font-bold text-amber-300 flex items-center justify-center gap-1 mt-0.5">
-                    <Coins className="w-4 h-4 text-[#FFC837]" />
-                    {Number(game.cost || 0).toLocaleString()} GOLD
+                  <span className="text-base font-black text-[#FF5FA0] flex items-center justify-center gap-1 mt-0.5">
+                    <Coins className="w-4 h-4 text-[#FFDE25]" />
+                    {Number(game.cost || 0).toLocaleString()}
                   </span>
                 </div>
 
-                <div className="bg-[#080E1C] p-3 rounded-2xl border border-white/10 text-center font-jakarta">
-                  <span className="text-[9px] text-slate-400 block font-cinzel font-bold uppercase tracking-wider">
-                    DEFAULT RENOWN
+                <div className="bg-[#FAF7EE] p-3 rounded-2xl border-3 border-[#0D0518] text-center font-mono">
+                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-wider">
+                    DEFAULT POINTS
                   </span>
-                  <span className="text-base font-bold text-emerald-300 flex items-center justify-center gap-1 mt-0.5">
-                    <Trophy className="w-4 h-4 text-emerald-400" />
+                  <span className="text-base font-black text-[#28C76F] flex items-center justify-center gap-1 mt-0.5">
+                    <Trophy className="w-4 h-4 text-[#28C76F]" />
                     {game.defaultPoints !== undefined && game.defaultPoints !== null ? game.defaultPoints : '—'} PTS
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
-              <span className="text-[11px] font-mono text-slate-400">
+            <div className="flex items-center justify-between pt-4 border-t-2 border-[#0D0518]/20">
+              <span className="text-[11px] font-mono font-bold text-gray-500">
                 ID: {game.id}
               </span>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleOpenEdit(game)}
-                  className="btn-fantasy-subtle p-2 text-xs flex items-center gap-1 text-slate-200"
+                  className="btn-pixel-white p-2 text-xs flex items-center gap-1"
                   title="Rename / Change Coin Cost"
                 >
-                  <Edit2 className="w-3.5 h-3.5 text-[#00F0FF]" />
+                  <Edit2 className="w-3.5 h-3.5" />
                   <span className="font-bold text-[11px]">Edit</span>
                 </button>
                 <button
                   onClick={() => handleDelete(game.id, game.name)}
-                  className="p-2 rounded-xl bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-500/40 font-bold transition-colors"
-                  title="Delete Trial"
+                  className="p-2 rounded-xl bg-red-100 hover:bg-red-500 hover:text-white text-red-600 border-2 border-[#0D0518] font-bold transition-colors"
+                  title="Delete Game"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -186,59 +186,59 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
       </div>
 
       {games.length === 0 && (
-        <div className="text-center py-20 bg-[#0F1626] border border-white/10 rounded-3xl p-8 shadow-fantasy-card text-slate-200">
-          <Gamepad2 className="w-14 h-14 mx-auto text-[#FFC837] mb-3" />
-          <h2 className="font-cinzel text-2xl font-bold mb-1">NO QUEST TRIALS IN CATALOG YET</h2>
-          <p className="font-jakarta text-xs text-slate-400 max-w-md mx-auto mb-6">
-            Forge your first quest trial with its gold token tribute. No events required!
+        <div className="text-center py-20 bg-white border-4 border-[#0D0518] rounded-3xl p-8 shadow-pixel-lg">
+          <Gamepad2 className="w-14 h-14 mx-auto text-[#FF7A00] mb-3 animate-bounce-subtle" />
+          <h2 className="font-bungee text-2xl text-[#0D0518] mb-1">NO GAMES IN CATALOG YET</h2>
+          <p className="font-mono text-xs text-gray-600 max-w-md mx-auto mb-6">
+            Create your first game (for example, <strong>Game A</strong>) with its coin entry cost. No events required!
           </p>
           <button
             onClick={handleOpenCreate}
-            className="btn-fantasy-primary text-sm py-3 px-6 font-cinzel font-bold"
+            className="btn-pixel-yellow text-sm py-3 px-6"
           >
-            + ADD YOUR FIRST TRIAL
+            + ADD YOUR FIRST GAME
           </button>
         </div>
       )}
 
       {/* CREATE / EDIT GAME MODAL */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0A091A]/80 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="relative w-full max-w-md rounded-3xl bg-gradient-to-b from-[#111928] via-[#0E1524] to-[#0A101C] border border-[#00F0FF]/40 p-6 sm:p-8 shadow-fantasy-card text-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0D0518]/80 backdrop-blur-xs">
+          <div className="relative w-full max-w-md bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 sm:p-8 shadow-pixel-xl">
             <button
               onClick={() => setModalOpen(false)}
-              className="absolute top-5 right-5 text-slate-400 hover:text-white font-mono text-lg font-bold"
+              className="absolute top-4 right-4 text-gray-500 hover:text-[#0D0518] font-mono text-lg font-black"
             >
               ✕
             </button>
 
-            <h2 className="font-cinzel text-2xl font-bold text-amber-200 mb-1">
-              {editingGame ? 'EDIT QUEST TRIAL' : 'FORGE NEW QUEST TRIAL'}
+            <h2 className="font-bungee text-2xl text-[#0D0518] mb-1">
+              {editingGame ? 'EDIT GAME' : 'ADD NEW GAME'}
             </h2>
-            <p className="text-xs text-slate-400 font-jakarta mb-5">
-              Kingdom quest configuration: trial title, gold entry tribute, and default reward points.
+            <p className="text-xs text-gray-600 font-mono mb-5 font-bold">
+              Simple game configuration: set the game name and coin entry cost.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-jakarta">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono">
               <div>
-                <label className="block text-slate-300 mb-1 font-cinzel font-bold text-xs uppercase tracking-wider">TRIAL TITLE *</label>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm">GAME NAME *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Trial of the Dragon Spire"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#080E1C] border border-white/15 text-slate-100 font-medium focus:outline-none focus:border-[#00F0FF] text-sm"
+                  placeholder="e.g. Game A"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0] text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-1 font-cinzel font-bold text-xs uppercase tracking-wider flex items-center justify-between">
-                  <span>GOLD ENTRY TRIBUTE *</span>
-                  <span className="text-[10px] text-amber-400 font-bold uppercase">Required</span>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm flex items-center justify-between">
+                  <span>COIN ENTRY COST *</span>
+                  <span className="text-[10px] text-[#FF5FA0] font-black uppercase">Required</span>
                 </label>
                 <div className="relative">
-                  <Coins className="w-5 h-5 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Coins className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="number"
                     min={0}
@@ -247,21 +247,21 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
                     value={formData.cost}
                     onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
                     placeholder="e.g. 50"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#080E1C] border border-white/15 text-slate-100 font-mono font-bold text-base focus:outline-none focus:border-[#00F0FF]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-mono font-black text-base focus:outline-none focus:border-[#FF5FA0]"
                   />
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Number of gold tokens required for an adventurer to embark on this trial.
+                <p className="text-[10px] text-gray-500 mt-1 font-bold">
+                  Number of arcade coins required for a participant to enter this game.
                 </p>
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-1 font-cinzel font-bold text-xs uppercase tracking-wider flex items-center justify-between">
-                  <span>DEFAULT RENOWN AWARDED</span>
-                  <span className="text-[10px] text-emerald-400 font-bold uppercase">Suggested in Scoring</span>
+                <label className="block text-[#0D0518] mb-1 font-black text-sm flex items-center justify-between">
+                  <span>DEFAULT POINTS EARNED</span>
+                  <span className="text-[10px] text-[#28C76F] font-black uppercase">Suggested in Scoring</span>
                 </label>
                 <div className="relative">
-                  <Trophy className="w-5 h-5 text-emerald-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Trophy className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="number"
                     min={0}
@@ -269,11 +269,11 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
                     value={formData.defaultPoints}
                     onChange={(e) => setFormData({ ...formData, defaultPoints: e.target.value })}
                     placeholder="e.g. 10"
-                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#080E1C] border border-white/15 text-slate-100 font-mono font-bold text-base focus:outline-none focus:border-[#00F0FF]"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#FAF7EE] border-3 border-[#0D0518] text-[#0D0518] font-mono font-black text-base focus:outline-none focus:border-[#FF5FA0]"
                   />
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Renown score pre-filled when recording glory for this trial. Can be altered at scoring time.
+                <p className="text-[10px] text-gray-500 mt-1 font-bold">
+                  Points automatically pre-filled when awarding scores for this game. Can be edited at scoring time.
                 </p>
               </div>
 
@@ -283,10 +283,10 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
                   id="gameActive"
                   checked={formData.isActive}
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="w-4 h-4 rounded border-slate-700 bg-[#080E1C] text-emerald-500 focus:ring-0 cursor-pointer"
+                  className="w-4 h-4 rounded border-2 border-[#0D0518] text-[#FF5FA0] focus:ring-0 cursor-pointer"
                 />
-                <label htmlFor="gameActive" className="text-xs font-semibold text-slate-200 cursor-pointer">
-                  Activate quest trial immediately in kingdom rotation
+                <label htmlFor="gameActive" className="text-xs font-bold text-[#0D0518] cursor-pointer">
+                  Activate game immediately in competition rotation
                 </label>
               </div>
 
@@ -294,15 +294,15 @@ export default function GameManagement({ games = [], onSaveGame, onDeleteGame, o
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="btn-fantasy-subtle text-center justify-center text-xs py-3 font-cinzel font-bold"
+                  className="btn-pixel-white text-center justify-center text-xs py-3"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="btn-fantasy-primary text-center justify-center text-xs py-3 font-cinzel font-bold"
+                  className="btn-pixel-yellow text-center justify-center text-xs py-3 font-bold"
                 >
-                  {editingGame ? 'SAVE CHANGES' : 'CREATE TRIAL'}
+                  {editingGame ? 'SAVE CHANGES' : 'CREATE GAME'}
                 </button>
               </div>
             </form>

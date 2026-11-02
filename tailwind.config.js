@@ -7,50 +7,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Fantasy Realm Atmosphere Palette
-        realm: {
-          void: '#05040D',        // Darkest celestial abyss
-          night: '#0A091A',       // Primary twilight canvas
-          deep: '#100E26',        // Deep forest & citadel shadow
-          amethyst: '#1C153A',    // Mystical twilight purple
-          slate: '#241D45',       // Elevated surface
-          gold: '#FFC837',        // Sunstone gold (titles, crests, coins)
-          'gold-light': '#FFE484',// Radiance highlight
-          amber: '#FF9E1B',       // Warm evening ember
-          emerald: '#10B981',     // Sacred grove & verve
-          'emerald-light': '#6EE7B7',
-          cyan: '#00F0FF',        // Crystalline spring water & arcane runes
-          'cyan-light': '#A5F3FC',
-          ruby: '#F43F5E',        // Dragon ruby & challenge badge
-          parchment: '#FAF5E8',   // Royal decree & high-contrast card
-        },
-        // Pixel moodboard palette preserved for backward compatibility
+        // Direct extraction from the visual reference moodboard
         pixel: {
-          bg: '#5C2D91',
-          'bg-deep': '#40186D',
-          'bg-dark': '#2B0E4C',
-          'bg-light': '#7B42BC',
-          yellow: '#FFDE25',
+          bg: '#5C2D91',          // Primary arcade violet sky / backdrop
+          'bg-deep': '#40186D',   // Deep evening violet / header backdrop
+          'bg-dark': '#2B0E4C',   // Night ground / darkest purple
+          'bg-light': '#7B42BC',  // Highlight violet
+          yellow: '#FFDE25',      // Sunshine arcade yellow ("GAME", "THANK YOU", moon, trophy)
           'yellow-light': '#FFF078',
           'yellow-dark': '#DDAE00',
-          pink: '#FF5FA0',
+          pink: '#FF5FA0',        // Bubblegum pixel pink ("START", "RULES!")
           'pink-light': '#FFA3CB',
           'pink-dark': '#D82E74',
-          green: '#28C76F',
+          green: '#28C76F',       // Retro mint green ("MENU", grass, health bar)
           'green-light': '#6EE7B7',
           'green-dark': '#15803D',
-          cyan: '#00F0FF',
+          cyan: '#00F0FF',        // Electric cyan ("GAME OVER", jackets, badges)
           'cyan-dark': '#0284C7',
-          brick: '#C86432',
+          brick: '#C86432',       // Terracotta brick platform walkway
           'brick-dark': '#8E3812',
           'brick-light': '#E08552',
-          window: '#D1D5DB',
-          'window-bar': '#000080',
-          white: '#FFFFFF',
-          ink: '#0D0518',
-          muted: '#8B72A8',
+          window: '#D1D5DB',      // Classic 90s OS dialogue grey
+          'window-bar': '#000080',// Classic OS titlebar navy blue
+          white: '#FFFFFF',       // Speech bubble white
+          ink: '#0D0518',         // Deep pixel black border
+          muted: '#8B72A8',       // Subdued violet text
         },
-        // Pop palette preserved
+        // Backwards compatibility mappings for smooth migration
         pop: {
           canvas: '#5C2D91',
           butter: '#FFFDF5',
@@ -73,10 +56,6 @@ export default {
         },
       },
       fontFamily: {
-        cinzel: ['Cinzel', 'serif'],
-        'cinzel-dec': ['"Cinzel Decorative"', 'cursive'],
-        fantasy: ['Cinzel', 'serif'],
-        jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
         arcade: ['"Press Start 2P"', 'monospace'],
         pixel: ['Silkscreen', 'monospace'],
         bungee: ['Bungee', 'cursive'],
@@ -98,12 +77,6 @@ export default {
         'pop': '4px 4px 0px #0D0518',
         'pop-lg': '6px 6px 0px #0D0518',
         'pop-xl': '8px 8px 0px #0D0518',
-        // Fantasy Dimensional Glows & Shadows
-        'fantasy-gold': '0 0 30px rgba(255, 200, 55, 0.45)',
-        'fantasy-cyan': '0 0 30px rgba(0, 240, 255, 0.4)',
-        'fantasy-emerald': '0 0 30px rgba(16, 185, 129, 0.4)',
-        'fantasy-card': '0 12px 36px -6px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08)',
-        'fantasy-card-hover': '0 20px 48px -8px rgba(0, 0, 0, 0.85), 0 0 24px rgba(255, 200, 55, 0.25)',
       },
       keyframes: {
         'marquee': {
@@ -114,47 +87,10 @@ export default {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-4px)' },
         },
-        'float-slow': {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
-        },
-        'float-island': {
-          '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-          '50%': { transform: 'translateY(-14px) rotate(0.4deg)' },
-        },
-        'float-island-delayed': {
-          '0%, 100%': { transform: 'translateY(-12px) rotate(-0.3deg)' },
-          '50%': { transform: 'translateY(6px) rotate(0.3deg)' },
-        },
-        'shimmer-aurora': {
-          '0%, 100%': { opacity: '0.45', transform: 'scale(1)' },
-          '50%': { opacity: '0.8', transform: 'scale(1.04)' },
-        },
-        'waterfall-stream': {
-          '0%': { strokeDashoffset: '0' },
-          '100%': { strokeDashoffset: '-80' },
-        },
-        'fly-across': {
-          '0%': { transform: 'translateX(-120px) translateY(20px) scale(0.7)', opacity: '0' },
-          '15%': { opacity: '0.85' },
-          '85%': { opacity: '0.85' },
-          '100%': { transform: 'translateX(1300px) translateY(-50px) scale(1)', opacity: '0' },
-        },
-        'firefly-glow': {
-          '0%, 100%': { opacity: '0.2', transform: 'scale(0.8)' },
-          '50%': { opacity: '1', transform: 'scale(1.3)' },
-        },
       },
       animation: {
         'marquee': 'marquee 22s linear infinite',
         'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
-        'float-slow': 'float-slow 6s ease-in-out infinite',
-        'float-island': 'float-island 8s ease-in-out infinite',
-        'float-island-delayed': 'float-island-delayed 9s ease-in-out infinite',
-        'shimmer-aurora': 'shimmer-aurora 7s ease-in-out infinite',
-        'waterfall-stream': 'waterfall-stream 1.8s linear infinite',
-        'fly-across': 'fly-across 26s linear infinite',
-        'firefly-glow': 'firefly-glow 3.5s ease-in-out infinite',
       },
     },
   },

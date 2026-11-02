@@ -9,7 +9,6 @@ import {
   Plus,
   Sparkles,
   Activity,
-  Shield,
 } from 'lucide-react';
 import LeaderboardTableView from '../components/leaderboard/LeaderboardTableView';
 import { soundFx } from '../utilities/soundFx';
@@ -30,68 +29,64 @@ export default function AdminDashboard({
       value: `${data.settings?.startingCoins ?? 0} COINS`,
       subtext: 'Auto-granted on registration',
       icon: Coins,
-      colorBar: 'bg-[#FFC837]',
-      textColor: 'text-amber-300',
+      colorBar: 'bg-[#FFDE25]',
       action: () => setCurrentView('coins'),
     },
     {
-      label: 'QUEST TRIALS',
+      label: 'GAMES',
       value: `${(data.games || []).length} GAMES`,
       subtext: `${activeGamesCount} Active In Rotation`,
       icon: Gamepad2,
-      colorBar: 'bg-[#00F0FF]',
-      textColor: 'text-cyan-300',
+      colorBar: 'bg-[#FF7A00]',
       action: () => setCurrentView('games'),
     },
     {
-      label: 'CHAMPIONS',
+      label: 'PARTICIPANTS',
       value: `${(data.participants || []).length} PLAYERS`,
       subtext: 'Verified Registered Users',
       icon: Users,
-      colorBar: 'bg-emerald-400',
-      textColor: 'text-emerald-300',
+      colorBar: 'bg-[#5C2D91]',
       action: () => setCurrentView('participants'),
     },
     {
-      label: 'AWARDED RENOWN',
+      label: 'DISPATCHED POINTS',
       value: `${totalPoints.toLocaleString()} PTS`,
       subtext: `${(data.transactions || []).length} Verified Entries`,
       icon: Trophy,
-      colorBar: 'bg-purple-400',
-      textColor: 'text-purple-300',
+      colorBar: 'bg-[#28C76F]',
       action: () => setCurrentView('scoring'),
     },
   ];
 
   return (
-    <div className="py-4 space-y-8 max-w-7xl mx-auto font-sans">
-      {/* Citadel Scribe Control Hero */}
-      <div className="rounded-3xl bg-gradient-to-r from-[#0F1B38] via-[#0B152C] to-[#070D1C] border border-[#00F0FF]/30 p-6 sm:p-8 shadow-fantasy-card flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="relative z-10">
+    <div className="py-4 space-y-8 max-w-7xl mx-auto">
+      {/* Master Control Hero */}
+      <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-            <span className="font-cinzel text-[10px] text-[#00F0FF] tracking-widest font-bold uppercase">
-              HIGH CITADEL ARCHIVE • REALM STANDINGS
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FF5FA0] animate-ping" />
+            <span className="font-arcade text-[10px] text-[#FFDE25] tracking-wider font-black">
+              ARCADE OPERATOR STATION • LIVE STANDINGS
             </span>
           </div>
-          <h1 className="text-3xl sm:text-5xl font-cinzel font-black tracking-wider text-[#FFC837] fantasy-title-gold">
+          <h1 className="text-3xl sm:text-5xl font-bungee tracking-wide text-[#FFDE25] pixel-title-yellow">
             LEADERBOARD
           </h1>
-          <p className="text-slate-300 font-jakarta text-xs sm:text-sm mt-1 max-w-xl font-medium">
-            Live kingdom participant rankings, quest-by-quest score breakdown, and master marshal scoring controls.
+          <p className="text-purple-200 font-mono text-xs sm:text-sm mt-1 max-w-xl font-medium">
+            Live participant rankings, game-by-game score breakdown, and quick operator scoring controls.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           <button
             onClick={() => {
               soundFx.play('coin');
               if (onOpenQuickScore) onOpenQuickScore();
             }}
-            className="btn-fantasy-primary flex items-center gap-2 text-xs py-3 px-5 font-cinzel font-black"
+            className="btn-pixel-yellow flex items-center gap-2"
           >
-            <Trophy className="w-4 h-4 text-[#0A091A]" />
+            <Trophy className="w-4 h-4" />
             <span>UPDATE SCORES</span>
           </button>
 
@@ -100,9 +95,9 @@ export default function AdminDashboard({
               soundFx.play('click');
               setCurrentView('coins');
             }}
-            className="btn-fantasy-subtle flex items-center gap-1.5 text-xs py-2.5 px-4 font-cinzel font-bold text-amber-200"
+            className="btn-pixel-green flex items-center gap-1.5"
           >
-            <Coins className="w-4 h-4 text-[#FFC837]" />
+            <Coins className="w-4 h-4" />
             <span>COIN SETTINGS</span>
           </button>
 
@@ -111,9 +106,9 @@ export default function AdminDashboard({
               soundFx.play('click');
               setCurrentView('games');
             }}
-            className="btn-fantasy-citadel flex items-center gap-1.5 text-xs py-2.5 px-4 font-cinzel font-bold"
+            className="btn-pixel-white flex items-center gap-1.5"
           >
-            <Gamepad2 className="w-4 h-4 text-[#00F0FF]" />
+            <Gamepad2 className="w-4 h-4" />
             <span>GAMES</span>
           </button>
 
@@ -122,9 +117,9 @@ export default function AdminDashboard({
               soundFx.play('fanfare');
               triggerCelebration();
             }}
-            className="btn-fantasy-subtle flex items-center gap-1.5 text-xs py-2.5 px-3 font-cinzel text-pink-300"
+            className="btn-pixel-pink flex items-center gap-1.5"
           >
-            <Sparkles className="w-4 h-4 text-[#FFC837]" />
+            <Sparkles className="w-4 h-4" />
             <span>FANFARE</span>
           </button>
         </div>
@@ -144,21 +139,21 @@ export default function AdminDashboard({
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && st.action()}
-              className="rounded-2xl bg-gradient-to-b from-[#101A30] to-[#0A101E] border border-white/10 p-5 shadow-fantasy-card hover:-translate-y-1 hover:border-[#00F0FF]/40 transition-all cursor-pointer relative overflow-hidden text-slate-100"
+              className="group bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-2xl p-4 shadow-pixel hover:-translate-y-1.5 hover:shadow-pixel-xl hover:border-[#FFDE25] transition-all duration-200 cursor-pointer relative overflow-hidden"
             >
-              <div className={`absolute top-0 left-0 right-0 h-1 ${st.colorBar}`} />
+              <div className={`absolute top-0 left-0 right-0 h-2.5 ${st.colorBar}`} />
               <div className="flex items-center justify-between mb-2 mt-1">
-                <span className="font-cinzel text-[10px] text-slate-400 font-bold tracking-wider">
+                <span className="font-arcade text-[9px] text-gray-500 font-black">
                   {st.label}
                 </span>
-                <Icon className="w-4 h-4 text-[#00F0FF]" />
+                <Icon className="w-4 h-4 text-[#0D0518] group-hover:scale-110 group-hover:rotate-6 transition-transform" />
               </div>
-              <h3 className={`font-cinzel font-black text-2xl ${st.textColor} truncate mb-0.5`}>
+              <h3 className="font-display font-black text-xl text-[#0D0518] truncate mb-0.5">
                 {st.value}
               </h3>
-              <div className="flex items-center justify-between text-xs font-jakarta text-slate-400">
+              <div className="flex items-center justify-between text-xs font-mono text-gray-600 font-bold">
                 <span className="truncate">{st.subtext}</span>
-                <ArrowUpRight className="w-3.5 h-3.5 shrink-0 ml-1 text-slate-300" />
+                <ArrowUpRight className="w-3.5 h-3.5 shrink-0 ml-1 text-[#0D0518]" />
               </div>
             </div>
           );
@@ -178,11 +173,11 @@ export default function AdminDashboard({
       {/* Operator Activity Feed & Scoring Terminal Shortcuts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
         {/* Transaction Log */}
-        <div className="rounded-3xl bg-gradient-to-b from-[#101B33] to-[#0A1122] border border-white/10 p-6 shadow-fantasy-card flex flex-col justify-between text-slate-100">
+        <div className="bg-white text-[#0D0518] border-4 border-[#0D0518] rounded-3xl p-6 shadow-pixel-lg flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2 font-cinzel text-xs text-amber-200 font-bold">
-                <Activity className="w-4 h-4 text-[#00F0FF]" />
+            <div className="flex items-center justify-between mb-4 border-b-3 border-[#0D0518] pb-3">
+              <div className="flex items-center gap-2 font-arcade text-xs text-[#0D0518] font-black">
+                <Activity className="w-4 h-4 text-[#FF5FA0]" />
                 <span>RECENT DISPATCHED SCORES</span>
               </div>
               <button
@@ -190,7 +185,7 @@ export default function AdminDashboard({
                   soundFx.play('switch');
                   setCurrentView('scoring');
                 }}
-                className="text-xs font-jakarta text-cyan-300 hover:text-cyan-200 hover:underline font-bold"
+                className="text-xs font-mono text-[#5C2D91] hover:underline font-black"
               >
                 Scoring Terminal →
               </button>
@@ -209,26 +204,26 @@ export default function AdminDashboard({
                   return (
                     <div
                       key={tx.id}
-                      className="p-3.5 rounded-xl bg-[#070D1B] border border-white/10 text-xs font-jakarta"
+                      className="p-3 rounded-xl bg-[#FAF7EE] border-2 border-[#0D0518] text-xs font-mono"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-100 truncate max-w-[150px]">
-                          {participant?.avatar || '⚔️'} {participant?.name || 'Participant'}
+                        <span className="font-black text-[#0D0518] truncate max-w-[150px]">
+                          {participant?.avatar || '👾'} {participant?.name || 'Participant'}
                         </span>
                         <span
-                          className={`font-bold font-mono px-2 py-0.5 rounded border text-xs ${
+                          className={`font-black font-mono px-2 py-0.5 rounded border border-[#0D0518] ${
                             isPositive
-                              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300'
-                              : 'bg-red-950/80 border-red-500/50 text-red-300'
+                              ? 'bg-[#28C76F] text-[#0D0518]'
+                              : 'bg-[#FF5FA0] text-white'
                           }`}
                         >
                           {isPositive ? `+${tx.pointsDelta}` : tx.pointsDelta} PTS
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                        in {game?.name || 'Quest'}: "{noteText}"
+                      <p className="text-[11px] text-gray-600 truncate mt-0.5 font-medium">
+                        in {game?.name || 'Game'}: "{noteText}"
                       </p>
-                      <div className="text-[10px] text-slate-500 flex justify-between mt-1 font-mono">
+                      <div className="text-[10px] text-gray-500 flex justify-between mt-1 font-bold">
                         <span>{new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
                     </div>
@@ -236,7 +231,7 @@ export default function AdminDashboard({
                 })}
 
               {(data.transactions || []).length === 0 && (
-                <div className="text-center py-8 text-slate-400 font-jakarta text-xs">
+                <div className="text-center py-8 text-gray-500 font-mono text-xs font-bold">
                   No scores recorded yet.
                 </div>
               )}
@@ -248,47 +243,47 @@ export default function AdminDashboard({
               soundFx.play('switch');
               setCurrentView('scoring');
             }}
-            className="btn-fantasy-primary w-full mt-4 text-center justify-center text-xs py-3 font-cinzel font-black"
+            className="btn-pixel-yellow w-full mt-4 text-center justify-center text-xs py-3 font-bold"
           >
             Launch Scoring Console
           </button>
         </div>
 
         {/* Quick Rotation Directory & System Status */}
-        <div className="rounded-3xl bg-gradient-to-b from-[#101B33] to-[#0A1122] border border-white/10 p-6 shadow-fantasy-card flex flex-col justify-between text-slate-100">
+        <div className="bg-[#40186D] text-white border-4 border-[#0D0518] rounded-3xl p-6 shadow-pixel-lg flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2 font-cinzel text-xs text-[#FFC837] font-bold uppercase">
+            <div className="flex items-center justify-between mb-4 border-b-3 border-[#0D0518] pb-3">
+              <div className="flex items-center gap-2 font-arcade text-xs text-[#FFDE25] font-black uppercase">
                 <Gamepad2 className="w-4 h-4 text-[#00F0FF]" />
-                <span>ROTATING QUEST TRIALS</span>
+                <span>ROTATING GAMES DIRECTORY</span>
               </div>
               <button
                 onClick={() => {
                   soundFx.play('switch');
                   setCurrentView('games');
                 }}
-                className="text-xs font-jakarta text-cyan-300 hover:text-cyan-200 hover:underline font-bold"
+                className="text-xs font-mono text-purple-200 hover:text-white hover:underline font-bold"
               >
                 Manage Games →
               </button>
             </div>
 
-            <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
               {(data.games || []).map((g, idx) => (
                 <div
                   key={g.id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-[#070D1B] border border-white/10 text-xs font-jakarta"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF7EE] text-[#0D0518] border-2 border-[#0D0518] text-xs font-mono font-bold"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-[10px] font-cinzel text-slate-500 font-bold">#{idx + 1}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-arcade text-gray-500">#{idx + 1}</span>
                     <div>
-                      <span className="font-bold text-slate-100 block">{g.name}</span>
-                      <span className="text-[10px] text-slate-400 font-mono">Entry: {Number(g.cost || 0)} gold coins</span>
+                      <span className="font-black text-[#0D0518] block">{g.name}</span>
+                      <span className="text-[10px] text-gray-500 font-normal">Entry: {Number(g.cost || 0)} virtual coins</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded border font-cinzel text-[9px] font-bold ${
-                      g.isActive ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-slate-800 text-slate-400 border-slate-700'
+                    <span className={`px-2 py-0.5 rounded border border-[#0D0518] font-black font-arcade text-[9px] ${
+                      g.isActive ? 'bg-[#28C76F] text-[#0D0518]' : 'bg-gray-200 text-gray-500'
                     }`}>
                       {g.isActive ? 'ACTIVE' : 'OFFLINE'}
                     </span>
@@ -297,7 +292,7 @@ export default function AdminDashboard({
               ))}
 
               {(data.games || []).length === 0 && (
-                <div className="text-center py-8 text-slate-400 font-jakarta text-xs">
+                <div className="text-center py-8 text-purple-200 font-mono text-xs">
                   No games configured. Click "Manage Games" to add games.
                 </div>
               )}
@@ -309,9 +304,9 @@ export default function AdminDashboard({
               soundFx.play('switch');
               setCurrentView('games');
             }}
-            className="btn-fantasy-citadel w-full mt-4 text-center justify-center text-xs py-3 font-cinzel font-bold"
+            className="btn-pixel-pink w-full mt-4 text-center justify-center text-xs py-3 font-bold"
           >
-            Add / Edit Quest Trials
+            Add / Edit Games
           </button>
         </div>
       </div>
