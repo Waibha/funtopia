@@ -31,10 +31,10 @@ export default function App() {
       if (remote) {
         setData((prev) => ({
           ...prev,
-          participants: remote.participants.length > 0 ? remote.participants : prev.participants,
+          participants: remote.participants,
           games: remote.games.length > 0 ? remote.games : prev.games,
-          transactions: remote.transactions.length > 0 ? remote.transactions : prev.transactions,
-          coinTransactions: remote.coinTransactions.length > 0 ? remote.coinTransactions : prev.coinTransactions,
+          transactions: remote.transactions,
+          coinTransactions: remote.coinTransactions,
           settings: remote.settings || prev.settings,
         }));
       }
