@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { 
   Play, 
@@ -50,11 +50,7 @@ import {
   subscribeToSyncStatus
 } from '../../services/guessWhoService';
 import { 
-  isSupabaseConfigured,
-  signInCoordinator,
-  signOutCoordinator,
-  getCoordinatorSession,
-  onCoordinatorAuthStateChange
+  isSupabaseConfigured
 } from '../../services/supabaseClient';
 import { APPROVED_CATEGORIES } from '../../data/guessWhoSeedDecks';
 import { playArcadeSound } from '../../utilities/sound';
@@ -64,26 +60,114 @@ import AddQuestionModal from '../../components/guess-who/AddQuestionModal';
 import QuestionBrowserModal from '../../components/guess-who/QuestionBrowserModal';
 import Modal from '../../components/ui/Modal';
 
-export default function AdminGuessWhoPage() {
+export default function AdminGuessWhoPage({
+  data,
+  participants = [],
+  games = [],
+  onAwardScore,
+  onJoinGame,
+  triggerCelebration,
+}) {
   // Navigation workflow state:
   // 'step_player' | 'step_generate' | 'step_review' | 'step_gameplay' | 'step_result'
   const [currentStep, setCurrentStep] = useState('step_player');
 
   // Supabase Auth & Synchronization Telemetry
   const isSupabaseReady = isSupabaseConfigured();
-  const [coordinatorUser, setCoordinatorUser] = useState(null);
   const [syncTelemetry, setSyncTelemetry] = useState(getSupabaseSyncStatus());
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState(null);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Player & Slab state
+  // Player, Participant & Slab state
+  const [selectedParticipantId, setSelectedParticipantId] = useState('');
   const [playerNameInput, setPlayerNameInput] = useState('');
   const [activePlayer, setActivePlayer] = useState(null);
   const [slab, setSlab] = useState(null);
   const [playersList, setPlayersList] = useState([]);
+
+  // Championship Scoring Ledger Session Tracking (prevents duplicate awards)
+  const scoredSessionsRef = useRef(new Set());
+
+  // Dynamic Guess Who game configuration from championship catalog
+  const guessWhoGame = useMemo(() => {
+    return (
+      (games || []).find(
+        (g) => g.id === 'game-guess-who' || (g.name || '').toLowerCase().includes('guess who')
+      ) || {
+        id: 'game-guess-who',
+        name: 'Guess Who?',
+        cost: 5,
+        defaultPoints: 7,
+        isActive: true,
+      }
+    );
+  }, [games]);
+
+  const entryCost = useMemo(() => {
+    if (!guessWhoGame) return 5;
+    return guessWhoGame.cost !== undefined ? Number(guessWhoGame.cost) : Number(guessWhoGame.entryFeeCoins || 5);
+  }, [guessWhoGame]);
+
+  // Award championship competition points to participant ledger
+  const awardChampionshipScore = (finalScore, isEarlyWin, puzzlesPlayed) => {
+    if (!slab || !activePlayer || !onAwardScore) return;
+    if (scoredSessionsRef.current.has(slab.id)) return;
+    scoredSessionsRef.current.add(slab.id);
+
+    const participantId = activePlayer.id || activePlayer.participantId;
+    if (!participantId) return;
+
+    const tx = {
+      id: `tx-gw-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      eventId: 'madagascar-championship',
+      participantId: participantId,
+      participantName: activePlayer.name,
+      gameId: guessWhoGame?.id || 'game-guess-who',
+      gameName: guessWhoGame?.name || 'Guess Who?',
+      pointsDelta: Number(finalScore) || 0,
+      note: `Guess Who (${finalScore} pts${isEarlyWin ? ' - Early Win' : ''})`,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        sessionId: slab.id,
+        slabId: slab.id,
+        isEarlyWin: Boolean(isEarlyWin),
+        puzzlesPlayed: puzzlesPlayed || 12,
+      },
+    };
+
+    onAwardScore(tx);
+  };
+
+  // Explicit puzzle navigation with immediate projector synchronization
+  const handleGoToPuzzle = (newIndex) => {
+    if (!slab || !slab.slots || newIndex < 0 || newIndex >= (slab.slots.length || 12)) return;
+    playArcadeSound('blip');
+    setCurrentIndex(newIndex);
+    setRevealLevel(1);
+    setIsDisplayedOnScreen(true);
+    setActiveFeedback(null);
+
+    const targetSlot = slab.slots[newIndex];
+    const targetQuestion = targetSlot?.question;
+    if (targetQuestion) {
+      publishAuthoritativeState({
+        playerName: activePlayer?.name || 'Contender',
+        score: currentScore,
+        finalScore: currentScore,
+        currentSlot: newIndex + 1,
+        imageUrl: targetQuestion.image_url,
+        dialogueText: targetQuestion.dialogue_text,
+        songClueText: targetQuestion.english_clue || targetQuestion.song_clue_text || (targetQuestion.subtype === 'bollywood_song_guess' ? targetQuestion.clue : null),
+        subtype: targetQuestion.subtype || null,
+        revealType: targetQuestion.reveal_type || (targetQuestion.subtype === 'bollywood_song_guess' ? 'song_clue' : 'crop'),
+        revealMetadata: targetQuestion.reveal_metadata || null,
+        revealLevel: 1,
+        isDisplayed: true,
+        feedback: null,
+        isGameActive: true,
+        isGameEnded: false,
+        isWinner: false,
+      });
+    }
+  };
 
   // Manual Generation temporary selection
   const [manualSelectionIds, setManualSelectionIds] = useState([]);
@@ -93,7 +177,7 @@ export default function AdminGuessWhoPage() {
   // Gameplay state
   const FEEDBACK_DISPLAY_DURATION_MS = 1800;
   const [activeFeedback, setActiveFeedback] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0); // 0 to 19
+  const [currentIndex, setCurrentIndex] = useState(0); // 0 to 11
   const [currentScore, setCurrentScore] = useState(0);
   const [revealLevel, setRevealLevel] = useState(1);
   const [isDisplayedOnScreen, setIsDisplayedOnScreen] = useState(false);
@@ -108,56 +192,17 @@ export default function AdminGuessWhoPage() {
     setPlayersList(getRegisteredPlayers());
   }, []);
 
-  // Monitor Coordinator Authentication & Supabase Synchronization
+  // Monitor Supabase Synchronization
   useEffect(() => {
     if (isSupabaseReady) {
-      getCoordinatorSession().then(({ user }) => {
-        setCoordinatorUser(user);
-      });
-      const authSub = onCoordinatorAuthStateChange((event, session) => {
-        setCoordinatorUser(session?.user || null);
-      });
       const syncSub = subscribeToSyncStatus((status) => {
         setSyncTelemetry(status);
       });
       return () => {
-        if (typeof authSub?.unsubscribe === 'function') authSub.unsubscribe();
         syncSub();
       };
     }
   }, [isSupabaseReady]);
-
-  const handleCoordinatorLogin = async (e) => {
-    e.preventDefault();
-    if (!loginEmail.trim() || !loginPassword.trim()) {
-      setLoginError('Coordinator email and password are required.');
-      return;
-    }
-    setIsLoggingIn(true);
-    setLoginError(null);
-    try {
-      const { data, error } = await signInCoordinator({ email: loginEmail.trim(), password: loginPassword });
-      if (error) {
-        setLoginError(error.message);
-      } else {
-        setCoordinatorUser(data?.user || null);
-        setIsLoginModalOpen(false);
-        setLoginEmail('');
-        setLoginPassword('');
-        playArcadeSound('laser');
-      }
-    } catch (err) {
-      setLoginError(err.message || 'Login failed.');
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
-
-  const handleCoordinatorLogout = async () => {
-    await signOutCoordinator();
-    setCoordinatorUser(null);
-    playArcadeSound('blip');
-  };
 
   const library = getQuestionLibrary();
 
@@ -167,12 +212,59 @@ export default function AdminGuessWhoPage() {
 
   const handleStartPlayerFlow = (e) => {
     e.preventDefault();
-    const trimmed = playerNameInput.trim();
-    if (!trimmed) return;
+
+    let playerObj = null;
+
+    if (selectedParticipantId) {
+      const found = (participants || []).find((p) => p.id === selectedParticipantId);
+      if (found) {
+        if (onJoinGame && guessWhoGame) {
+          const res = onJoinGame({ participantId: found.id, gameId: guessWhoGame.id });
+          if (res && !res.success && (found.coins || 0) < entryCost) {
+            alert(`Participant does not have enough coins (${found.coins || 0} available, ${entryCost} required).`);
+            return;
+          }
+        }
+        playerObj = {
+          id: found.id,
+          name: found.name,
+          usn: found.usn,
+          coins: found.coins,
+        };
+      }
+    }
+
+    if (!playerObj) {
+      const trimmed = playerNameInput.trim();
+      if (!trimmed) return;
+      const matched = (participants || []).find(
+        (p) => p.name.toLowerCase() === trimmed.toLowerCase() || (p.usn && p.usn.toLowerCase() === trimmed.toLowerCase())
+      );
+      if (matched) {
+        if (onJoinGame && guessWhoGame) {
+          const res = onJoinGame({ participantId: matched.id, gameId: guessWhoGame.id });
+          if (res && !res.success && (matched.coins || 0) < entryCost) {
+            alert(`Participant does not have enough coins (${matched.coins || 0} available, ${entryCost} required).`);
+            return;
+          }
+        }
+        playerObj = {
+          id: matched.id,
+          name: matched.name,
+          usn: matched.usn,
+          coins: matched.coins,
+        };
+      } else {
+        const local = registerPlayer(trimmed);
+        playerObj = {
+          id: local.id,
+          name: local.name,
+        };
+      }
+    }
 
     playArcadeSound('blip');
-    const player = registerPlayer(trimmed);
-    setActivePlayer(player);
+    setActivePlayer(playerObj);
     setCurrentScore(0);
     setManualSelectionIds([]);
     setCurrentStep('step_generate');
@@ -340,6 +432,8 @@ export default function AdminGuessWhoPage() {
     const isEarlyWin = currentScore >= 7;
     archiveCompletedRun(activePlayer.name, currentScore, completedSlab, isEarlyWin);
 
+    awardChampionshipScore(currentScore, isEarlyWin, currentIndex + 1);
+
     const finalDetails = {
       ...getResultDetails(currentScore),
       finalScore: currentScore,
@@ -362,6 +456,7 @@ export default function AdminGuessWhoPage() {
     });
 
     if (finalDetails.isWinner) {
+      if (triggerCelebration) triggerCelebration();
       confetti({
         particleCount: 120,
         spread: 90,
@@ -388,6 +483,8 @@ export default function AdminGuessWhoPage() {
 
       // Save completed run and score in player history
       archiveCompletedRun(activePlayer.name, finalOrNextScore, completedSlab, isEarlyWin);
+
+      awardChampionshipScore(finalOrNextScore, isEarlyWin, currentIndex + 1);
 
       // Evaluate final result
       const finalDetails = {
@@ -490,7 +587,10 @@ export default function AdminGuessWhoPage() {
         };
         setGameResult(finalDetails);
 
+        awardChampionshipScore(updatedState.score, updatedState.isEarlyWin, currentIndex + 1);
+
         if (updatedState.isWinner) {
+          if (triggerCelebration) triggerCelebration();
           confetti({
             particleCount: 120,
             spread: 90,
@@ -535,6 +635,7 @@ export default function AdminGuessWhoPage() {
   const handleResetForNextPlayer = () => {
     playArcadeSound('blip');
     setPlayerNameInput('');
+    setSelectedParticipantId('');
     setActivePlayer(null);
     setSlab(null);
     setGameResult(null);
@@ -616,47 +717,22 @@ export default function AdminGuessWhoPage() {
         </div>
       </div>
 
-      {/* Supabase Synchronization & Coordinator Auth Telemetry Banner */}
+      {/* Supabase Synchronization & Admin Authorization Banner */}
       <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono">
         <div className="flex items-center gap-2 flex-wrap">
-          {isSupabaseReady ? (
-            <>
-              <Badge variant={coordinatorUser ? 'emerald' : 'gold'} size="sm">
-                {coordinatorUser ? '🟢 SUPABASE SYNC ACTIVE' : '🟡 SUPABASE ONLINE'}
-              </Badge>
-              {coordinatorUser ? (
-                <span className="text-slate-300">
-                  Coordinator: <strong className="text-cyan-300">{coordinatorUser.email}</strong>
-                </span>
-              ) : (
-                <span className="text-amber-300">
-                  Sign in as coordinator to synchronize authoritative scores to Supabase
-                </span>
-              )}
-            </>
-          ) : (
-            <>
-              <Badge variant="purple" size="sm">⚪ OFFLINE MODE</Badge>
-              <span className="text-slate-400">
-                Local in-memory / localStorage mode active (No Supabase credentials detected)
-              </span>
-            </>
-          )}
+          <Badge variant="emerald" size="sm">
+            🟢 OPERATOR SESSION AUTHORIZED
+          </Badge>
+          <span className="text-slate-300">
+            Authenticated via Admin Portal • Realtime Projector Broadcast Active
+          </span>
         </div>
 
-        {isSupabaseReady && (
-          <div className="flex items-center gap-2 shrink-0">
-            {coordinatorUser ? (
-              <Button variant="ghost" size="sm" onClick={handleCoordinatorLogout} className="text-[11px] py-1 px-2.5">
-                Sign Out
-              </Button>
-            ) : (
-              <Button variant="cyan" size="sm" onClick={() => setIsLoginModalOpen(true)} className="text-[11px] py-1 px-2.5 shadow-sm">
-                🔐 Coordinator Login
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-cyan-300 text-[11px]">
+          <span>Entry Fee: <strong className="text-yellow-300">{entryCost} Coins</strong></span>
+          <span>•</span>
+          <span>Target: <strong className="text-yellow-300">7 Pts to Win</strong></span>
+        </div>
       </div>
 
       {/* Sync Warning Banner if write error exists */}
@@ -698,22 +774,62 @@ export default function AdminGuessWhoPage() {
             </div>
 
             <form onSubmit={handleStartPlayerFlow} className="space-y-4 text-left">
+              {participants && participants.length > 0 && (
+                <div>
+                  <label className="block text-xs font-mono text-cyan-300 mb-1">
+                    Select Registered Championship Participant:
+                  </label>
+                  <select
+                    value={selectedParticipantId}
+                    onChange={(e) => {
+                      setSelectedParticipantId(e.target.value);
+                      const found = participants.find((p) => p.id === e.target.value);
+                      if (found) setPlayerNameInput(found.name);
+                    }}
+                    className="w-full px-4 py-2.5 rounded-xl bg-cosmic-950 border border-cyan-400/50 text-white font-mono text-xs focus:outline-none focus:border-cyan-300"
+                  >
+                    <option value="">-- Choose from Championship Roster ({participants.length} registered) --</option>
+                    {participants.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} {p.usn ? `(${p.usn})` : ''} — Balance: {p.coins ?? 0} Coins
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-mono text-slate-300 mb-1">
-                  Player Name:
+                  {participants && participants.length > 0 ? 'Or Contender Name:' : 'Player Name:'}
                 </label>
                 <input
                   type="text"
-                  required
+                  required={!selectedParticipantId}
                   placeholder="e.g. Aarav Sharma, Priya Patel..."
                   value={playerNameInput}
-                  onChange={(e) => setPlayerNameInput(e.target.value)}
+                  onChange={(e) => {
+                    setPlayerNameInput(e.target.value);
+                    if (selectedParticipantId) setSelectedParticipantId('');
+                  }}
                   className="w-full px-4 py-2.5 rounded-xl bg-cosmic-950 border border-cyan-400/50 text-white font-mono text-sm placeholder-slate-500 focus:outline-none focus:border-cyan-300"
                 />
               </div>
 
+              {selectedParticipantId && (() => {
+                const p = participants.find((x) => x.id === selectedParticipantId);
+                const hasCoins = (p?.coins || 0) >= entryCost;
+                return (
+                  <div className={`p-3 rounded-xl border text-xs font-mono flex items-center justify-between ${
+                    hasCoins ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+                  }`}>
+                    <span>Wallet Balance: <strong>{p?.coins ?? 0} Coins</strong></span>
+                    <span>Required Entry: <strong>{entryCost} Coins</strong></span>
+                  </div>
+                );
+              })()}
+
               <Button variant="pink" size="md" type="submit" className="w-full">
-                <Play className="w-4 h-4 fill-white mr-1.5" /> Generate Slab
+                <Play className="w-4 h-4 fill-white mr-1.5" /> Start Match & Generate Slab
               </Button>
             </form>
           </Card>
@@ -1085,6 +1201,36 @@ export default function AdminGuessWhoPage() {
                 {isDisplayedOnScreen ? '● LIVE ON SCREEN' : '○ STANDBY'}
               </span>
             </Card>
+          </div>
+
+          {/* Explicit Puzzle Navigation Controls (Live Projector Sync) */}
+          <div className="p-3.5 rounded-xl bg-purple-950/60 border border-purple-500/40 flex items-center justify-between gap-3 font-mono text-xs shadow-lg">
+            <button
+              type="button"
+              disabled={isSubmitting || currentIndex <= 0}
+              onClick={() => handleGoToPuzzle(currentIndex - 1)}
+              className="px-3.5 py-2 rounded-lg bg-purple-900/80 hover:bg-purple-800 text-white font-bold border border-purple-400/50 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              <span>← PREVIOUS PUZZLE</span>
+            </button>
+
+            <div className="flex items-center gap-2">
+              <span className="font-retro text-xs text-yellow-300">
+                PUZZLE #{currentIndex + 1} OF {totalQuestions}
+              </span>
+              <span className="text-[10px] text-cyan-300 hidden sm:inline">
+                (Click to advance / broadcast live to projector)
+              </span>
+            </div>
+
+            <button
+              type="button"
+              disabled={isSubmitting || currentIndex >= totalQuestions - 1}
+              onClick={() => handleGoToPuzzle(currentIndex + 1)}
+              className="px-3.5 py-2 rounded-lg bg-purple-900/80 hover:bg-purple-800 text-white font-bold border border-purple-400/50 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95"
+            >
+              <span>NEXT PUZZLE →</span>
+            </button>
           </div>
 
           {/* Notice on 12th Puzzle: All images reached */}
@@ -1467,69 +1613,7 @@ export default function AdminGuessWhoPage() {
         />
       )}
 
-      {/* Coordinator Authentication Modal */}
-      <Modal
-        isOpen={isLoginModalOpen}
-        onClose={() => {
-          setIsLoginModalOpen(false);
-          setLoginError(null);
-        }}
-        title="COORDINATOR AUTHENTICATION"
-      >
-        <form onSubmit={handleCoordinatorLogin} className="space-y-4">
-          <p className="text-xs text-slate-300 font-sans leading-relaxed">
-            Sign in with verified coordinator credentials to authorize authoritative scoring and live Realtime state broadcasts to the projector display.
-          </p>
-          {loginError && (
-            <div className="p-3 rounded-lg bg-pink-950/70 border border-pink-500/50 text-pink-300 text-xs font-mono">
-              ⚠️ {loginError}
-            </div>
-          )}
-          <div>
-            <label className="block text-xs font-mono text-slate-300 mb-1">Coordinator Email:</label>
-            <input
-              type="email"
-              value={loginEmail}
-              onChange={(e) => setLoginEmail(e.target.value)}
-              placeholder="coordinator@example.com"
-              className="w-full px-3 py-2 rounded-lg bg-cosmic-950 border border-purple-500/40 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
-              autoFocus
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-mono text-slate-300 mb-1">Password:</label>
-            <input
-              type="password"
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-              placeholder="••••••••••••"
-              className="w-full px-3 py-2 rounded-lg bg-cosmic-950 border border-purple-500/40 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
-            />
-          </div>
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setIsLoginModalOpen(false);
-                setLoginError(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="cyan"
-              size="sm"
-              disabled={isLoggingIn}
-              className="shadow-neon-cyan"
-            >
-              {isLoggingIn ? 'Authenticating...' : 'Sign In as Coordinator'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      
     </div>
   );
 }

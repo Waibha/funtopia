@@ -15,44 +15,58 @@
 
 /**
  * Returns prioritized candidate URLs for a given puzzle question.
- * @param {Object} question - Question object from question library
+ * @param {Object|string} question - Question object from question library or raw URL string
  * @returns {string[]} Array of candidate image URLs in priority order
  */
 export const getImageCandidates = (question) => {
   if (!question) return [];
 
+  // Support string input directly
+  const q = typeof question === 'string' ? { image_url: question } : question;
+
   const candidates = [];
 
   // 1. Explicit local asset path if annotated in dataset record
-  if (question.local_asset_path) {
-    candidates.push(question.local_asset_path);
+  if (q.local_asset_path) {
+    candidates.push(q.local_asset_path);
   }
-  if (question.local_image_url) {
-    candidates.push(question.local_image_url);
+  if (q.local_image_url) {
+    candidates.push(q.local_image_url);
   }
-  if (question.image_path) {
-    candidates.push(question.image_path);
+  if (q.image_path) {
+    candidates.push(q.image_path);
   }
 
   // 2. PRIMARY DATASET URL (Prioritized as authored by Agent 2)
   // For the 23 local assets, this is '/assets/guess-who/...'.
   // For all other records, this is the canonical Wikimedia Commons URL.
-  if (question.image_url) {
-    candidates.push(question.image_url);
+  if (q.image_url) {
+    candidates.push(q.image_url);
+    if (!q.image_url.startsWith('http') && !q.image_url.startsWith('/') && !q.image_url.startsWith('data:')) {
+      candidates.push(`/${q.image_url}`);
+    }
+    try {
+      const encoded = encodeURI(q.image_url);
+      if (encoded !== q.image_url) {
+        candidates.push(encoded);
+      }
+    } catch {
+      // ignore
+    }
   }
 
   // 3. External backup URL if present and distinct from primary
-  if (question.external_image_url && question.external_image_url !== question.image_url) {
-    candidates.push(question.external_image_url);
+  if (q.external_image_url && q.external_image_url !== q.image_url) {
+    candidates.push(q.external_image_url);
   }
 
   // 4. Fallback convention in Agent 2's verified asset directory (/assets/guess-who/)
-  if (question.id) {
-    candidates.push(`/assets/guess-who/logos/${question.id}.svg`);
-    candidates.push(`/assets/guess-who/${question.id}.jpg`);
-    candidates.push(`/assets/guess-who/${question.id}.png`);
-    candidates.push(`/assets/guess-who/${question.id}.webp`);
-    candidates.push(`/assets/guess-who/${question.id}.svg`);
+  if (q.id) {
+    candidates.push(`/assets/guess-who/logos/${q.id}.svg`);
+    candidates.push(`/assets/guess-who/${q.id}.jpg`);
+    candidates.push(`/assets/guess-who/${q.id}.png`);
+    candidates.push(`/assets/guess-who/${q.id}.webp`);
+    candidates.push(`/assets/guess-who/${q.id}.svg`);
   }
 
   // Deduplicate candidates

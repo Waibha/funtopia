@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, ShieldCheck, ArrowRight, ArrowLeft, Users, Lock, Sparkles, Gamepad2, Coins, Calendar, UserPlus, HelpCircle } from 'lucide-react';
+import { Trophy, ShieldCheck, ArrowRight, ArrowLeft, Users, Lock, Sparkles, Gamepad2, Coins, Calendar, UserPlus } from 'lucide-react';
 import { soundFx } from '../utilities/soundFx';
 import AuthArcadeBackground from '../components/backgrounds/AuthArcadeBackground';
 import MeetCreatorsModal from '../components/creators/MeetCreatorsModal';
@@ -62,7 +62,7 @@ export default function PortalSelectPage() {
       </div>
 
       {/* Main Choice Stage */}
-      <main className="relative z-10 max-w-7xl mx-auto w-full my-auto py-6 px-4">
+      <main className="relative z-10 max-w-5xl mx-auto w-full my-auto py-8 px-4">
         <div className="text-center mb-8">
           <span className="px-3.5 py-1.5 rounded-full bg-[#FF5FA0] text-white font-arcade text-[10px] font-black uppercase border-3 border-[#0D0518] shadow-pixel-sm inline-block mb-3">
             SELECT ACCESS LEVEL
@@ -71,12 +71,12 @@ export default function PortalSelectPage() {
             CHOOSE YOUR PORTAL
           </h2>
           <p className="text-purple-200 font-mono text-xs sm:text-sm mt-2 max-w-xl mx-auto">
-            Select your destination in the MADAGASCAR universe. Enter as a competitor, play the Guess Who deduction game, coordinate live matches, or manage the tournament as an administrator.
+            Select your destination in the MADAGASCAR universe. Enter as a competitor to track your score and play games, or access the admin portal to manage the tournament circuit.
           </p>
         </div>
 
-        {/* Quad High-Impact Portal Choices */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+        {/* Dual High-Impact Portal Choices */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch max-w-4xl mx-auto">
           {/* ========================================================= */}
           {/* PORTAL CHOICE 1: PARTICIPANT PORTAL                       */}
           {/* ========================================================= */}
@@ -159,191 +159,7 @@ export default function PortalSelectPage() {
           </div>
 
           {/* ========================================================= */}
-          {/* PORTAL CHOICE 2: GUESS WHO? GAME ARENA                    */}
-          {/* ========================================================= */}
-          <div
-            onClick={() => handleSelect('/guess-who')}
-            className="group cursor-pointer rounded-3xl bg-[#0E1338] text-white border-4 border-[#0D0518] shadow-pixel-xl hover:-translate-y-2.5 hover:shadow-[8px_12px_0px_#0D0518] hover:border-[#00F0FF] transition-all duration-300 flex flex-col justify-between relative overflow-hidden"
-          >
-            {/* Corner Badge */}
-            <div className="absolute top-0 right-0 bg-[#00F0FF] text-[#0D0518] font-arcade text-[9px] font-black px-4 py-1.5 rounded-bl-2xl border-l-3 border-b-3 border-[#0D0518] shadow-pixel-sm group-hover:bg-[#FFDE25] transition-colors z-20">
-              ARENA • PLAY NOW
-            </div>
-
-            {/* Retro 90s OS Marquee Bar */}
-            <div className="bg-[#7928CA] text-white font-mono font-black text-xs px-4 py-2 flex items-center justify-between border-b-3 border-[#0D0518] -mt-1 -mx-1 group-hover:bg-[#9333EA] transition-colors">
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#00F0FF] group-hover:rotate-12 transition-transform" />
-                <span>GUESS_WHO_ARENA.ROM</span>
-              </span>
-              <span className="text-[10px] font-arcade text-[#FFDE25]">12 PUZZLES</span>
-            </div>
-
-            <div className="p-6 sm:p-7 flex flex-col justify-between flex-grow">
-              <div>
-                {/* Header Title with Avatar */}
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#00F0FF] border-3 border-[#0D0518] shadow-pixel flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform shrink-0">
-                    🎭
-                  </div>
-                  <div>
-                    <span className="font-arcade text-[10px] text-[#00F0FF] font-black block">
-                      COSMIC DEDUCTION ARENA
-                    </span>
-                    <h3 className="font-bungee text-xl sm:text-2xl text-[#FFDE25]">
-                      GUESS WHO?
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Graphic Scene Box */}
-                <div className="w-full h-28 sm:h-32 rounded-2xl bg-[#180A28] border-3 border-[#0D0518] shadow-pixel-sm mb-5 p-3 flex items-center justify-around relative overflow-hidden group-hover:border-[#00F0FF] transition-colors">
-                  <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#00F0FF 1px, transparent 1px)', backgroundSize: '12px 12px' }} />
-                  
-                  <div className="flex items-center justify-center gap-3 sm:gap-4 z-10">
-                    <div className="text-center group-hover:-translate-y-2 transition-transform duration-200">
-                      <span className="text-2xl sm:text-3xl block filter drop-shadow">🧩</span>
-                      <span className="text-[8px] font-arcade text-[#FF5FA0]">12 PUZZLES</span>
-                    </div>
-                    <div className="text-center -translate-y-2 group-hover:-translate-y-4 transition-transform duration-200">
-                      <span className="text-3xl sm:text-4xl block filter drop-shadow animate-bounce-subtle">🎯</span>
-                      <span className="text-[8px] font-arcade text-[#FFDE25]">7 TO WIN</span>
-                    </div>
-                    <div className="text-center group-hover:-translate-y-2 transition-transform duration-200">
-                      <span className="text-2xl sm:text-3xl block filter drop-shadow">📽️</span>
-                      <span className="text-[8px] font-arcade text-[#00F0FF]">PROJECTOR</span>
-                    </div>
-                  </div>
-
-                  <div className="absolute bottom-0 inset-x-0 h-3 pixel-brick-strip" />
-                </div>
-
-                <p className="text-purple-200 font-sans text-xs sm:text-sm font-medium mb-5 leading-relaxed">
-                  The flagship visual mystery challenge! Identify hidden icons, logos, dialogues, songs, and native scripts across 8 categories with live audience synchronization.
-                </p>
-
-                {/* Functional Highlights */}
-                <div className="space-y-2 text-xs font-mono font-bold text-cyan-100 mb-6 bg-[#130722] p-3.5 sm:p-4 rounded-2xl border-2 border-[#0D0518]">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#00F0FF] shrink-0" />
-                    <span>Exactly 12 mystery puzzle cards per slab</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-[#FFDE25] shrink-0" />
-                    <span>Early victory immediately at 7 correct answers</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Gamepad2 className="w-4 h-4 text-[#FF5FA0] shrink-0" />
-                    <span>8 categories (flags, Bollywood, eyes, songs)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#28C76F] shrink-0" />
-                    <span>Sanitized audience display & Realtime sync</span>
-                  </div>
-                </div>
-              </div>
-
-              <button className="btn-pixel-green w-full text-center justify-center text-sm py-3.5 sm:py-4 group-hover:bg-[#00F0FF] group-hover:text-[#0D0518] transition-colors">
-                <span>PLAY NOW</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* ========================================================= */}
-          {/* PORTAL CHOICE 3: GUESS WHO — ADMIN / COORDINATOR          */}
-          {/* ========================================================= */}
-          <div
-            onClick={() => handleSelect('/admin/guess-who')}
-            className="group cursor-pointer rounded-3xl bg-[#170C33] text-white border-4 border-[#0D0518] shadow-pixel-xl hover:-translate-y-2.5 hover:shadow-[8px_12px_0px_#0D0518] hover:border-[#FFDE25] transition-all duration-300 flex flex-col justify-between relative overflow-hidden"
-          >
-            {/* Corner Badge */}
-            <div className="absolute top-0 right-0 bg-[#FFDE25] text-[#0D0518] font-arcade text-[9px] font-black px-4 py-1.5 rounded-bl-2xl border-l-3 border-b-3 border-[#0D0518] shadow-pixel-sm group-hover:bg-[#00F0FF] transition-colors z-20">
-              COORDINATOR ACCESS
-            </div>
-
-            {/* Retro 90s Marquee Bar */}
-            <div className="bg-[#581C87] text-white font-mono font-black text-xs px-4 py-2 flex items-center justify-between border-b-3 border-[#0D0518] -mt-1 -mx-1 group-hover:bg-[#6B21A8] transition-colors">
-              <span className="flex items-center gap-2">
-                <Lock className="w-3.5 h-3.5 text-[#FFDE25] group-hover:rotate-12 transition-transform" />
-                <span>GW_COORDINATOR_CONSOLE.SYS</span>
-              </span>
-              <span className="text-[10px] font-arcade text-[#FFDE25]">RESTRICTED</span>
-            </div>
-
-            <div className="p-6 sm:p-7 flex flex-col justify-between flex-grow">
-              <div>
-                {/* Header Title with Avatar */}
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#FFDE25] border-3 border-[#0D0518] shadow-pixel flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-3 transition-transform shrink-0">
-                    🎛️
-                  </div>
-                  <div>
-                    <span className="font-arcade text-[10px] text-[#FFDE25] font-black block">
-                      MATCH CONTROLLER & SCORING
-                    </span>
-                    <h3 className="font-bungee text-xl sm:text-2xl text-white">
-                      GUESS WHO — ADMIN / COORDINATOR
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Graphic Scene Box */}
-                <div className="w-full h-28 sm:h-32 rounded-2xl bg-[#0F061F] border-3 border-[#0D0518] shadow-pixel-sm mb-5 p-3 flex items-center justify-around relative overflow-hidden group-hover:border-[#FFDE25] transition-colors">
-                  <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#FFDE25 1px, transparent 1px)', backgroundSize: '12px 12px' }} />
-                  
-                  <div className="flex items-center justify-center gap-3 sm:gap-4 z-10">
-                    <div className="text-center group-hover:-translate-y-2 transition-transform duration-200">
-                      <span className="text-2xl sm:text-3xl block filter drop-shadow">📑</span>
-                      <span className="text-[8px] font-arcade text-[#00F0FF]">SLAB CONFIG</span>
-                    </div>
-                    <div className="text-center -translate-y-2 group-hover:-translate-y-4 transition-transform duration-200">
-                      <span className="text-3xl sm:text-4xl block filter drop-shadow animate-bounce-subtle">📡</span>
-                      <span className="text-[8px] font-arcade text-[#28C76F]">LIVE BROADCAST</span>
-                    </div>
-                    <div className="text-center group-hover:-translate-y-2 transition-transform duration-200">
-                      <span className="text-2xl sm:text-3xl block filter drop-shadow">⚡</span>
-                      <span className="text-[8px] font-arcade text-[#FFDE25]">ATOMIC SCORING</span>
-                    </div>
-                  </div>
-
-                  <div className="absolute bottom-0 inset-x-0 h-3 pixel-brick-strip" />
-                </div>
-
-                <p className="text-purple-200 font-sans text-xs sm:text-sm font-medium mb-5 leading-relaxed">
-                  Dedicated match control for Guess Who coordinators. Generate and edit 12-question slabs, record live player turns, broadcast to the projector, and sync authoritative scores.
-                </p>
-
-                {/* Functional Highlights */}
-                <div className="space-y-2 text-xs font-mono font-bold text-amber-100 mb-6 bg-[#120724] p-3.5 sm:p-4 rounded-2xl border-2 border-[#0D0518]">
-                  <div className="flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-[#FFDE25] shrink-0" />
-                    <span>Secure coordinator passkey & Supabase auth</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#00F0FF] shrink-0" />
-                    <span>Generate, customize & replace 12-puzzle slabs</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#28C76F] shrink-0" />
-                    <span>Live projector display broadcast & reveal sync</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-4 h-4 text-[#FF5FA0] shrink-0" />
-                    <span>Authoritative scoring, early win & match history</span>
-                  </div>
-                </div>
-              </div>
-
-              <button className="btn-pixel-yellow w-full text-center justify-center text-sm py-3.5 sm:py-4 group-hover:bg-[#FFDE25] transition-colors">
-                <span>COORDINATOR LOGIN</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* ========================================================= */}
-          {/* PORTAL CHOICE 4: ADMIN PORTAL                             */}
+          {/* PORTAL CHOICE 2: ADMIN PORTAL                             */}
           {/* ========================================================= */}
           <div
             onClick={() => handleSelect('/admin')}
@@ -399,7 +215,7 @@ export default function PortalSelectPage() {
                 </div>
 
                 <p className="text-purple-200 font-sans text-xs sm:text-sm font-medium mb-5 leading-relaxed">
-                  Restricted to event organisers and authorized administrators. Full operational control over games, participants, and scoring transactions.
+                  Restricted to event organisers and authorized administrators. Full operational control over games, participants, Guess Who? management, and scoring transactions.
                 </p>
 
                 {/* Functional Highlights */}
@@ -409,12 +225,12 @@ export default function PortalSelectPage() {
                     <span>Manage games, coin entry costs & active status</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Gamepad2 className="w-4 h-4 text-[#00F0FF] shrink-0" />
-                    <span>Manage games (costs/budgets, points & active status)</span>
+                    <Sparkles className="w-4 h-4 text-[#00F0FF] shrink-0" />
+                    <span>Full Guess Who? match controller & slab editor</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#28C76F] shrink-0" />
-                    <span>Manage registered participant roster</span>
+                    <span>Manage registered participant roster & coins</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Coins className="w-4 h-4 text-[#FF5FA0] shrink-0" />
@@ -436,7 +252,7 @@ export default function PortalSelectPage() {
       <footer className="relative z-10 w-full mt-6">
         <div className="pixel-grass-strip h-3 w-full" />
         <div className="pixel-brick-strip py-3.5 px-6 text-center text-xs font-arcade text-[#FFDE25]">
-          MADAGASCAR CHAMPIONSHIP CIRCUIT • FOUR DEDICATED EXPERIENCES
+          MADAGASCAR CHAMPIONSHIP CIRCUIT • TWO DEDICATED EXPERIENCES
         </div>
       </footer>
 
