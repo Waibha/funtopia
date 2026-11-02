@@ -16,6 +16,8 @@ export const supabaseConfig = {
   ),
 };
 
+export const isSupabaseConfigured = () => supabaseConfig.isConfigured;
+
 export const supabase = supabaseConfig.isConfigured
   ? createClient(supabaseConfig.url, supabaseConfig.anonKey, {
       auth: {

@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GuessWhoQuestionRecord",
+  "description": "Standard schema for Guess Who? puzzle questions in FUNTOPIA",
+  "example_image_record": {
+    "id": "hw-1",
+    "category": "hollywood_celebrities",
+    "category_label": "Hollywood Celebrities",
+    "title": "Action & Sci-Fi Icon",
+    "prompt": "Who played Neo in The Matrix and the legendary assassin John Wick?",
+    "correct_answer": "Keanu Reeves",
+    "clue": "Known for Speed, The Matrix trilogy, John Wick, and Cyberpunk 2077.",
+    "difficulty": "Easy",
+    "reveal_type": "crop",
+    "image_url": "/assets/guess-who/manual_uploads/hollywood_celebrities/keanu_reeves.jpg",
+    "local_asset_path": "/assets/guess-who/manual_uploads/hollywood_celebrities/keanu_reeves.jpg",
+    "reveal_metadata": {
+      "cropX": 35,
+      "cropY": 25,
+      "zoom": 2.2
+    },
+    "verification_status": "manual_selection"
+  },
+  "example_dialogue_record": {
+    "id": "bd-1",
+    "category": "bollywood_dialogues",
+    "category_label": "Bollywood Dialogues",
+    "title": "Iconic Villain Catchphrase",
+    "prompt": "Which Bollywood movie features the legendary villainous line: 'Mogambo khush hua'?",
+    "dialogue_text": "“ मोगैम्बो खुश हुआ! ”\n('Mogambo khush hua!')",
+    "correct_answer": "Mr. India (1987) — Amrish Puri as Mogambo",
+    "clue": "Directed by Shekhar Kapur; starring Anil Kapoor with an invisibility watch.",
+    "difficulty": "Easy",
+    "reveal_type": "dialogue",
+    "verification_status": "manual_selection"
+  },
+  "approved_categories": [
+    "hollywood_celebrities",
+    "bollywood_celebrities",
+    "scientists",
+    "objects",
+    "flags",
+    "bollywood_dialogues",
+    "logos_symbols",
+    "miscellaneous"
+  ],
+  "reveal_types": [
+    "crop",
+    "blur",
+    "puzzle_tiles",
+    "silhouette",
+    "dialogue"
+  ]
+}

@@ -10,11 +10,13 @@ import {
   ArrowLeft,
   Sparkles,
   Sliders,
+  Tv,
 } from 'lucide-react';
 import AudioSettingsModal from '../components/AudioSettingsModal';
 import AdminDashboard from './AdminDashboard';
 import GameManagement from './GameManagement';
 import ScoringManagement from './ScoringManagement';
+import AdminGuessWhoPage from './admin/AdminGuessWhoPage';
 import ParticipantRosterManager from '../components/admin/ParticipantRosterManager';
 import CoinEconomyManager from '../components/admin/CoinEconomyManager';
 import AdminLogin from '../components/admin/AdminLogin';
@@ -121,6 +123,7 @@ export default function AdminPortal({
   const navItems = [
     { id: 'leaderboard', label: 'LEADERBOARD', icon: Trophy },
     { id: 'games', label: 'GAMES', icon: Gamepad2 },
+    { id: 'guess-who', label: 'GUESS WHO?', icon: Sparkles },
     { id: 'participants', label: 'PARTICIPANTS', icon: Users },
     { id: 'coins', label: 'COINS', icon: Coins },
     { id: 'scoring', label: 'SCORING', icon: Trophy },
@@ -185,6 +188,15 @@ export default function AdminPortal({
 
               {/* Action Controls */}
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.open('/guess-who', '_blank')}
+                  className="btn-pixel-pink py-1.5 px-3 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold"
+                  title="Open Guess Who Projector Display in new window"
+                >
+                  <Tv className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">PROJECTOR</span>
+                </button>
+
                 <button
                   onClick={() => setIsAudioModalOpen(true)}
                   className="btn-pixel-yellow p-2.5 rounded-xl flex items-center gap-1.5 text-xs"
@@ -274,6 +286,10 @@ export default function AdminPortal({
               onDeleteGame={onDeleteGame}
               onToggleGameActive={onToggleGameActive}
             />
+          )}
+
+          {currentTab === 'guess-who' && (
+            <AdminGuessWhoPage />
           )}
 
           {currentTab === 'coins' && (

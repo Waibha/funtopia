@@ -6,6 +6,9 @@ import PortalSelectPage from './pages/PortalSelectPage';
 import ParticipantPortal from './pages/ParticipantPortal';
 import AdminPortal from './pages/AdminPortal';
 import MeetCreatorsPage from './pages/MeetCreatorsPage';
+import GuessWhoHubPage from './pages/guess-who/GuessWhoHubPage';
+import GuessWhoLobbyPage from './pages/guess-who/GuessWhoLobbyPage';
+import AdminGuessWhoPage from './pages/admin/AdminGuessWhoPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { dbService } from './services/api/dbService';
 import { loadStoredData, saveStoredData, INITIAL_DATA } from './services/mockData';
@@ -297,6 +300,11 @@ export default function App() {
         {/* Meet the Creators / About */}
         <Route path="/creators" element={<MeetCreatorsPage />} />
         <Route path="/about" element={<MeetCreatorsPage />} />
+
+        {/* Guess Who? Module Routes */}
+        <Route path="/guess-who" element={<GuessWhoHubPage />} />
+        <Route path="/guess-who/lobby" element={<GuessWhoLobbyPage />} />
+        <Route path="/admin/guess-who" element={<AdminGuessWhoPage />} />
 
         {/* Legacy callback route redirects to Participant Portal */}
         <Route

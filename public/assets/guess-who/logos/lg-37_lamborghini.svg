@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 210">
+  <path d="M25,20 L155,20 L155,130 C155,175 90,195 90,195 C90,195 25,175 25,130 Z" fill="#000000" stroke="#d4af37" stroke-width="6"/>
+  <!-- Stylized Charging Golden Bull Emblem (Wordmark removed to prevent answer leak) -->
+  <path d="M60,135 C65,115 70,105 85,100 C92,98 100,105 110,105 C122,105 130,95 125,85 C115,85 110,88 102,84 C95,75 80,82 72,92 C62,98 52,110 50,130 Z" fill="#d4af37"/>
+</svg>
