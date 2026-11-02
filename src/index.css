@@ -8,34 +8,97 @@
   }
 
   body {
-    background-color: #5C2D91;
-    color: #FFFFFF;
-    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #0A091A;
+    color: #F8FAFC;
+    font-family: 'Plus Jakarta Sans', 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 
-  /* Pixel Retro Scrollbar */
+  /* Fantasy Realm Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
   }
   ::-webkit-scrollbar-track {
-    background: #40186D;
+    background: #0D0B20;
   }
   ::-webkit-scrollbar-thumb {
-    background: #FFDE25;
-    border-radius: 2px;
-    border: 2px solid #0D0518;
+    background: #FFC837;
+    border-radius: 4px;
+    border: 2px solid #0D0B20;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #FF5FA0;
+    background: #FFE484;
   }
 }
 
 @layer components {
   /* ========================================================================= */
-  /* VISUAL INSPIRATION PILL BUTTONS (SIGN IN, MENU, START)                    */
+  /* MAGICAL FANTASY ADVENTURE BUTTONS                                         */
+  /* ========================================================================= */
+  .btn-fantasy-primary {
+    @apply relative inline-flex items-center justify-center gap-2.5 px-8 py-4 sm:px-12 sm:py-5 rounded-2xl font-cinzel text-base sm:text-xl font-black uppercase tracking-widest text-[#0A091A] bg-gradient-to-r from-[#FFC837] via-[#FFE484] to-[#FF9E1B] border-2 border-[#FFEFA6] shadow-fantasy-gold transition-all duration-200 hover:-translate-y-1 hover:brightness-110 active:translate-y-0.5 active:shadow-none select-none;
+  }
+
+  .btn-fantasy-citadel {
+    @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-cinzel text-sm sm:text-base font-bold uppercase tracking-wider text-cyan-200 bg-gradient-to-r from-[#0C1E3D] via-[#103063] to-[#0A1833] border-2 border-[#00F0FF]/50 shadow-fantasy-cyan transition-all duration-200 hover:-translate-y-1 hover:border-[#00F0FF] active:translate-y-0.5 select-none;
+  }
+
+  .btn-fantasy-emerald {
+    @apply relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-cinzel text-sm sm:text-base font-bold uppercase tracking-wider text-emerald-100 bg-gradient-to-r from-[#062E20] via-[#0D4D36] to-[#062419] border-2 border-[#10B981]/50 shadow-fantasy-emerald transition-all duration-200 hover:-translate-y-1 hover:border-[#10B981] active:translate-y-0.5 select-none;
+  }
+
+  .btn-fantasy-subtle {
+    @apply relative inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-jakarta text-xs font-bold text-slate-200 bg-[#161233]/90 hover:bg-[#201A49] border border-white/15 hover:border-[#FFC837]/60 transition-all select-none;
+  }
+
+  /* ========================================================================= */
+  /* FANTASY SURFACE CARDS & FRAMES                                            */
+  /* ========================================================================= */
+  .fantasy-card {
+    @apply relative rounded-3xl bg-gradient-to-b from-[#141033]/90 via-[#0F0C28]/95 to-[#09071A]/95 border-2 border-white/10 shadow-fantasy-card backdrop-blur-md transition-all duration-200;
+  }
+
+  .fantasy-card-hover {
+    @apply hover:-translate-y-1.5 hover:border-[#FFC837]/40 hover:shadow-fantasy-card-hover;
+  }
+
+  .fantasy-card-citadel {
+    @apply relative rounded-3xl bg-gradient-to-b from-[#0F1B38]/90 via-[#0A132B]/95 to-[#060B1A]/95 border-2 border-[#00F0FF]/30 shadow-fantasy-card backdrop-blur-md;
+  }
+
+  .fantasy-card-grove {
+    @apply relative rounded-3xl bg-gradient-to-b from-[#0E2920]/90 via-[#0A1F18]/95 to-[#06140F]/95 border-2 border-[#10B981]/30 shadow-fantasy-card backdrop-blur-md;
+  }
+
+  /* ========================================================================= */
+  /* CINEMATIC FANTASY HEADLINE & GLOWS                                        */
+  /* ========================================================================= */
+  .fantasy-title-gold {
+    @apply font-cinzel font-black tracking-widest text-[#FFC837];
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.9),
+      0 0 28px rgba(255, 200, 55, 0.55),
+      0 0 60px rgba(255, 158, 27, 0.35);
+  }
+
+  .fantasy-title-cyan {
+    @apply font-cinzel font-black tracking-widest text-[#00F0FF];
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.9),
+      0 0 25px rgba(0, 240, 255, 0.55);
+  }
+
+  .fantasy-title-emerald {
+    @apply font-cinzel font-black tracking-widest text-[#34D399];
+    text-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.9),
+      0 0 25px rgba(16, 185, 129, 0.55);
+  }
+
+  /* ========================================================================= */
+  /* VISUAL INSPIRATION PILL BUTTONS (Preserved for compatibility)             */
   /* ========================================================================= */
   .btn-pixel-yellow {
     @apply inline-flex items-center justify-center gap-2 bg-[#FFDE25] hover:bg-[#FFE552] text-[#0D0518] font-arcade text-xs sm:text-sm uppercase tracking-wider px-5 py-3 rounded-2xl border-3 border-[#0D0518] shadow-pixel transition-all duration-150 hover:-translate-y-0.5 active:translate-x-1 active:translate-y-1 active:shadow-none select-none;
@@ -53,14 +116,13 @@
     @apply inline-flex items-center justify-center gap-2 bg-white hover:bg-[#FFFDF5] text-[#0D0518] font-arcade text-xs sm:text-sm uppercase tracking-wider px-4 py-2.5 rounded-xl border-2 border-[#0D0518] shadow-pixel-sm transition-all duration-150 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none select-none;
   }
 
-  /* Backwards-compatible aliases */
   .btn-pop-yellow { @apply btn-pixel-yellow; }
   .btn-pop-coral { @apply btn-pixel-pink; }
   .btn-pop-purple { @apply btn-pixel-green; }
   .btn-pop-white { @apply btn-pixel-white; }
 
   /* ========================================================================= */
-  /* SPEECH BUBBLE CONTAINERS (Directly from inspiration screens)               */
+  /* SPEECH BUBBLE CONTAINERS & WINDOWS (Preserved)                            */
   /* ========================================================================= */
   .speech-card {
     @apply bg-white text-[#0D0518] rounded-3xl border-4 border-[#0D0518] shadow-pixel-lg p-6 relative;
@@ -70,9 +132,6 @@
     @apply absolute -bottom-3 left-10 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[14px] border-t-[#0D0518];
   }
 
-  /* ========================================================================= */
-  /* CLASSIC 90S OS RETRO DIALOGUE WINDOW (From "ARE YOU READY?" Screen)      */
-  /* ========================================================================= */
   .retro-os-window {
     @apply bg-[#D1D5DB] text-[#0D0518] rounded-none border-4 border-[#0D0518] shadow-pixel-xl overflow-hidden;
   }
@@ -81,9 +140,7 @@
     @apply bg-[#000080] text-white font-mono font-black text-xs px-3 py-1.5 flex items-center justify-between border-b-2 border-[#0D0518];
   }
 
-  /* ========================================================================= */
-  /* REPEATING PIXEL BRICK PLATFORM & GRASS FOOTING                           */
-  /* ========================================================================= */
+  /* Platform strips preserved */
   .pixel-brick-strip {
     background-color: #C86432;
     background-image: 
@@ -105,9 +162,6 @@
     border-top: 4px solid #0D0518;
   }
 
-  /* ========================================================================= */
-  /* PIXEL TITLE SHADOWS ("GAME", "RULES!", "THANK YOU")                      */
-  /* ========================================================================= */
   .pixel-title-yellow {
     color: #FFDE25;
     text-shadow: 

@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 
 /**
  * AuthArcadeBackground
- * Restrained floating geometric elements with subtle movement.
- * Creates an immersive arcade entrance atmosphere for authentication screens.
+ * Floating celestial stardust and glowing runic motes.
+ * Creates an enchanting fantasy entrance atmosphere with full reduced-motion accessibility.
  */
 export default function AuthArcadeBackground() {
   const canvasRef = useRef(null);
@@ -28,11 +28,11 @@ export default function AuthArcadeBackground() {
     window.addEventListener('resize', handleResize);
 
     const nodes = [
-      { x: width * 0.12, y: height * 0.25, r: 16, vy: 0.1, vx: 0.05, rot: 0, rotV: 0.003, color: 'rgba(255, 222, 37, 0.14)', type: 'coin' },
-      { x: width * 0.88, y: height * 0.2, r: 24, vy: -0.08, vx: -0.04, rot: 0.5, rotV: -0.002, color: 'rgba(255, 95, 160, 0.12)', type: 'diamond' },
-      { x: width * 0.18, y: height * 0.78, r: 20, vy: 0.09, vx: -0.03, rot: 1.1, rotV: 0.004, color: 'rgba(0, 240, 255, 0.12)', type: 'square' },
-      { x: width * 0.82, y: height * 0.75, r: 18, vy: -0.12, vx: 0.05, rot: 2.0, rotV: -0.003, color: 'rgba(192, 132, 252, 0.14)', type: 'coin' },
-      { x: width * 0.5, y: height * 0.88, r: 14, vy: 0.07, vx: 0.02, rot: 0.8, rotV: 0.002, color: 'rgba(255, 222, 37, 0.10)', type: 'diamond' },
+      { x: width * 0.12, y: height * 0.25, r: 16, vy: 0.1, vx: 0.05, rot: 0, rotV: 0.003, color: 'rgba(255, 200, 55, 0.22)', type: 'coin' },
+      { x: width * 0.88, y: height * 0.2, r: 24, vy: -0.08, vx: -0.04, rot: 0.5, rotV: -0.002, color: 'rgba(0, 240, 255, 0.18)', type: 'diamond' },
+      { x: width * 0.18, y: height * 0.78, r: 20, vy: 0.09, vx: -0.03, rot: 1.1, rotV: 0.004, color: 'rgba(16, 185, 129, 0.18)', type: 'square' },
+      { x: width * 0.82, y: height * 0.75, r: 18, vy: -0.12, vx: 0.05, rot: 2.0, rotV: -0.003, color: 'rgba(255, 200, 55, 0.20)', type: 'coin' },
+      { x: width * 0.5, y: height * 0.88, r: 14, vy: 0.07, vx: 0.02, rot: 0.8, rotV: 0.002, color: 'rgba(0, 240, 255, 0.16)', type: 'diamond' },
     ];
 
     let lastTime = performance.now();
@@ -43,10 +43,10 @@ export default function AuthArcadeBackground() {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Deep purple arcade background
+      // Deep fantasy night canvas
       const grad = ctx.createRadialGradient(width / 2, height / 2, width * 0.1, width / 2, height / 2, width * 0.75);
-      grad.addColorStop(0, 'rgba(48, 14, 84, 0.25)');
-      grad.addColorStop(1, 'rgba(13, 5, 24, 0.55)');
+      grad.addColorStop(0, 'rgba(17, 24, 39, 0.35)');
+      grad.addColorStop(1, 'rgba(10, 9, 26, 0.85)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, width, height);
 
@@ -106,12 +106,12 @@ export default function AuthArcadeBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
       <canvas ref={canvasRef} className="w-full h-full block" />
-      {/* Subtle arcade grid overlay */}
+      {/* Subtle stardust overlay */}
       <div
-        className="absolute inset-0 opacity-[0.025]"
+        className="absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage: `linear-gradient(to right, #C084FC 1px, transparent 1px), linear-gradient(to bottom, #C084FC 1px, transparent 1px)`,
-          backgroundSize: '36px 36px',
+          backgroundImage: `radial-gradient(#FFC837 1px, transparent 1px)`,
+          backgroundSize: '32px 32px',
         }}
       />
     </div>

@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 
 /**
  * ParticipantArcadeBackground
- * Gentle falling game-inspired shapes (retro blocks, floating arcade coins, playful gems).
- * Layered depth and gentle ambient lighting for the Participant Portal.
+ * Floating celestial stardust and glowing runic crystals.
+ * Creates an immersive magical fantasy adventure atmosphere for the Adventurers' Realm.
  */
 export default function ParticipantArcadeBackground() {
   const canvasRef = useRef(null);
@@ -27,7 +27,7 @@ export default function ParticipantArcadeBackground() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Floating/falling arcade elements
+    // Floating fantasy motes & crystals
     const elements = Array.from({ length: 18 }, (_, i) => ({
       x: Math.random() * width,
       y: Math.random() * height,
@@ -38,10 +38,10 @@ export default function ParticipantArcadeBackground() {
       rotSpeed: (Math.random() - 0.5) * 0.02,
       type: ['coin', 'diamond', 'square', 'star'][i % 4],
       color: [
-        'rgba(255, 222, 37, 0.16)', // yellow coin
-        'rgba(255, 95, 160, 0.14)',  // pink gem
-        'rgba(0, 240, 255, 0.14)',   // cyan block
-        'rgba(192, 132, 252, 0.15)', // purple prism
+        'rgba(255, 200, 55, 0.20)', // gold
+        'rgba(16, 185, 129, 0.18)', // emerald
+        'rgba(0, 240, 255, 0.18)',  // cyan
+        'rgba(168, 85, 247, 0.18)', // amethyst
       ][i % 4],
     }));
 
@@ -53,11 +53,11 @@ export default function ParticipantArcadeBackground() {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Deep purple arcade background gradient
+      // Deep fantasy night gradient
       const grad = ctx.createRadialGradient(width / 2, height * 0.4, 100, width / 2, height * 0.5, width * 0.85);
-      grad.addColorStop(0, 'rgba(88, 28, 135, 0.20)');
-      grad.addColorStop(0.7, 'rgba(48, 14, 84, 0.35)');
-      grad.addColorStop(1, 'rgba(15, 4, 32, 0.60)');
+      grad.addColorStop(0, 'rgba(15, 23, 42, 0.45)');
+      grad.addColorStop(0.7, 'rgba(11, 15, 29, 0.75)');
+      grad.addColorStop(1, 'rgba(10, 9, 26, 0.95)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, width, height);
 
@@ -67,20 +67,16 @@ export default function ParticipantArcadeBackground() {
           el.x += el.speedX * dt;
           el.rot += el.rotSpeed;
 
-          // Wrap around screen edges smoothly
-          if (el.y > height + 40) {
-            el.y = -30;
-            el.x = Math.random() * width;
-          }
-          if (el.x < -40) el.x = width + 30;
-          if (el.x > width + 40) el.x = -30;
+          if (el.y > height + 40) el.y = -40;
+          if (el.x > width + 40) el.x = -40;
+          if (el.x < -40) el.x = width + 40;
         }
 
         ctx.save();
         ctx.translate(el.x, el.y);
         ctx.rotate(el.rot);
-        ctx.fillStyle = el.color;
         ctx.strokeStyle = el.color;
+        ctx.fillStyle = el.color;
         ctx.lineWidth = 1.5;
 
         if (el.type === 'coin') {
@@ -88,7 +84,7 @@ export default function ParticipantArcadeBackground() {
           ctx.arc(0, 0, el.size / 2, 0, Math.PI * 2);
           ctx.stroke();
           ctx.beginPath();
-          ctx.arc(0, 0, el.size / 3.5, 0, Math.PI * 2);
+          ctx.arc(0, 0, el.size / 4, 0, Math.PI * 2);
           ctx.fill();
         } else if (el.type === 'diamond') {
           ctx.beginPath();
@@ -103,7 +99,6 @@ export default function ParticipantArcadeBackground() {
           ctx.strokeRect(-el.size / 2, -el.size / 2, el.size, el.size);
           ctx.fillRect(-el.size / 3, -el.size / 3, (el.size * 2) / 3, (el.size * 2) / 3);
         } else if (el.type === 'star') {
-          // 4-point retro arcade sparkle
           ctx.beginPath();
           ctx.moveTo(0, -el.size / 2);
           ctx.lineTo(el.size / 6, -el.size / 6);
@@ -136,12 +131,12 @@ export default function ParticipantArcadeBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
       <canvas ref={canvasRef} className="w-full h-full block" />
-      {/* Subtle retro dot matrix */}
+      {/* Subtle fantasy stardust matrix */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage: `radial-gradient(#FFDE25 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
+          backgroundImage: `radial-gradient(#10B981 1px, transparent 1px)`,
+          backgroundSize: '28px 28px',
         }}
       />
     </div>

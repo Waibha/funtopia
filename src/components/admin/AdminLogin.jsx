@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, ArrowLeft, AlertTriangle, KeyRound } from 'lucide-react';
+import { Lock, ArrowLeft, AlertTriangle, KeyRound, Shield, Sparkles } from 'lucide-react';
 import { soundFx } from '../../utilities/soundFx';
 import { verifyAdminPasskey } from '../../services/api/authService';
 import AuthArcadeBackground from '../backgrounds/AuthArcadeBackground';
@@ -39,65 +39,66 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#5C2D91] text-white flex flex-col justify-between p-4 sm:p-8 select-none font-sans overflow-hidden">
-      {/* Background Animated Arcade Elements */}
+    <div className="relative min-h-screen bg-[#0A091A] text-slate-100 flex flex-col justify-between p-4 sm:p-8 select-none font-sans overflow-hidden">
+      {/* Background Animated Elements */}
       <AuthArcadeBackground />
+      <div className="fixed inset-0 bg-radial-at-t from-cyan-950/25 via-transparent to-[#0A091A]/95 pointer-events-none" />
 
+      {/* Top Bar */}
       <div className="relative z-10 max-w-md mx-auto w-full flex items-center justify-between">
         <button
           onClick={onReturnToPortals}
-          className="btn-pixel-white text-[11px] py-1.5 px-3 flex items-center gap-1.5"
+          className="btn-fantasy-subtle text-xs py-2 px-3 flex items-center gap-1.5 font-cinzel text-cyan-200"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>PORTALS</span>
+          <ArrowLeft className="w-3.5 h-3.5 text-[#00F0FF]" />
+          <span>RETURN TO PORTALS</span>
         </button>
 
-        <span className="font-arcade text-[10px] text-[#FF5FA0] font-black">
-          RESTRICTED GATEWAY
+        <span className="font-cinzel text-[10px] text-[#00F0FF] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full bg-cyan-950/80 border border-[#00F0FF]/30 shadow-fantasy-cyan">
+          HIGH CITADEL ARCHIVE
         </span>
       </div>
 
-      {/* Main 90s OS Retro Window (Homage to Screen 2: "ARE YOU READY?") */}
+      {/* Main High Citadel Vault Frame */}
       <div className="relative z-10 max-w-md mx-auto w-full my-auto py-6">
-        <div className="retro-os-window rounded-2xl">
-          {/* Classic 90s Blue Header Bar */}
-          <div className="retro-os-titlebar py-2 px-3">
-            <div className="flex items-center gap-2">
-              <Lock className="w-3.5 h-3.5" />
-              <span>ADMIN_AUTHENTICATION_GATEWAY.EXE</span>
+        <div className="rounded-3xl bg-gradient-to-b from-[#0F1B38]/95 via-[#0A132B]/95 to-[#060B1A]/95 border-2 border-[#00F0FF]/40 shadow-fantasy-card overflow-hidden backdrop-blur-xl animate-fade-in">
+          {/* Celestial Titlebar */}
+          <div className="bg-[#0B152C]/90 px-4 py-3 border-b border-[#00F0FF]/25 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-cyan-200 text-xs font-cinzel font-bold tracking-wider">
+              <Shield className="w-4 h-4 text-[#00F0FF]" />
+              <span>CITADEL_PASSKEY_SANCTUM</span>
             </div>
-            <div className="flex items-center gap-1">
-              <span className="px-1.5 py-0.2 bg-[#D1D5DB] text-[#0D0518] border border-[#0D0518] text-[10px] cursor-pointer">_</span>
-              <span className="px-1.5 py-0.2 bg-[#D1D5DB] text-[#0D0518] border border-[#0D0518] text-[10px] cursor-pointer">✕</span>
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <span className="text-[10px] font-mono text-cyan-300">RESTRICTED</span>
             </div>
           </div>
 
-          <div className="p-6 bg-[#D1D5DB]">
-            {/* "ARE YOU READY?" dialogue box banner */}
-            <div className="bg-white border-3 border-[#0D0518] p-4 text-center rounded-xl mb-5 shadow-pixel-sm">
-              <div className="flex items-center justify-center gap-3 mb-1">
-                <span className="text-xl">👾</span>
-                <span className="font-arcade text-sm text-[#0D0518] font-black">
-                  ARE YOU READY ?
-                </span>
-                <span className="text-xl">👾</span>
+          <div className="p-6">
+            {/* Seal Dialogue Banner */}
+            <div className="bg-[#081024]/80 border border-[#00F0FF]/30 p-5 text-center rounded-2xl mb-6 shadow-fantasy-cyan">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-cyan-950/80 border border-[#00F0FF]/50 flex items-center justify-center text-2xl mb-3 shadow-fantasy-cyan">
+                🗝️
               </div>
-              <p className="text-[11px] font-mono text-gray-600 font-bold">
-                ENTER AUTHORIZED ADMIN PASSKEY
+              <h2 className="font-cinzel text-xl font-black text-[#FFC837] fantasy-title-gold tracking-wide">
+                HIGH CITADEL VAULT
+              </h2>
+              <p className="text-[11px] font-jakarta text-cyan-200/80 mt-1">
+                Enter authorized Grand Scribe Passkey & Identity
               </p>
             </div>
 
             {errorMsg && (
-              <div className="mb-4 p-3 rounded-xl bg-red-100 border-2 border-red-600 text-red-900 text-xs font-mono flex items-start gap-2 animate-shake">
-                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <div className="mb-4 p-3 rounded-xl bg-red-950/70 border border-red-500/60 text-red-200 text-xs font-jakarta flex items-start gap-2.5 animate-shake">
+                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                 <span className="font-bold">{errorMsg}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono text-[#0D0518]">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-jakarta text-slate-200">
               <div>
-                <label className="block text-[#0D0518] mb-1 font-black">
-                  ADMIN PASSKEY *
+                <label className="block text-slate-300 font-cinzel font-bold text-xs uppercase mb-1.5 tracking-wider">
+                  CITADEL PASSKEY *
                 </label>
                 <div className="relative">
                   <input
@@ -109,14 +110,14 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
                     autoCapitalize="none"
                     autoCorrect="off"
                     spellCheck="false"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border-3 border-[#0D0518] text-[#0D0518] font-mono font-bold focus:outline-none focus:border-[#FF5FA0]"
+                    className="w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-[#060D1E] border border-white/15 text-slate-100 font-mono font-bold focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all"
                   />
-                  <KeyRound className="w-4 h-4 text-gray-400 absolute right-3 top-3.5 pointer-events-none" />
+                  <KeyRound className="w-4 h-4 text-cyan-400 absolute right-3 top-3 pointer-events-none" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[#0D0518] mb-1 font-black">
+                <label className="block text-slate-300 font-cinzel font-bold text-xs uppercase mb-1.5 tracking-wider">
                   OPERATOR EMAIL / IDENTITY
                 </label>
                 <input
@@ -127,25 +128,25 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck="false"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white border-3 border-[#0D0518] text-[#0D0518] font-bold focus:outline-none focus:border-[#FF5FA0]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#060D1E] border border-white/15 text-slate-100 font-mono font-medium focus:outline-none focus:border-[#00F0FF] focus:ring-1 focus:ring-[#00F0FF] transition-all"
                 />
               </div>
 
-              {/* Action Buttons styled like the [ Yes ] [ No ] dialog buttons */}
-              <div className="pt-2 grid grid-cols-2 gap-3">
+              {/* Action Buttons */}
+              <div className="pt-3 grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={onReturnToPortals}
-                  className="btn-pixel-white text-center justify-center text-xs py-3"
+                  className="btn-fantasy-subtle text-center justify-center text-xs py-3 font-cinzel font-bold"
                 >
-                  NO / CANCEL
+                  CANCEL
                 </button>
                 <button
                   type="submit"
                   disabled={isAuthorizing}
-                  className="btn-pixel-yellow text-center justify-center text-xs py-3 font-bold"
+                  className="btn-fantasy-citadel text-center justify-center text-xs py-3 font-cinzel font-bold"
                 >
-                  {isAuthorizing ? 'VERIFYING...' : 'YES / ENTER'}
+                  {isAuthorizing ? 'VERIFYING...' : 'ENTER CITADEL'}
                 </button>
               </div>
             </form>
@@ -154,11 +155,8 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
       </div>
 
       {/* Footer Platform */}
-      <footer className="relative z-10 w-full select-none">
-        <div className="pixel-grass-strip h-3 w-full" />
-        <div className="pixel-brick-strip py-3 px-6 text-center text-xs font-arcade text-[#FFDE25]">
-          SECURE OPERATOR TERMINAL • CRYPTO-HASH VERIFICATION v2.6
-        </div>
+      <footer className="relative z-10 w-full select-none text-center py-4 border-t border-white/10 text-xs font-cinzel text-slate-400">
+        MADAGASCAR CITADEL MARSHAL TERMINAL • SECURE TELEMETRY ARCHIVE
       </footer>
     </div>
   );
