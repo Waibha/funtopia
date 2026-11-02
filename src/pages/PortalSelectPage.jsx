@@ -122,7 +122,7 @@ export default function PortalSelectPage() {
               <div className="space-y-2 text-xs font-mono font-bold text-[#0D0518] mb-6 bg-[#FFFDF5] p-4 rounded-2xl border-2 border-[#0D0518]">
                 <div className="flex items-center gap-2">
                   <UserPlus className="w-4 h-4 text-[#28C76F] shrink-0" />
-                  <span>Register or access participant profile</span>
+                  <span>Competitor profile & virtual coin wallet</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-[#FFDE25] shrink-0" />

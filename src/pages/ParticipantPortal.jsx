@@ -18,7 +18,6 @@ import {
   X,
 } from 'lucide-react';
 import PublicLeaderboard from './PublicLeaderboard';
-import ParticipantRegistration from '../components/participant/ParticipantRegistration';
 import LiveTicker from '../components/LiveTicker';
 import AudioSettingsModal from '../components/AudioSettingsModal';
 import ParticipantAuthScreen from '../components/participant/ParticipantAuthScreen';
@@ -36,7 +35,7 @@ export default function ParticipantPortal({
   setSoundEnabled,
 }) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('leaderboard'); // 'leaderboard' | 'games' | 'register' | 'profile'
+  const [activeTab, setActiveTab] = useState('leaderboard'); // 'leaderboard' | 'games' | 'profile'
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
   // Authenticated participant session
@@ -56,11 +55,20 @@ export default function ParticipantPortal({
     }
   }, [navigate]);
 
-  // Synchronize session profile
+  // Synchronize session profile (fallback to session payload if participant list is refreshing)
   const loggedInParticipant = useMemo(() => {
     if (!session?.participantId) return null;
-    return (data.participants || []).find((p) => p.id === session.participantId) || null;
-  }, [session, data.participants]);
+    const found = (data.participants || []).find((p) => p.id === session.participantId);
+    if (found) return found;
+    return {
+      id: session.participantId,
+      name: session.name || 'Competitor',
+      usn: session.usn || '',
+      email: session.email || '',
+      avatar: session.avatar || '👾',
+      coins: Number(session.coins || data.settings?.startingCoins || 5),
+    };
+  }, [session, data.participants, data.settings]);
 
   const currentCoins = loggedInParticipant ? Number(loggedInParticipant.coins ?? 0) : 0;
 
@@ -229,7 +237,7 @@ export default function ParticipantPortal({
                 </div>
               </div>
 
-              {/* Navigation Tabs */}
+              {/* Navigation Tabs (Leaderboard, Games, My Profile) */}
               <nav className="hidden sm:flex items-center gap-2 bg-[#2B0E4C] p-1.5 rounded-2xl border-3 border-[#0D0518] shadow-pixel-sm">
                 <button
                   onClick={() => handleTabChange('leaderboard')}
@@ -255,90 +263,66 @@ export default function ParticipantPortal({
                   <span>GAMES ({data.games.length})</span>
                 </button>
 
-                {loggedInParticipant ? (
-                  <button
-                    onClick={() => handleTabChange('profile')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
-                      activeTab === 'profile'
-                        ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
-                        : 'text-purple-200 hover:text-white'
-                    }`}
-                  >
-                    <User className="w-3.5 h-3.5" />
-                    <span>MY PROFILE</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleTabChange('register')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
-                      activeTab === 'register'
-                        ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
-                        : 'text-purple-200 hover:text-white'
-                    }`}
-                  >
-                    <UserPlus className="w-3.5 h-3.5" />
-                    <span>SIGN IN / REGISTER</span>
-                  </button>
-                )}
+                <button
+                  onClick={() => handleTabChange('profile')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-display font-black tracking-wider transition-all ${
+                    activeTab === 'profile'
+                      ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518] shadow-pixel-sm -translate-y-0.5'
+                      : 'text-purple-200 hover:text-white'
+                  }`}
+                >
+                  <User className="w-3.5 h-3.5" />
+                  <span>MY PROFILE</span>
+                </button>
               </nav>
 
               {/* Right Side: Logged-in Participant Badge, Coins Wallet, & Audio */}
               <div className="flex items-center gap-2.5">
-                {loggedInParticipant ? (
-                  <div className="flex items-center gap-2">
-                    {/* Coin Wallet Balance */}
-                    <div
-                      title="Arcade Coins (Used to enter games)"
-                      className="hidden md:flex items-center gap-1.5 bg-[#200B3B] px-3 py-1.5 rounded-xl border-2 border-[#FFDE25] shadow-pixel-sm text-xs font-mono hover:scale-105 hover:border-[#FFF078] transition-all cursor-default"
-                    >
-                      <span className="text-sm animate-bounce-subtle">🪙</span>
-                      <div>
-                        <span className="text-[8px] text-[#FFDE25] block font-arcade font-black leading-none">COINS</span>
-                        <span className="font-black text-white text-xs">{currentCoins}</span>
-                      </div>
-                    </div>
-
-                    {/* Competition Points Score */}
-                    <div
-                      title="Tournament Points (Competition Ranking)"
-                      className="hidden lg:flex items-center gap-1.5 bg-[#200B3B] px-3 py-1.5 rounded-xl border-2 border-[#28C76F] shadow-pixel-sm text-xs font-mono hover:scale-105 hover:border-[#6EE7B7] transition-all cursor-default"
-                    >
-                      <span className="text-sm">🏆</span>
-                      <div>
-                        <span className="text-[8px] text-[#28C76F] block font-arcade font-black leading-none">POINTS</span>
-                        <span className="font-black text-[#28C76F] text-xs">{myTotalPoints} PTS</span>
-                      </div>
-                    </div>
-
-                    {/* Participant Profile Pill */}
-                    <div className="flex items-center gap-2 bg-white text-[#0D0518] px-3 py-1.5 rounded-xl border-2 border-[#0D0518] shadow-pixel-sm hover:-translate-y-0.5 hover:shadow-pixel transition-all">
-                      <span className="text-xl">{loggedInParticipant.avatar || '👾'}</span>
-                      <div className="hidden sm:block text-left font-mono">
-                        <span className="font-black text-xs block leading-tight truncate max-w-[100px]">
-                          {loggedInParticipant.name}
-                        </span>
-                        <span className="text-[9px] text-[#28C76F] font-bold flex items-center gap-0.5">
-                          <ShieldCheck className="w-2.5 h-2.5" /> {loggedInParticipant.usn || 'Verified'}
-                        </span>
-                      </div>
-                      <button
-                        onClick={handleLogout}
-                        className="text-gray-400 hover:text-red-600 hover:scale-110 p-1 rounded transition-all"
-                        title="Sign Out"
-                      >
-                        <LogOut className="w-3.5 h-3.5" />
-                      </button>
+                <div className="flex items-center gap-2">
+                  {/* Coin Wallet Balance */}
+                  <div
+                    title="Arcade Coins (Used to enter games)"
+                    className="hidden md:flex items-center gap-1.5 bg-[#200B3B] px-3 py-1.5 rounded-xl border-2 border-[#FFDE25] shadow-pixel-sm text-xs font-mono hover:scale-105 hover:border-[#FFF078] transition-all cursor-default"
+                  >
+                    <span className="text-sm animate-bounce-subtle">🪙</span>
+                    <div>
+                      <span className="text-[8px] text-[#FFDE25] block font-arcade font-black leading-none">COINS</span>
+                      <span className="font-black text-white text-xs">{currentCoins}</span>
                     </div>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => handleTabChange('register')}
-                    className="btn-pixel-yellow text-xs py-2 px-3 flex items-center gap-1.5"
+
+                  {/* Competition Points Score */}
+                  <div
+                    title="Tournament Points (Competition Ranking)"
+                    className="hidden lg:flex items-center gap-1.5 bg-[#200B3B] px-3 py-1.5 rounded-xl border-2 border-[#28C76F] shadow-pixel-sm text-xs font-mono hover:scale-105 hover:border-[#6EE7B7] transition-all cursor-default"
                   >
-                    <User className="w-3.5 h-3.5" />
-                    <span>SIGN IN / REGISTER</span>
-                  </button>
-                )}
+                    <span className="text-sm">🏆</span>
+                    <div>
+                      <span className="text-[8px] text-[#28C76F] block font-arcade font-black leading-none">POINTS</span>
+                      <span className="font-black text-[#28C76F] text-xs">{myTotalPoints} PTS</span>
+                    </div>
+                  </div>
+
+                  {/* Participant Profile Pill */}
+                  <div className="flex items-center gap-2 bg-white text-[#0D0518] px-3 py-1.5 rounded-xl border-2 border-[#0D0518] shadow-pixel-sm hover:-translate-y-0.5 hover:shadow-pixel transition-all">
+                    <span className="text-xl">{loggedInParticipant.avatar || '👾'}</span>
+                    <div className="hidden sm:block text-left font-mono">
+                      <span className="font-black text-xs block leading-tight truncate max-w-[100px]">
+                        {loggedInParticipant.name}
+                      </span>
+                      <span className="text-[9px] text-[#28C76F] font-bold flex items-center gap-0.5">
+                        <ShieldCheck className="w-2.5 h-2.5" /> {loggedInParticipant.usn || 'Verified'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="text-gray-400 hover:text-red-600 hover:scale-110 p-1 rounded transition-all"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
 
                 {/* Audio Master Modal Toggle */}
                 <button
@@ -370,12 +354,12 @@ export default function ParticipantPortal({
                 GAMES
               </button>
               <button
-                onClick={() => handleTabChange(loggedInParticipant ? 'profile' : 'register')}
+                onClick={() => handleTabChange('profile')}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-display font-black text-center ${
-                  activeTab === 'profile' || activeTab === 'register' ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518]' : 'text-purple-200'
+                  activeTab === 'profile' ? 'bg-[#FF5FA0] text-white border-2 border-[#0D0518]' : 'text-purple-200'
                 }`}
               >
-                {loggedInParticipant ? 'MY PROFILE' : 'SIGN IN'}
+                MY PROFILE
               </button>
             </div>
           </div>
@@ -392,7 +376,7 @@ export default function ParticipantPortal({
         {/* Participant Main Body */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex-grow py-6">
           {/* Active Player Profile Banner (when logged in) */}
-          {loggedInParticipant && activeTab !== 'register' && (
+          {loggedInParticipant && (
             <div className="mb-6 bg-[#32125A] rounded-2xl border-3 border-[#0D0518] p-4 shadow-pixel-sm flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-3xl border-2 border-[#0D0518] shadow-pixel-sm">
@@ -437,16 +421,7 @@ export default function ParticipantPortal({
             />
           )}
 
-          {activeTab === 'register' && !loggedInParticipant && (
-            <ParticipantRegistration
-              onRegisterParticipant={onRegisterParticipant}
-              onParticipantLogin={handleParticipantLogin}
-              startingCoins={data.settings?.startingCoins ?? 0}
-              registeredList={data.participants || []}
-            />
-          )}
-
-          {(activeTab === 'profile' || (activeTab === 'register' && loggedInParticipant)) && loggedInParticipant && (
+          {activeTab === 'profile' && loggedInParticipant && (
             <div className="max-w-2xl mx-auto space-y-6">
               <div className="bg-[#40186D] rounded-3xl border-4 border-[#0D0518] p-6 sm:p-8 shadow-pixel-xl text-white">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b-3 border-[#0D0518] pb-6">
