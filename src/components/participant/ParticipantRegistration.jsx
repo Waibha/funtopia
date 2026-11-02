@@ -95,7 +95,7 @@ export default function ParticipantRegistration({
       }
 
       soundFx.play('fanfare');
-      setSuccessMsg(`Welcome to FUNTOPIA, ${res.participant.name}!`);
+      setSuccessMsg(`Welcome to MADAGASCAR, ${res.participant.name}!`);
 
       if (onRegisterParticipant) {
         onRegisterParticipant(res.participant);

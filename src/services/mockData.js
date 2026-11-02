@@ -8,8 +8,8 @@ const STORAGE_KEY = 'funtopia_production_v2';
 
 export const INITIAL_DATA = {
   activeCompetition: {
-    id: 'funtopia-championship',
-    name: 'FUNTOPIA Championship',
+    id: 'madagascar-championship',
+    name: 'MADAGASCAR Championship',
     description: 'Official arcade competition and tournament platform.',
   },
   // Admin-controlled system settings

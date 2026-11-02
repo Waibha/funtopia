@@ -86,7 +86,7 @@ export default function ParticipantPortal({
     return Object.entries(map).map(([name, points]) => ({ name, points }));
   }, [loggedInParticipant, data.transactions, data.games]);
 
-  const competition = data.activeCompetition || { name: 'FUNTOPIA Championship' };
+  const competition = data.activeCompetition || { name: 'MADAGASCAR Championship' };
 
   const handleTabChange = (tabId) => {
     soundFx.play('switch');
@@ -217,7 +217,7 @@ export default function ParticipantPortal({
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bungee text-xl sm:text-2xl tracking-wide text-[#FFDE25] pixel-title-yellow">
-                      FUNTOPIA
+                      MADAGASCAR
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-[#28C76F] text-[#0D0518] font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm">
                       PARTICIPANT ARENA
@@ -692,7 +692,7 @@ export default function ParticipantPortal({
               <div className="flex items-center gap-2">
                 <span className="text-xl">👾</span>
                 <span className="text-[#FFDE25] font-arcade text-[10px]">
-                  FUNTOPIA INDIE GAMING PLATFORM
+                  MADAGASCAR INDIE GAMING PLATFORM
                 </span>
                 <span className="text-purple-200 text-[10px] hidden md:inline">
                   • REAL VERIFIED PARTICIPANTS

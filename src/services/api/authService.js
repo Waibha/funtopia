@@ -254,7 +254,7 @@ export async function registerParticipantWithUSN({
       success: true,
       participant,
       session,
-      message: `Registration successful! Welcome to FUNTOPIA, ${cleanName}!`,
+      message: `Registration successful! Welcome to MADAGASCAR, ${cleanName}!`,
     };
   } catch (err) {
     return {

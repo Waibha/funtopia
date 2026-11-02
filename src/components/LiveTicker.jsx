@@ -45,7 +45,7 @@ export default function LiveTicker({ activeEvent, transactions = [], participant
             {/* Event note */}
             <div className="inline-flex items-center gap-2 text-white">
               <span className="font-arcade text-[10px] text-[#FF5FA0] uppercase">
-                CIRCUIT: {activeEvent?.name || 'FUNTOPIA TOURNAMENT'}
+                CIRCUIT: {activeEvent?.name || 'MADAGASCAR TOURNAMENT'}
               </span>
               {activeEvent?.description && (
                 <span className="text-purple-200">— {activeEvent.description}</span>
