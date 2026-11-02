@@ -755,7 +755,26 @@ export const publishAuthoritativeState = async (updates = {}) => {
       updateSyncStatus({ error: err.message });
     }
 
-    // B) Realtime instant broadcast
+    // B) Persist authoritative session in system_settings for dual-laptop rehydration
+    try {
+      const slabToSave = updates.slab || getActiveSlab() || null;
+      supabase
+        .from('system_settings')
+        .upsert(
+          {
+            key: 'gw_authoritative_session',
+            value: {
+              ...dbPayload,
+              active_slab: slabToSave,
+            },
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'key' }
+        )
+        .then(() => {});
+    } catch (err) {}
+
+    // C) Realtime instant broadcast
     try {
       const channel = getSupabaseRealtimeChannel();
       if (channel) {
@@ -807,8 +826,34 @@ export const fetchAuthoritativeState = async () => {
         return sanitized;
       }
     } catch (err) {
-      console.warn('Failed querying Supabase gw_game_state, falling back to local state:', err);
+      console.warn('Failed querying Supabase gw_game_state, falling back to secondary store:', err);
     }
+
+    // Secondary lookup: system_settings key 'gw_authoritative_session'
+    try {
+      const { data: setRow } = await supabase
+        .from('system_settings')
+        .select('*')
+        .eq('key', 'gw_authoritative_session')
+        .maybeSingle();
+
+      if (setRow && setRow.value) {
+        const rowVal = setRow.value;
+        const updatedTime = Number(rowVal.updated_at || rowVal.updatedAt || 0);
+        const ageMs = Date.now() - updatedTime;
+        if (updatedTime > 0 && ageMs < 4 * 60 * 60 * 1000) {
+          const sanitized = sanitizeGameStateForProjector(rowVal);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(STORAGE_KEYS.AUTHORITATIVE_STATE, JSON.stringify(sanitized));
+            localStorage.setItem(STORAGE_KEYS.DISPLAY_STATE, JSON.stringify(sanitized));
+            if (rowVal.active_slab) {
+              localStorage.setItem(STORAGE_KEYS.ACTIVE_SLAB, JSON.stringify(rowVal.active_slab));
+            }
+          }
+          return sanitized;
+        }
+      }
+    } catch (err) {}
   }
 
   return getDisplayState();

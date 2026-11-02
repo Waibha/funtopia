@@ -614,14 +614,7 @@ export default function ParticipantPortal({
                             <span className="px-3 py-1.5 rounded-xl bg-[#28C76F] text-[#0D0518] font-arcade text-[10px] font-black border-2 border-[#0D0518]">
                               ENTERED ✓
                             </span>
-                            <button
-                              onClick={() => navigate('/guess-who')}
-                              className="btn-pixel-yellow text-xs py-3 px-5 flex items-center justify-center gap-2 font-black"
-                            >
-                              <Gamepad2 className="w-4 h-4" />
-                              <span>VIEW PROJECTOR</span>
-                              <ArrowRight className="w-4 h-4" />
-                            </button>
+                            
                           </div>
                         ) : (
                           <button

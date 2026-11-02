@@ -49,6 +49,8 @@ import {
   getSupabaseSyncStatus,
   subscribeToSyncStatus,
   clearStaleProjectorCache,
+  fetchAuthoritativeState,
+  subscribeToAuthoritativeState,
 } from '../../services/guessWhoService';
 import {
   isGwSupabaseConfigured
@@ -193,6 +195,74 @@ export default function AdminGuessWhoPage({
     setPlayersList(getRegisteredPlayers());
   }, []);
 
+  // Automatic Rehydration & Realtime Coordination across Dual Admin Laptops
+  useEffect(() => {
+    let isMounted = true;
+    async function rehydrateMatch() {
+      try {
+        const serverState = await fetchAuthoritativeState();
+        let localSlab = getActiveSlab();
+
+        if (!isMounted) return;
+
+        if (serverState && serverState.isGameActive) {
+          const slotIdx = Math.max(0, (serverState.currentSlot || 1) - 1);
+          if (localSlab) {
+            setSlab(localSlab);
+            setActivePlayer({
+              id: localSlab.playerId || 'active-player',
+              name: serverState.playerName || localSlab.playerName || 'Contender',
+            });
+          }
+          setCurrentIndex(slotIdx);
+          setCurrentScore(serverState.score || 0);
+          setRevealLevel(serverState.revealLevel || 1);
+          setIsDisplayedOnScreen(Boolean(serverState.isDisplayed));
+          setCurrentStep(serverState.isGameEnded ? 'step_result' : 'step_gameplay');
+        } else if (localSlab && localSlab.status === 'review') {
+          setSlab(localSlab);
+          setActivePlayer({ id: localSlab.playerId || 'active-player', name: localSlab.playerName });
+          setCurrentStep('step_review');
+        }
+      } catch (err) {
+        console.warn('Match rehydration notice:', err);
+      }
+    }
+
+    rehydrateMatch();
+
+    // Bi-directional live sync for dual-laptop coordination
+    const unsub = subscribeToAuthoritativeState((remoteState) => {
+      if (!isMounted || !remoteState) return;
+      if (remoteState.isGameActive) {
+        if (typeof remoteState.currentSlot === 'number') {
+          const newIdx = Math.max(0, remoteState.currentSlot - 1);
+          setCurrentIndex((prev) => (prev !== newIdx ? newIdx : prev));
+        }
+        if (typeof remoteState.score === 'number') {
+          setCurrentScore(remoteState.score);
+        }
+        if (typeof remoteState.revealLevel === 'number') {
+          setRevealLevel(remoteState.revealLevel);
+        }
+        if (remoteState.isDisplayed !== undefined) {
+          setIsDisplayedOnScreen(remoteState.isDisplayed);
+        }
+        if (remoteState.feedback !== undefined) {
+          setActiveFeedback(remoteState.feedback);
+        }
+        if (remoteState.isGameEnded) {
+          setCurrentStep('step_result');
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      unsub();
+    };
+  }, []);
+
   // Monitor Supabase Synchronization
   useEffect(() => {
     if (isSupabaseReady) {
@@ -279,6 +349,8 @@ export default function AdminGuessWhoPage({
     try {
       playArcadeSound('laser');
       const newSlab = generateAutomaticSlab(activePlayer.name);
+      newSlab.playerId = activePlayer?.id;
+      saveActiveSlab(newSlab);
       setSlab(newSlab);
       setCurrentStep('step_review');
     } catch (err) {
@@ -342,9 +414,14 @@ export default function AdminGuessWhoPage({
     setIsDisplayedOnScreen(true);
     setActiveFeedback(null);
 
-    const firstQuestion = slab.slots[0]?.question;
+    const activeSlab = { ...slab, status: 'active', playerId: activePlayer?.id || slab?.playerId };
+    saveActiveSlab(activeSlab);
+    setSlab(activeSlab);
+
+    const firstQuestion = activeSlab.slots[0]?.question;
     if (firstQuestion) {
       publishAuthoritativeState({
+        slab: activeSlab,
         playerName: activePlayer.name,
         score: 0,
         finalScore: 0,

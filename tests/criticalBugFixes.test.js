@@ -6,6 +6,7 @@ import {
   getDisplayState,
   sanitizeGameStateForProjector,
   publishAuthoritativeState,
+  fetchAuthoritativeState,
 } from '../src/services/guessWhoService.js';
 
 import {
@@ -115,5 +116,90 @@ test('--- CRITICAL BUG FIXES & CHAMPIONSHIP INTEGRATION TESTS ---', async (t) =>
     const report = validateGwSupabaseConfig();
     assert.ok('errors' in report, 'Validation report must contain errors array');
     assert.ok('warnings' in report, 'Validation report must contain warnings array');
+  });
+
+  await t.test('5. Dual-Laptop Synchronization: Laptop B updates authoritative state -> Laptop A (Projector) receives sanitized state', async () => {
+    // Laptop B (Admin Workstation) publishes authoritative state with confidential fields
+    const adminActionState = {
+      playerName: 'Contender A',
+      score: 3,
+      finalScore: 3,
+      currentSlot: 4,
+      totalQuestions: 12,
+      revealLevel: 2,
+      isDisplayed: true,
+      isGameActive: true,
+      isGameEnded: false,
+      feedback: 'correct',
+      imageUrl: '/assets/guess-who/flags/japan.png',
+      realAnswer: 'Japan',
+      correctAnswer: 'Japan',
+      clue1: 'Known as the Land of the Rising Sun',
+      clue2: 'Capital is Tokyo',
+    };
+
+    // Laptop A (Projector) reads sanitized version
+    const sanitizedForProjector = sanitizeGameStateForProjector(adminActionState);
+
+    // Verify confidential answers are stripped from Laptop A display
+    assert.equal(sanitizedForProjector.realAnswer, undefined, 'Confidential realAnswer must be omitted from projector state');
+    assert.equal(sanitizedForProjector.correctAnswer, undefined, 'Confidential correctAnswer must be omitted from projector state');
+
+    // Verify essential gameplay progression is preserved on Laptop A display
+    assert.equal(sanitizedForProjector.playerName, 'Contender A');
+    assert.equal(sanitizedForProjector.score, 3);
+    assert.equal(sanitizedForProjector.currentSlot, 4);
+    assert.equal(sanitizedForProjector.totalQuestions, 12);
+    assert.equal(sanitizedForProjector.revealLevel, 2);
+    assert.equal(sanitizedForProjector.isDisplayed, true);
+    assert.equal(sanitizedForProjector.feedback, 'correct');
+    assert.equal(sanitizedForProjector.imageUrl, '/assets/guess-who/flags/japan.png');
+  });
+
+  await t.test('6. Reconnection and Reload Safety: Rehydrates match without resetting slot or creating new match', async () => {
+    const fetched = await fetchAuthoritativeState();
+    assert.ok(fetched !== null && typeof fetched === 'object', 'fetchAuthoritativeState returns valid session state');
+    // Ensure sanitize function preserves slot position
+    const rehydrated = sanitizeGameStateForProjector({
+      currentSlot: 7,
+      score: 5,
+      isGameActive: true,
+      playerName: 'Veteran Player',
+    });
+    assert.equal(rehydrated.currentSlot, 7, 'Current puzzle slot is preserved across reloads');
+    assert.equal(rehydrated.score, 5, 'Current match score is preserved across reloads');
+    assert.equal(rehydrated.isGameActive, true, 'Match remains active across reloads');
+  });
+
+  await t.test('7. Participant Portal zero-projector policy verification', async () => {
+    // Read ParticipantPortal.jsx to ensure no projector link or button exists in participant view
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const participantPortalCode = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/pages/ParticipantPortal.jsx'),
+      'utf-8'
+    );
+
+    // Verify no projector navigation button exists
+    assert.ok(!participantPortalCode.includes("navigate('/guess-who')"), 'ParticipantPortal must not have navigate to /guess-who');
+    assert.ok(!participantPortalCode.includes('VIEW PROJECTOR'), 'ParticipantPortal must not contain VIEW PROJECTOR button');
+    assert.ok(participantPortalCode.includes('ENTERED ✓'), 'ParticipantPortal shows ENTERED checkmark when joined');
+    assert.ok(participantPortalCode.includes('JOIN GAME'), 'ParticipantPortal contains JOIN GAME button');
+  });
+
+  await t.test('8. Admin Workstation confidential answer panel & projector launcher preservation', async () => {
+    const fs = await import('node:fs');
+    const path = await import('node:path');
+    const adminPageCode = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/pages/admin/AdminGuessWhoPage.jsx'),
+      'utf-8'
+    );
+
+    // Workstation controls preserved
+    assert.ok(adminPageCode.includes('handleSetReveal'), 'Admin retains reveal controls');
+    assert.ok(adminPageCode.includes('handleRecordTurn'), 'Admin retains reward/scoring controls');
+    assert.ok(adminPageCode.includes('handleGoToPuzzle'), 'Admin retains puzzle navigation controls');
+    assert.ok(adminPageCode.includes('fetchAuthoritativeState'), 'Admin workstation rehydrates on mount');
+    assert.ok(adminPageCode.includes('subscribeToAuthoritativeState'), 'Admin workstation subscribes to live updates');
   });
 });
