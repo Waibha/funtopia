@@ -76,7 +76,7 @@ export default function AdminPortal({
     };
   }, []);
 
-  const competition = data.activeCompetition || { name: 'FUNTOPIA Tournament' };
+  const competition = data.activeCompetition || { name: 'MADAGASCAR Tournament' };
 
   const handleLoginSuccess = (session) => {
     setAdminSession(session);
@@ -152,7 +152,7 @@ export default function AdminPortal({
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bungee text-xl sm:text-2xl tracking-wide text-[#FFDE25] pixel-title-yellow">
-                      FUNTOPIA
+                      MADAGASCAR
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-[#FFDE25] text-[#0D0518] font-arcade text-[9px] font-black uppercase border-2 border-[#0D0518] shadow-pixel-sm">
                       RESTRICTED ADMIN
@@ -316,7 +316,7 @@ export default function AdminPortal({
           <div className="pixel-brick-strip py-4 px-6 text-center text-xs font-mono text-white">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
               <div className="flex items-center gap-2 font-black text-[#FFDE25]">
-                <span className="font-arcade text-xs">FUNTOPIA</span>
+                <span className="font-arcade text-xs">MADAGASCAR</span>
                 <span>•</span>
                 <span>ADMIN CONSOLE</span>
               </div>

@@ -9,12 +9,12 @@ export default function AdminParticipantsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const participants = [
-    { id: 'PLR-101', name: 'CyberNova', email: 'nova@funtopia.arcade', role: 'Contender', status: 'Active', seed: '#1', team: 'Nebula Rogues' },
-    { id: 'PLR-102', name: 'RetroVoxel', email: 'voxel@funtopia.arcade', role: 'Contender', status: 'Active', seed: '#2', team: 'Bit Shift' },
-    { id: 'PLR-103', name: 'StarGazer_X', email: 'stargazer@funtopia.arcade', role: 'Contender', status: 'Active', seed: '#3', team: 'Pulsar Squad' },
-    { id: 'PLR-104', name: 'NeonBlaster', email: 'blaster@funtopia.arcade', role: 'Contender', status: 'Pending', seed: '#4', team: 'Laser Knights' },
-    { id: 'PLR-105', name: 'PixelPhantom', email: 'phantom@funtopia.arcade', role: 'Contender', status: 'Active', seed: '#5', team: 'Shadow Ops' },
-    { id: 'PLR-106', name: 'QuantumLeap', email: 'quantum@funtopia.arcade', role: 'Judge', status: 'Active', seed: '-', team: 'Mainframe Crew' },
+    { id: 'PLR-101', name: 'CyberNova', email: 'nova@madagascar.arcade', role: 'Contender', status: 'Active', seed: '#1', team: 'Nebula Rogues' },
+    { id: 'PLR-102', name: 'RetroVoxel', email: 'voxel@madagascar.arcade', role: 'Contender', status: 'Active', seed: '#2', team: 'Bit Shift' },
+    { id: 'PLR-103', name: 'StarGazer_X', email: 'stargazer@madagascar.arcade', role: 'Contender', status: 'Active', seed: '#3', team: 'Pulsar Squad' },
+    { id: 'PLR-104', name: 'NeonBlaster', email: 'blaster@madagascar.arcade', role: 'Contender', status: 'Pending', seed: '#4', team: 'Laser Knights' },
+    { id: 'PLR-105', name: 'PixelPhantom', email: 'phantom@madagascar.arcade', role: 'Contender', status: 'Active', seed: '#5', team: 'Shadow Ops' },
+    { id: 'PLR-106', name: 'QuantumLeap', email: 'quantum@madagascar.arcade', role: 'Judge', status: 'Active', seed: '-', team: 'Mainframe Crew' },
   ];
 
   const filtered = participants.filter((p) => {

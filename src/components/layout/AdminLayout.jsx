@@ -158,7 +158,7 @@ export default function AdminLayout() {
         <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-purple-500/20 bg-cosmic-950/60 backdrop-blur-md">
           <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
             <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span>Funtopia Mainframe • Day 1 Stream</span>
+            <span>MADAGASCAR Mainframe • Day 1 Stream</span>
           </div>
 
           <div className="flex items-center gap-3">

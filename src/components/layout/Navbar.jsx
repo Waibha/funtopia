@@ -100,7 +100,7 @@ export default function Navbar() {
             </div>
             <div>
               <span className="font-retro text-lg sm:text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-300 to-cyan-300">
-                FUNTOPIA
+                MADAGASCAR
               </span>
               <span className="block text-[8px] font-retro tracking-widest text-slate-400 -mt-1 group-hover:text-cyan-300 transition-colors">
                 ARCADE CHAMPIONSHIP

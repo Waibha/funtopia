@@ -45,7 +45,7 @@ export default function HomePage() {
         </div>
 
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-retro font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-300 to-cyan-400 drop-shadow-[0_0_35px_rgba(236,72,153,0.5)] mb-6 leading-tight">
-          FUNTOPIA
+          MADAGASCAR
         </h1>
 
         <p className="max-w-2xl mx-auto text-lg sm:text-xl text-slate-300 font-sans leading-relaxed mb-8">

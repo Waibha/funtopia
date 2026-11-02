@@ -224,7 +224,7 @@ export default function GuessWhoHubPage() {
             </p>
             <div className="flex items-center justify-center gap-2 text-xs font-mono text-slate-500 pt-2">
               <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span>Listening on Funtopia Projector Feed...</span>
+              <span>Listening on MADAGASCAR Projector Feed...</span>
             </div>
           </div>
         ) : (displayState.songClueText || displayState.subtype === 'bollywood_song_guess' || displayState.revealType === 'song_clue') ? (

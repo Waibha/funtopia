@@ -1,4 +1,6 @@
-# FUNTOPIA — Indie Arcade Championship Platform & Guess Who Arena
+# MADAGASCAR — Indie Arcade Championship Platform & Guess Who Arena
+
+> **Repository Note:** The GitHub repository is named **FUNTOPIA** (`Waibha/funtopia`), while the official web application and tournament platform name is **MADAGASCAR**.
 
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-6.0.1-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -7,17 +9,17 @@
 [![Web Audio API](https://img.shields.io/badge/Web_Audio_API-8--Bit_Synth-FFDE25?logo=audio&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**FUNTOPIA** is a retro-modern tournament and interactive arcade gaming platform designed for tracking arcade game participants, virtual coin balances, live performance scores, real-time standings, and running the interactive **Guess Who?** deduction arena.
+**MADAGASCAR** is a retro-modern tournament and interactive arcade gaming platform designed for running the interactive **Guess Who?** deduction arena, managing arcade competitors and virtual coin balances, recording live match scores, and broadcasting real-time **leaderboards**.
 
-Built with React 18, Vite, Tailwind CSS, and Supabase, FUNTOPIA delivers an immersive gaming atmosphere featuring canvas-driven environmental animations, tactile 8-bit synthesizer audio, responsive live leaderboards, and dual operational domains.
+Built with React 18, Vite, Tailwind CSS, and Supabase, **MADAGASCAR** delivers an immersive gaming atmosphere featuring canvas-driven environmental animations, tactile 8-bit synthesizer audio, responsive live leaderboards, and dual operational domains.
 
 ---
 
 ## 🚀 Dual-Domain Architecture
 
-FUNTOPIA combines two complete, complementary domains:
+MADAGASCAR combines two complete, complementary domains:
 
-- **Domain 1 — Championship Tournament Platform:**
+- **Domain 1 — Championship Tournament Platform & Arcade Leaderboard:**
   - Real-time participant registration and USN-based PIN authentication.
   - Live arcade leaderboard with podium rankings, score breakdown by game, and audit logs.
   - Virtual coin economy with tournament entry fees and administrative adjustments.
@@ -81,7 +83,7 @@ FUNTOPIA combines two complete, complementary domains:
 
 ## 💻 Local Installation & Setup
 
-1. **Clone the repository:**
+1. **Clone the repository (GitHub repository name: `funtopia`):**
    ```bash
    git clone https://github.com/Waibha/funtopia.git
    cd funtopia
@@ -109,7 +111,7 @@ FUNTOPIA combines two complete, complementary domains:
 
 ## 🧪 Testing & Quality Verification
 
-FUNTOPIA includes automated testing across both platform domains:
+MADAGASCAR includes automated testing across both platform domains:
 
 ```bash
 # Run Guess Who scoring, reveal mechanics, and Supabase integration tests
@@ -126,7 +128,7 @@ node test/verify-12-coin-flow.mjs
 
 ## 🗄️ Database Schema & Backend Services
 
-FUNTOPIA utilizes PostgreSQL with Supabase RLS across two modules:
+MADAGASCAR utilizes PostgreSQL with Supabase RLS across two modules:
 
 ### Championship Module
 1. `participants`: Competitor profiles, USN unique constraint, PIN hash, and coin balances.
@@ -147,11 +149,11 @@ FUNTOPIA utilizes PostgreSQL with Supabase RLS across two modules:
 
 ## 👥 Meet the Creators
 
-FUNTOPIA is created and developed by a dedicated 2-person development team:
+MADAGASCAR is created and developed by a dedicated 2-person development team:
 
 | Creator | Role | Contribution Scope |
 | :--- | :--- | :--- |
-| **Waibha** | Lead Architect & Full-Stack Developer | Engineered the core FUNTOPIA tournament platform, including the arcade leaderboard, Admin Portal, Participant Portal, USN authentication, coin economy, and Supabase data services. |
+| **Waibha** | Lead Architect & Full-Stack Developer | Engineered the core MADAGASCAR tournament platform, including the live arcade leaderboard, Admin Portal, Participant Portal, USN authentication, coin economy, and Supabase data services. |
 | **hania** | Game Developer & Systems Engineer | Developed the interactive Guess Who? game, 211-puzzle dataset, 12-slot slab engine, scoring RPC (`gw_submit_turn`), projector display sanitization, and Supabase Realtime synchronization. |
 
 ---

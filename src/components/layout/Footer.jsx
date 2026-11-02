@@ -8,7 +8,7 @@ export default function Footer() {
       {/* Top Arcade Marquee Stripe */}
       <div className="border-b border-purple-500/20 bg-purple-950/40 py-2 overflow-hidden select-none">
         <div className="flex whitespace-nowrap animate-marquee font-retro text-[9px] text-cyan-400/80 tracking-widest gap-8">
-          <span>★ FUNTOPIA 2026 ARCADE CHAMPIONSHIP</span>
+          <span>★ MADAGASCAR 2026 ARCADE CHAMPIONSHIP</span>
           <span className="text-pink-400">♦ STAGE 1: GUESS WHO? (COORDINATOR OPERATED) ♦</span>
           <span>★ 50% GUESS WHO? MODULE BY PERSON 2</span>
           <span className="text-yellow-400">★ 50% LEADERBOARD MODULE BY PERSON 1</span>
@@ -27,7 +27,7 @@ export default function Footer() {
                 <Gamepad2 className="w-4 h-4 text-pink-400" />
               </div>
               <span className="font-retro text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-cyan-300">
-                FUNTOPIA
+                MADAGASCAR
               </span>
             </div>
             <p className="text-xs text-slate-400 font-sans leading-relaxed">
@@ -137,7 +137,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-6 border-t border-purple-500/20 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© 2026 FUNTOPIA. All rights reserved. Cosmic Retro Arcade System.</p>
+          <p>© 2026 MADAGASCAR. All rights reserved. Cosmic Retro Arcade System.</p>
           <p className="flex items-center gap-1">
             Engineered with <Heart className="w-3.5 h-3.5 text-pink-500 fill-pink-500" /> for the Championship.
           </p>
