@@ -146,7 +146,7 @@ export default function ParticipantPortal({
           soundFx.play('scoreDown');
           setJoinStatusBanner({
             type: 'error',
-            message: res.error || `Insufficient coins! Entry costs ${game.cost} coins, but your balance is ${currentCoins} coins.`,
+            message: res?.error || res?.reason || `Insufficient coins! Entry costs ${game.cost} coins, but your balance is ${currentCoins} coins.`,
           });
           setIsJoining(false);
           return;
@@ -156,6 +156,7 @@ export default function ParticipantPortal({
         soundFx.play('coin');
         triggerCelebration();
 
+        setSession((prev) => (prev ? { ...prev, coins: res.newBalance } : prev));
         setJoinedGames((prev) => ({ ...prev, [game.id]: true }));
         setJoinStatusBanner({
           type: 'success',
@@ -572,7 +573,15 @@ export default function ParticipantPortal({
                     isActive: true,
                   };
                   const gwCost = guessWhoGame.cost !== undefined ? guessWhoGame.cost : (guessWhoGame.entryFeeCoins || 5);
-                  const isGwJoined = Boolean(joinedGames[guessWhoGame.id]);
+                  const isGwJoined = Boolean(
+                    joinedGames[guessWhoGame.id] ||
+                    joinedGames['game-guess-who'] ||
+                    (loggedInParticipant && (data.coinTransactions || []).some(
+                      (tx) => (tx.participantId === loggedInParticipant.id || (loggedInParticipant.usn && tx.participantId === loggedInParticipant.usn)) &&
+                              (tx.gameId === guessWhoGame.id || tx.gameId === 'game-guess-who' || (tx.gameName || '').toLowerCase().includes('guess who')) &&
+                              tx.type === 'game_entry'
+                    ))
+                  );
                   const canAffordGw = loggedInParticipant ? currentCoins >= gwCost : false;
 
                   return (
@@ -615,25 +624,16 @@ export default function ParticipantPortal({
                             </button>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 w-full sm:w-auto">
-                            <button
-                              onClick={() => handleJoinGameClick(guessWhoGame)}
-                              disabled={isJoining || (loggedInParticipant && !canAffordGw)}
-                              className={`btn-pixel-green text-xs py-3 px-5 flex items-center justify-center gap-2 w-full sm:w-auto font-black ${
-                                loggedInParticipant && !canAffordGw ? 'opacity-50 cursor-not-allowed' : ''
-                              }`}
-                            >
-                              <Coins className="w-4 h-4" />
-                              <span>JOIN GAME ({gwCost} COINS)</span>
-                            </button>
-                            <button
-                              onClick={() => navigate('/guess-who')}
-                              className="btn-pixel-white text-xs py-3 px-4 flex items-center justify-center gap-1.5 font-bold"
-                              title="Open audience display"
-                            >
-                              <span>PROJECTOR</span>
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => handleJoinGameClick(guessWhoGame)}
+                            disabled={isJoining || (loggedInParticipant && !canAffordGw)}
+                            className={`btn-pixel-green text-xs py-3 px-5 flex items-center justify-center gap-2 w-full sm:w-auto font-black ${
+                              loggedInParticipant && !canAffordGw ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                          >
+                            <Coins className="w-4 h-4" />
+                            <span>JOIN GAME ({gwCost} COINS)</span>
+                          </button>
                         )}
                       </div>
                     </div>

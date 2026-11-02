@@ -560,7 +560,11 @@ const getLiveChannel = () => {
 const getSupabaseRealtimeChannel = () => {
   if (!isSupabaseConfigured() || !supabase) return null;
   if (!activeRealtimeChannel) {
-    activeRealtimeChannel = supabase.channel('gw_game_state_sync');
+    activeRealtimeChannel = supabase.channel('gw_game_state_sync', {
+      config: {
+        broadcast: { ack: false, self: true },
+      },
+    });
     if (typeof activeRealtimeChannel.subscribe === 'function') {
       activeRealtimeChannel.subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -636,10 +640,34 @@ export const sanitizeGameStateForProjector = (data) => {
   };
 };
 
+export const clearStaleProjectorCache = () => {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.DISPLAY_STATE);
+      localStorage.removeItem(STORAGE_KEYS.AUTHORITATIVE_STATE);
+      localStorage.removeItem(STORAGE_KEYS.ACTIVE_SLAB);
+      localStorage.removeItem('funtopia_guess_who_state');
+    } catch (e) {}
+  }
+  const clean = sanitizeGameStateForProjector(null);
+  localStateSubscribers.forEach((fn) => {
+    try { fn(clean); } catch (e) {}
+  });
+  return clean;
+};
+
 export const getDisplayState = () => {
   try {
     const raw = getStoredValue(STORAGE_KEYS.AUTHORITATIVE_STATE) || getStoredValue(STORAGE_KEYS.DISPLAY_STATE);
-    if (raw) return sanitizeGameStateForProjector(JSON.parse(raw));
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const updatedTime = Number(parsed.updatedAt || parsed.updated_at || 0);
+      const ageMs = Date.now() - updatedTime;
+      if (updatedTime > 0 && ageMs > 3 * 60 * 60 * 1000) {
+        return sanitizeGameStateForProjector(null);
+      }
+      return sanitizeGameStateForProjector(parsed);
+    }
   } catch (err) {
     console.error('Failed reading display state:', err);
   }
@@ -760,6 +788,17 @@ export const fetchAuthoritativeState = async () => {
         .maybeSingle();
 
       if (!error && data) {
+        const updatedTime = Number(data.updated_at || data.updatedAt || 0);
+        const ageMs = Date.now() - updatedTime;
+        if (updatedTime > 0 && ageMs > 3 * 60 * 60 * 1000) {
+          const clean = sanitizeGameStateForProjector(null);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(STORAGE_KEYS.AUTHORITATIVE_STATE, JSON.stringify(clean));
+            localStorage.setItem(STORAGE_KEYS.DISPLAY_STATE, JSON.stringify(clean));
+          }
+          return clean;
+        }
+
         const sanitized = sanitizeGameStateForProjector(data);
         if (typeof window !== 'undefined') {
           localStorage.setItem(STORAGE_KEYS.AUTHORITATIVE_STATE, JSON.stringify(sanitized));
@@ -832,7 +871,11 @@ export const subscribeToAuthoritativeState = (callback) => {
   // 4. Supabase Realtime subscription
   let realtimeChannel = null;
   if (isSupabaseConfigured() && supabase) {
-    realtimeChannel = supabase.channel('gw_game_state_sync');
+    realtimeChannel = supabase.channel('gw_game_state_sync', {
+      config: {
+        broadcast: { ack: false, self: true },
+      },
+    });
 
     realtimeChannel
       // Instant broadcast
@@ -940,6 +983,17 @@ export const submitAuthoritativeTurn = async ({
 
       if (data) {
         updateSyncStatus({ lastSyncTime: Date.now(), error: null });
+        const updatedTime = Number(data.updated_at || data.updatedAt || 0);
+        const ageMs = Date.now() - updatedTime;
+        if (updatedTime > 0 && ageMs > 3 * 60 * 60 * 1000) {
+          const clean = sanitizeGameStateForProjector(null);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(STORAGE_KEYS.AUTHORITATIVE_STATE, JSON.stringify(clean));
+            localStorage.setItem(STORAGE_KEYS.DISPLAY_STATE, JSON.stringify(clean));
+          }
+          return clean;
+        }
+
         const sanitized = sanitizeGameStateForProjector(data);
         setStoredValue(STORAGE_KEYS.DISPLAY_STATE, JSON.stringify(sanitized));
         setStoredValue(STORAGE_KEYS.AUTHORITATIVE_STATE, JSON.stringify(sanitized));

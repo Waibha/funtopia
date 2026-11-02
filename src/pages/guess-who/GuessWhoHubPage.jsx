@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Maximize2, Minimize2, Radio, Trophy, Award, Sparkles, Heart } from 'lucide-react';
+import { Maximize2, Minimize2, Radio, Trophy, Award, Sparkles, Heart, RotateCcw } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 import CosmicBackground from '../../components/ui/CosmicBackground';
-import { getDisplayState, subscribeToProjector } from '../../services/guessWhoService';
+import { getDisplayState, subscribeToProjector, clearStaleProjectorCache } from '../../services/guessWhoService';
 import { playArcadeSound } from '../../utilities/sound';
 import GuessWhoRevealDisplay from './GuessWhoRevealDisplay';
 import BollywoodSongClueDisplay from '../../components/guess-who/BollywoodSongClueDisplay';
@@ -96,6 +96,19 @@ export default function GuessWhoHubPage() {
           </div>
         </div>
 
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              playArcadeSound('blip');
+              const clean = clearStaleProjectorCache();
+              setDisplayState(clean);
+            }}
+            className="p-1.5 rounded-lg bg-purple-950/50 hover:bg-purple-900/50 text-slate-400 hover:text-white border border-purple-500/30 transition-colors flex items-center gap-1.5 text-xs font-mono"
+            title="Force Reset Local Cache & Re-sync with Server"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden sm:inline text-[10px]">SYNC</span>
+          </button>
         {/* Projector Fullscreen Toggle */}
         <button
           onClick={toggleFullscreen}
@@ -104,6 +117,7 @@ export default function GuessWhoHubPage() {
         >
           {isFullscreen ? <Minimize2 className="w-4 h-4 text-cyan-400" /> : <Maximize2 className="w-4 h-4" />}
         </button>
+        </div>
       </div>
 
       {/* Main Presentation Viewport */}

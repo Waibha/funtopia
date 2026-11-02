@@ -25,8 +25,8 @@ const metaEnv = (typeof import.meta !== 'undefined' && import.meta.env)
   ? import.meta.env
   : (typeof process !== 'undefined' && process.env ? process.env : {});
 
-const gwSupabaseUrl = metaEnv.VITE_GW_SUPABASE_URL || '';
-const gwSupabaseAnonKey = metaEnv.VITE_GW_SUPABASE_ANON_KEY || '';
+const gwSupabaseUrl = metaEnv.VITE_GW_SUPABASE_URL || metaEnv.VITE_SUPABASE_URL || '';
+const gwSupabaseAnonKey = metaEnv.VITE_GW_SUPABASE_ANON_KEY || metaEnv.VITE_SUPABASE_ANON_KEY || '';
 
 /**
  * Validates the Guess Who Supabase environment variable configuration.

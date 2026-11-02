@@ -44,7 +44,21 @@ export default function App() {
         setData((prev) => ({
           ...prev,
           participants: remote.participants,
-          games: remote.games.length > 0 ? remote.games : prev.games,
+          games: (() => {
+            const list = remote.games.length > 0 ? remote.games : prev.games;
+            const hasGw = (list || []).some((g) => g.id === 'game-guess-who' || (g.name || '').toLowerCase().includes('guess who'));
+            if (!hasGw) {
+              const defaultGw = prev.games?.find((g) => g.id === 'game-guess-who' || (g.name || '').toLowerCase().includes('guess who')) || {
+                id: 'game-guess-who',
+                name: 'Guess Who?',
+                cost: 5,
+                defaultPoints: 7,
+                isActive: true,
+              };
+              return [defaultGw, ...(list || [])];
+            }
+            return list;
+          })(),
           transactions: remote.transactions,
           coinTransactions: remote.coinTransactions,
           settings: remote.settings || prev.settings,
@@ -147,12 +161,12 @@ export default function App() {
 
       const newBalance = Math.max(0, Number(participant.coins || 0) + delta);
       const updatedParticipants = prev.participants.map((p) =>
-        p.id === participantId ? { ...p, coins: newBalance } : p
+        p.id === participant.id ? { ...p, coins: newBalance } : p
       );
 
       const coinTx = {
         id: `ctx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        participantId,
+        participantId: participant.id,
         participantName: participant.name,
         amountDelta: delta,
         newBalance,
@@ -175,11 +189,26 @@ export default function App() {
 
   // Game Entry Handler (Deducts entry cost coins from participant)
   const handleJoinGame = ({ participantId, gameId }) => {
-    const participant = (data.participants || []).find((p) => p.id === participantId);
-    const game = (data.games || []).find((g) => g.id === gameId);
+    const cleanId = String(participantId || '').trim();
+    const participant = (data.participants || []).find(
+      (p) => p.id === cleanId || (p.usn && p.usn.trim().toUpperCase() === cleanId.toUpperCase())
+    );
+    let game = (data.games || []).find((g) => g.id === gameId);
+    if (!game && (gameId === 'game-guess-who' || (typeof gameId === 'string' && gameId.toLowerCase().includes('guess')))) {
+      game = (data.games || []).find((g) => (g.name || '').toLowerCase().includes('guess who')) || {
+        id: 'game-guess-who',
+        name: 'Guess Who?',
+        cost: 5,
+        defaultPoints: 7,
+        isActive: true,
+      };
+    }
 
     if (!participant || !game) {
-      return { success: false, reason: 'Participant or Game not found.' };
+      const reason = !participant
+        ? 'Participant profile not found. Please log in or re-register.'
+        : 'Game not found.';
+      return { success: false, reason, error: reason };
     }
 
     const currentCoins = Number(participant.coins || 0);
@@ -189,6 +218,7 @@ export default function App() {
       return {
         success: false,
         reason: `Insufficient coins. Required: ${entryCost}, Available: ${currentCoins}.`,
+        error: `Insufficient coins. Required: ${entryCost}, Available: ${currentCoins}.`,
       };
     }
 
@@ -196,7 +226,7 @@ export default function App() {
 
     const coinTx = {
       id: `ctx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      participantId,
+      participantId: participant.id,
       participantName: participant.name,
       gameId: game.id,
       gameName: game.name,
@@ -214,7 +244,7 @@ export default function App() {
     setData((prev) => ({
       ...prev,
       participants: prev.participants.map((p) =>
-        p.id === participantId ? { ...p, coins: newBalance } : p
+        p.id === participant.id ? { ...p, coins: newBalance } : p
       ),
       coinTransactions: [coinTx, ...(prev.coinTransactions || [])],
     }));

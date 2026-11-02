@@ -47,7 +47,8 @@ import {
   archiveCompletedRun,
   getRunHistory,
   getSupabaseSyncStatus,
-  subscribeToSyncStatus
+  subscribeToSyncStatus,
+  clearStaleProjectorCache,
 } from '../../services/guessWhoService';
 import {
   isGwSupabaseConfigured
@@ -634,6 +635,7 @@ export default function AdminGuessWhoPage({
   // Reset to Step 1 for next player
   const handleResetForNextPlayer = () => {
     playArcadeSound('blip');
+    clearStaleProjectorCache();
     setPlayerNameInput('');
     setSelectedParticipantId('');
     setActivePlayer(null);
@@ -701,7 +703,18 @@ export default function AdminGuessWhoPage({
             size="sm"
             onClick={() => setIsAddModalOpen(true)}
           >
-            <Plus className="w-3.5 h-3.5 mr-1" /> Add Puzzle to Library
+            <Plus className="w-3.5 h-3.5 mr-1" /> Add Puzzle
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              clearStaleProjectorCache();
+              handleResetForNextPlayer();
+            }}
+            title="Force reset projector and local cache to standby across devices"
+          >
+            <RotateCcw className="w-3.5 h-3.5 mr-1 text-purple-400" /> Reset Standby
           </Button>
 
           <a
