@@ -168,7 +168,7 @@ export default function ScoringManagement({
 
     const tx = {
       id: `tx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      competitionId: data.activeCompetition?.id || 'funtopia-championship',
+      competitionId: data.activeCompetition?.id || 'madagascar-championship',
       participantId: selectedParticipant.id,
       gameId: selectedGame.id,
       pointsDelta: finalDelta,

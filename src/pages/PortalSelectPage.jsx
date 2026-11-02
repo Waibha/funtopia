@@ -202,14 +202,14 @@ export default function PortalSelectPage() {
                 </div>
 
                 <p className="text-purple-200 font-sans text-xs sm:text-sm font-medium mb-5 leading-relaxed">
-                  Restricted to event organisers and authorized administrators. Full operational control over events, games, participants, and scoring transactions.
+                  Restricted to event organisers and authorized administrators. Full operational control over games, participants, and scoring transactions.
                 </p>
 
                 {/* Functional Highlights */}
                 <div className="space-y-2 text-xs font-mono font-bold text-purple-100 mb-6 bg-[#160626] p-4 rounded-2xl border-2 border-[#0D0518]">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-[#FFDE25] shrink-0" />
-                    <span>Manage events (create, edit, activate)</span>
+                    <span>Manage games, coin entry costs & active status</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Gamepad2 className="w-4 h-4 text-[#00F0FF] shrink-0" />
