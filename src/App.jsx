@@ -45,10 +45,10 @@ export default function App() {
       if (remote) {
         setData((prev) => ({
           ...prev,
-          participants: remote.participants.length > 0 ? remote.participants : prev.participants,
+          participants: remote.participants,
           games: remote.games.length > 0 ? remote.games : prev.games,
-          transactions: remote.transactions.length > 0 ? remote.transactions : prev.transactions,
-          coinTransactions: remote.coinTransactions.length > 0 ? remote.coinTransactions : prev.coinTransactions,
+          transactions: remote.transactions,
+          coinTransactions: remote.coinTransactions,
           settings: remote.settings || prev.settings,
         }));
       }
@@ -185,7 +185,7 @@ export default function App() {
     }
 
     const currentCoins = Number(participant.coins || 0);
-    const entryCost = Math.max(0, Number(game.entryFeeCoins || 0));
+    const entryCost = Math.max(0, Number(game.cost !== undefined ? game.cost : (game.entryFeeCoins || 0)));
 
     if (currentCoins < entryCost) {
       return {
