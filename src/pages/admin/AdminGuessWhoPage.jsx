@@ -50,12 +50,13 @@ import {
   subscribeToSyncStatus
 } from '../../services/guessWhoService';
 import { 
-  isSupabaseConfigured,
+  isGwSupabaseConfigured,
   signInCoordinator,
   signOutCoordinator,
   getCoordinatorSession,
-  onCoordinatorAuthStateChange
-} from '../../services/supabaseClient';
+  onCoordinatorAuthStateChange,
+  verifyCoordinatorRole
+} from '../../services/guessWhoSupabaseClient';
 import { APPROVED_CATEGORIES } from '../../data/guessWhoSeedDecks';
 import { playArcadeSound } from '../../utilities/sound';
 
@@ -70,7 +71,7 @@ export default function AdminGuessWhoPage() {
   const [currentStep, setCurrentStep] = useState('step_player');
 
   // Supabase Auth & Synchronization Telemetry
-  const isSupabaseReady = isSupabaseConfigured();
+  const isSupabaseReady = isGwSupabaseConfigured();
   const [coordinatorUser, setCoordinatorUser] = useState(null);
   const [syncTelemetry, setSyncTelemetry] = useState(getSupabaseSyncStatus());
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -111,11 +112,27 @@ export default function AdminGuessWhoPage() {
   // Monitor Coordinator Authentication & Supabase Synchronization
   useEffect(() => {
     if (isSupabaseReady) {
-      getCoordinatorSession().then(({ user }) => {
-        setCoordinatorUser(user);
+      getCoordinatorSession().then(async ({ user }) => {
+        if (user) {
+          const isAuthorized = await verifyCoordinatorRole(user);
+          if (isAuthorized) {
+            setCoordinatorUser(user);
+          } else {
+            await signOutCoordinator();
+            setCoordinatorUser(null);
+          }
+        } else {
+          setCoordinatorUser(null);
+        }
       });
-      const authSub = onCoordinatorAuthStateChange((event, session) => {
-        setCoordinatorUser(session?.user || null);
+      const authSub = onCoordinatorAuthStateChange(async (event, session) => {
+        const user = session?.user || null;
+        if (user) {
+          const isAuthorized = await verifyCoordinatorRole(user);
+          setCoordinatorUser(isAuthorized ? user : null);
+        } else {
+          setCoordinatorUser(null);
+        }
       });
       const syncSub = subscribeToSyncStatus((status) => {
         setSyncTelemetry(status);
@@ -139,8 +156,14 @@ export default function AdminGuessWhoPage() {
       const { data, error } = await signInCoordinator({ email: loginEmail.trim(), password: loginPassword });
       if (error) {
         setLoginError(error.message);
-      } else {
-        setCoordinatorUser(data?.user || null);
+      } else if (data?.user) {
+        const isAuthorized = await verifyCoordinatorRole(data.user);
+        if (!isAuthorized) {
+          await signOutCoordinator();
+          setLoginError('Access denied: Account is authenticated, but not registered in the Guess Who coordinator registry.');
+          return;
+        }
+        setCoordinatorUser(data.user);
         setIsLoginModalOpen(false);
         setLoginEmail('');
         setLoginPassword('');

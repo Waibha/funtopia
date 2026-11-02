@@ -96,7 +96,9 @@ FUNTOPIA combines two complete, complementary domains:
    ```bash
    cp .env.example .env
    ```
-   Add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+   Configure both independent Supabase projects in `.env`:
+   - **Main Championship Platform:** `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+   - **Dedicated Guess Who Arcade:** `VITE_GW_SUPABASE_URL` and `VITE_GW_SUPABASE_ANON_KEY`
 
 4. **Launch development server:**
    ```bash
