@@ -1,0 +1,222 @@
+[
+  {
+    "id": "lang-01",
+    "language": "French",
+    "greeting": "Bonjour",
+    "filename": "lang_01_french.png",
+    "font": "Segoe UI",
+    "r": 37, "g": 99, "b": 235,
+    "clue": "Romance language spoken in France, Canada, Switzerland, Belgium, and across parts of Africa.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-02",
+    "language": "Spanish",
+    "greeting": "Hola",
+    "filename": "lang_02_spanish.png",
+    "font": "Segoe UI",
+    "r": 234, "g": 88, "b": 12,
+    "clue": "Romance language spoken across Spain and most of Latin America.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-03",
+    "language": "Italian",
+    "greeting": "Ciao",
+    "filename": "lang_03_italian.png",
+    "font": "Segoe UI",
+    "r": 5, "g": 150, "b": 105,
+    "clue": "Romance language spoken in Italy, Switzerland, and San Marino.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-04",
+    "language": "Portuguese",
+    "greeting": "Olá",
+    "filename": "lang_04_portuguese.png",
+    "font": "Segoe UI",
+    "r": 22, "g": 163, "b": 74,
+    "clue": "Romance language spoken in Portugal, Brazil, Angola, and Mozambique.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-05",
+    "language": "Turkish",
+    "greeting": "Merhaba",
+    "filename": "lang_05_turkish.png",
+    "font": "Segoe UI",
+    "r": 220, "g": 38, "b": 38,
+    "clue": "Turkic language spoken primarily in Turkey, Northern Cyprus, and the diaspora.",
+    "difficulty": "Medium",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-06",
+    "language": "German",
+    "greeting": "Hallo",
+    "filename": "lang_06_german.png",
+    "font": "Segoe UI",
+    "r": 217, "g": 119, "b": 6,
+    "clue": "Germanic language spoken in Germany, Austria, Switzerland, and Liechtenstein.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-07",
+    "language": "Tamil",
+    "greeting": "வணக்கம்",
+    "filename": "lang_07_tamil.png",
+    "font": "Nirmala UI",
+    "r": 225, "g": 29, "b": 72,
+    "clue": "Classical Dravidian language spoken in Tamil Nadu (India), Sri Lanka, and Singapore.",
+    "difficulty": "Medium",
+    "script": "Tamil"
+  },
+  {
+    "id": "lang-08",
+    "language": "Malayalam",
+    "greeting": "നമസ്കാരം",
+    "filename": "lang_08_malayalam.png",
+    "font": "Nirmala UI",
+    "r": 147, "g": 51, "b": 234,
+    "clue": "Classical Dravidian language spoken primarily in Kerala and Lakshadweep, India.",
+    "difficulty": "Medium",
+    "script": "Malayalam"
+  },
+  {
+    "id": "lang-09",
+    "language": "Pashto",
+    "greeting": "سلام",
+    "filename": "lang_09_pashto.png",
+    "font": "Segoe UI",
+    "r": 2, "g": 132, "b": 199,
+    "clue": "Eastern Iranian language spoken by the Pashtun people of Afghanistan and Pakistan.",
+    "difficulty": "Medium",
+    "script": "Perso-Arabic (Pashto)"
+  },
+  {
+    "id": "lang-10",
+    "language": "Russian",
+    "greeting": "Привет",
+    "filename": "lang_10_russian.png",
+    "font": "Segoe UI",
+    "r": 79, "g": 70, "b": 229,
+    "clue": "East Slavic language spoken across Russia, Belarus, Kazakhstan, and Kyrgyzstan.",
+    "difficulty": "Easy",
+    "script": "Cyrillic"
+  },
+  {
+    "id": "lang-11",
+    "language": "Arabic",
+    "greeting": "مرحبا",
+    "filename": "lang_11_arabic.png",
+    "font": "Segoe UI",
+    "r": 13, "g": 148, "b": 136,
+    "clue": "Semitic language spoken across the Arab world in the Middle East and North Africa.",
+    "difficulty": "Easy",
+    "script": "Arabic"
+  },
+  {
+    "id": "lang-12",
+    "language": "Hebrew",
+    "greeting": "שלום",
+    "filename": "lang_12_hebrew.png",
+    "font": "Segoe UI",
+    "r": 202, "g": 138, "b": 4,
+    "clue": "Northwest Semitic language indigenous to Israel and revitalized as a modern spoken tongue.",
+    "difficulty": "Easy",
+    "script": "Hebrew"
+  },
+  {
+    "id": "lang-13",
+    "language": "Korean",
+    "greeting": "안녕하세요",
+    "filename": "lang_13_korean.png",
+    "font": "Malgun Gothic",
+    "r": 219, "g": 39, "b": 119,
+    "clue": "Koreanic language spoken in South Korea and North Korea, written in Hangul.",
+    "difficulty": "Easy",
+    "script": "Hangul"
+  },
+  {
+    "id": "lang-14",
+    "language": "Chinese (Simplified)",
+    "greeting": "你好",
+    "filename": "lang_14_chinese.png",
+    "font": "Microsoft YaHei",
+    "r": 190, "g": 18, "b": 60,
+    "clue": "Sinitic language spoken in Mainland China, Singapore, and across the Chinese diaspora.",
+    "difficulty": "Easy",
+    "script": "Simplified Hanzi"
+  },
+  {
+    "id": "lang-15",
+    "language": "Japanese",
+    "greeting": "こんにちは",
+    "filename": "lang_15_japanese.png",
+    "font": "Yu Gothic",
+    "r": 192, "g": 38, "b": 211,
+    "clue": "Japonic language spoken in Japan, written using Kanji, Hiragana, and Katakana.",
+    "difficulty": "Easy",
+    "script": "Hiragana"
+  },
+  {
+    "id": "lang-16",
+    "language": "Thai",
+    "greeting": "สวัสดี",
+    "filename": "lang_16_thai.png",
+    "font": "Leelawadee UI",
+    "r": 8, "g": 145, "b": 178,
+    "clue": "Kra-Dai language spoken in Thailand, written in the Thai script.",
+    "difficulty": "Medium",
+    "script": "Thai"
+  },
+  {
+    "id": "lang-17",
+    "language": "Dutch",
+    "greeting": "Hallo",
+    "filename": "lang_17_dutch.png",
+    "font": "Segoe UI",
+    "r": 249, "g": 115, "b": 22,
+    "clue": "West Germanic language spoken in the Netherlands, Belgium (Flanders), and Suriname.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-18",
+    "language": "Swedish",
+    "greeting": "Hej",
+    "filename": "lang_18_swedish.png",
+    "font": "Segoe UI",
+    "r": 59, "g": 130, "b": 246,
+    "clue": "North Germanic language spoken in Sweden and parts of Finland.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-19",
+    "language": "Polish",
+    "greeting": "Cześć",
+    "filename": "lang_19_polish.png",
+    "font": "Segoe UI",
+    "r": 159, "g": 18, "b": 57,
+    "clue": "West Slavic language spoken in Poland and by Polish communities worldwide.",
+    "difficulty": "Medium",
+    "script": "Latin"
+  },
+  {
+    "id": "lang-20",
+    "language": "Vietnamese",
+    "greeting": "Xin chào",
+    "filename": "lang_20_vietnamese.png",
+    "font": "Segoe UI",
+    "r": 16, "g": 185, "b": 129,
+    "clue": "Austroasiatic tonal language spoken in Vietnam, written in Latin script with tone diacritics.",
+    "difficulty": "Easy",
+    "script": "Latin"
+  }
+]
