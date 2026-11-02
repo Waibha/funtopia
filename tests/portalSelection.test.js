@@ -91,7 +91,7 @@ test('--- PORTAL SELECTION: GUESS WHO & CORE PORTALS INTEGRITY ---', async (t) =
     );
     assert.match(
       content,
-      /FUNTOPIA/,
+      /MADAGASCAR|FUNTOPIA/,
       'Must maintain FUNTOPIA branding in footer or header'
     );
   });

@@ -63,7 +63,7 @@ export default function MeetCreatorsPage() {
             MEET THE CREATORS
           </h1>
           <p className="text-purple-200 font-mono text-xs sm:text-sm mt-2 max-w-xl mx-auto">
-            The two contributors who built the <strong className="text-[#FFDE25]">FUNTOPIA</strong> indie arcade championship platform.
+            The two contributors who built the <strong className="text-[#FFDE25]">MADAGASCAR</strong> indie arcade championship platform.
           </p>
         </div>
 
@@ -109,7 +109,7 @@ export default function MeetCreatorsPage() {
               </div>
 
               <p className="font-sans text-xs sm:text-sm text-[#2A1640] leading-relaxed mb-6 font-medium bg-[#FFFDF7] p-4 rounded-2xl border-2 border-[#0D0518]">
-                Engineered the core FUNTOPIA tournament platform, including the arcade leaderboard, Admin Portal, Participant Portal, USN-based authentication, virtual coin system and Supabase integration.
+                Engineered the core MADAGASCAR tournament platform, including the arcade leaderboard, Admin Portal, Participant Portal, USN-based authentication, virtual coin system and Supabase integration.
               </p>
             </div>
 
@@ -217,7 +217,7 @@ export default function MeetCreatorsPage() {
       <footer className="relative z-10 w-full mt-8">
         <div className="pixel-grass-strip h-3 w-full" />
         <div className="pixel-brick-strip py-3.5 px-6 text-center text-xs font-arcade text-[#FFDE25]">
-          FUNTOPIA INDIE ARCADE • MEET THE CREATORS
+          MADAGASCAR INDIE ARCADE • MEET THE CREATORS
         </div>
       </footer>
     </div>

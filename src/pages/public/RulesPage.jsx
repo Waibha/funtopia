@@ -45,7 +45,7 @@ export default function RulesPage() {
           ARCADE RULEBOOK
         </h1>
         <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto">
-          Tournament guidelines, deduction mechanics, and scoring criteria for the Funtopia Championship.
+          Tournament guidelines, deduction mechanics, and scoring criteria for the MADAGASCAR Championship.
         </p>
       </div>
 

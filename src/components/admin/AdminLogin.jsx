@@ -19,7 +19,7 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
     try {
       const res = await verifyAdminPasskey({
         passkey,
-        operatorEmail: operatorEmail.trim() || 'operator@funtopia.arcade',
+        operatorEmail: operatorEmail.trim() || 'operator@madagascar.arcade',
       });
 
       if (res.success && res.session) {
@@ -123,7 +123,7 @@ export default function AdminLogin({ onLoginSuccess, onReturnToPortals }) {
                   type="text"
                   value={operatorEmail}
                   onChange={(e) => setOperatorEmail(e.target.value)}
-                  placeholder="operator@funtopia.arcade"
+                  placeholder="operator@madagascar.arcade"
                   autoCapitalize="none"
                   autoCorrect="off"
                   spellCheck="false"
